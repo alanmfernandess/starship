@@ -1,413 +1,1366 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AeroCalc - Take-Off Power Calculator</title>
-    
-    <!-- Tailwind CSS (via CDN) -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Ícones Lucide (via CDN) -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-
+    <title>Starship AeroCalc - Take-Off Performance</title>
     <style>
-        /* Esconder as setinhas nos inputs de número */
-        input[type="number"]::-webkit-inner-spin-button,
-        input[type="number"]::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
+        /* Modern, lightweight CSS reset and base styles */
+        :root {
+            --primary: #0f172a;
+            --primary-light: #1e293b;
+            --accent: #0284c7;
+            --bg-body: #f1f5f9;
+            --bg-card: #ffffff;
+            --text-main: #334155;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --error-bg: #fef2f2;
+            --error-text: #ef4444;
+            --error-border: #fecaca;
+            --success-bg: #f0fdf4;
+            --success-border: #bbf7d0;
+            --warning-bg: #fffbeb;
+            --warning-text: #d97706;
+            --warning-border: #fde68a;
         }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            width: 100%;
+            max-width: 480px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05), 0 4px 10px rgba(0, 0, 0, 0.02);
+            overflow: hidden;
+        }
+
+        .header {
+            background-color: var(--primary);
+            color: #ffffff;
+            padding: 24px;
+            text-align: center;
+            border-bottom: 4px solid var(--accent);
+        }
+
+        .header h1 {
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .header p {
+            font-size: 13px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 500;
+        }
+
+        .content {
+            padding: 24px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .form-group {
+            flex: 1;
+            margin-bottom: 18px;
+        }
+
+        .form-row .form-group {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-main);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
         input[type="number"] {
-            -moz-appearance: textfield;
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--primary);
+            transition: all 0.2s ease;
+            outline: none;
+            background-color: #f8fafc;
+        }
+
+        input[type="number"]:focus {
+            border-color: var(--accent);
+            background-color: #fff;
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+        }
+
+        .unit {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 600;
+            pointer-events: none;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        .radio-label {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            font-weight: 600;
+            background-color: #f8fafc;
+            color: var(--text-muted);
+        }
+
+        .radio-label input {
+            display: none;
+        }
+
+        .radio-label:has(input:checked) {
+            background-color: var(--accent);
+            color: #ffffff;
+            border-color: var(--accent);
+            box-shadow: 0 4px 10px rgba(2, 132, 199, 0.2);
+        }
+
+        .results-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .result-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--text-muted);
+            transition: all 0.3s;
+        }
+
+        .result-container.active {
+            border-color: var(--success-border);
+            background: var(--success-bg);
+            border-left-color: #10b981;
+        }
+
+        .result-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .result-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .result-desc {
+            font-size: 11px;
+            color: #94a3b8;
+        }
+
+        .result-value {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text-muted);
+            letter-spacing: -0.5px;
+            text-align: right;
+            transition: color 0.3s;
+        }
+
+        .result-container.active .result-value {
+            color: var(--primary);
+        }
+
+        .limit-badge {
+            display: inline-block;
+            font-size: 10px;
+            background: var(--accent);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 8px;
+            vertical-align: middle;
+            display: none;
+        }
+
+        .error-msg {
+            display: none;
+            color: var(--error-text);
+            font-size: 13px;
+            margin-top: 16px;
+            text-align: center;
+            background: var(--error-bg);
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--error-border);
+            font-weight: 500;
+            line-height: 1.4;
+        }
+
+        /* Speeds Panel Specifics */
+        .v-speeds-box {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .speeds-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            width: 100%;
+            margin-top: 12px;
+        }
+
+        .speed-item {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 8px;
+            text-align: center;
+        }
+
+        .speed-item span {
+            display: block;
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .speed-item strong {
+            display: block;
+            font-size: 18px;
+            color: var(--primary);
+        }
+
+        .tofl-item {
+            grid-column: span 4;
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .tofl-item span { color: #cbd5e1; }
+        .tofl-item strong { color: #ffffff; font-size: 20px; }
+
+        .warning-msg {
+            display: none;
+            color: var(--warning-text);
+            font-size: 12px;
+            margin-top: 12px;
+            padding: 10px;
+            background: var(--warning-bg);
+            border: 1px solid var(--warning-border);
+            border-radius: 6px;
+            font-weight: 500;
+            width: 100%;
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans selection:bg-blue-200 overflow-x-hidden">
+<body>
 
-    <!-- NAVBAR -->
-    <nav class="fixed top-0 w-full bg-white/80 backdrop-blur-md z-50 border-b border-slate-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <div class="flex items-center gap-2">
-                    <i data-lucide="plane-takeoff" class="w-6 h-6 text-blue-600"></i>
-                    <span class="font-bold text-lg tracking-tight text-slate-900">AeroCalc<span class="text-blue-600">.</span></span>
-                </div>
-                <div class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
-                    <a href="#features" class="hover:text-blue-600 transition-colors">Features</a>
-                    <a href="#calculator" class="bg-blue-600 text-white px-5 py-2 rounded-full hover:bg-blue-700 transition-colors shadow-sm">
-                        Launch Calculator
-                    </a>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <!-- HERO SECTION -->
-    <section class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
-        <div class="absolute inset-0 bg-gradient-to-b from-blue-50 to-slate-50 z-0"></div>
-        <div class="absolute top-20 right-0 opacity-5 z-0 transform translate-x-1/3">
-            <i data-lucide="wind" class="w-96 h-96 text-blue-900"></i>
+    <div class="card">
+        <div class="header">
+            <h1>AeroCalc</h1>
+            <p>Take-Off Performance</p>
         </div>
 
-        <div class="relative z-10 max-w-5xl mx-auto px-4 text-center">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-bold uppercase tracking-widest mb-6">
-                <span class="flex h-2 w-2 rounded-full bg-blue-600 animate-pulse"></span>
-                Updated for 2026
-            </div>
-            
-            <h1 class="text-5xl md:text-7xl font-extrabold text-slate-900 tracking-tight mb-8 leading-tight">
-                Absolute Precision in <br class="hidden md:block" />
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Every Take-Off</span>
-            </h1>
-            
-            <p class="text-lg md:text-xl text-slate-600 mb-10 max-w-2xl mx-auto leading-relaxed">
-                Calculate the ideal static power at 1700 RPM in seconds. An essential tool for flight planning, based on official performance charts.
-            </p>
-            
-            <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
-                <a href="#calculator" class="w-full sm:w-auto bg-blue-600 text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-blue-700 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 flex items-center justify-center gap-2">
-                    Start Calculating <i data-lucide="arrow-right" class="w-5 h-5"></i>
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- CALCULATOR SECTION -->
-    <section id="calculator" class="py-20 relative z-10">
-        <div class="max-w-6xl mx-auto px-4">
-            
-            <!-- Header da Calculadora -->
-            <div class="bg-slate-900 text-white p-6 rounded-t-3xl shadow-xl flex flex-col md:flex-row items-center justify-between border-b border-slate-800">
-                <div class="flex items-center gap-3 mb-4 md:mb-0">
-                    <i data-lucide="plane-takeoff" class="w-8 h-8 text-blue-400"></i>
-                    <div>
-                        <h2 class="text-xl md:text-2xl font-bold tracking-tight">Take-Off Power Calculator</h2>
-                        <p class="text-slate-400 text-sm font-medium tracking-wide">STATIC AT 1700 RPM</p>
+        <div class="content">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="alt">Field Press. Alt</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="alt" value="1000" min="0" max="10000" step="1">
+                        <span class="unit">FT</span>
                     </div>
                 </div>
-                <div id="statusBadge" class="flex items-center gap-2 px-4 py-2 rounded-full border bg-slate-800 border-slate-700 transition-colors">
-                    <i data-lucide="power" id="statusIcon" class="w-4 h-4 text-slate-400"></i>
-                    <span id="statusText" class="text-sm font-semibold uppercase tracking-wider text-slate-400">
-                        Anti-Ice OFF
-                    </span>
+
+                <div class="form-group">
+                    <label for="oat">OAT</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="oat" value="10" min="-40" max="60" step="1">
+                        <span class="unit">°C</span>
+                    </div>
                 </div>
             </div>
 
-            <!-- Corpo da Calculadora -->
-            <div class="bg-white rounded-b-3xl shadow-2xl overflow-hidden flex flex-col lg:flex-row border border-slate-200 border-t-0">
-                
-                <!-- Controles (Esquerda) -->
-                <div class="w-full lg:w-3/5 p-8 md:p-12 flex flex-col justify-center">
-                    <h3 class="text-3xl font-bold text-slate-900 mb-2">Flight Parameters</h3>
-                    <p class="text-slate-500 mb-8">Adjust the current conditions to calculate exact torque.</p>
+            <div class="form-group">
+                <label for="weight">Planned T.O. Weight</label>
+                <div class="input-wrapper">
+                    <input type="number" id="weight" value="14000" min="10000" max="14900" step="10">
+                    <span class="unit">LBS</span>
+                </div>
+            </div>
 
-                    <div class="space-y-8">
+            <div class="form-row">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Flaps</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="flaps" value="retracted">
+                            Retract
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="flaps" value="extended" checked>
+                            Extend
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Eng Anti-Ice</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="antiIce" value="off" checked>
+                            OFF
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="antiIce" value="on">
+                            ON
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="results-wrapper">
+                <!-- Torque Result -->
+                <div class="result-container" id="box-torque">
+                    <div class="result-info">
+                        <div class="result-label">Take-Off Power</div>
+                        <div class="result-desc">Set before brake release</div>
+                    </div>
+                    <div class="result-value" id="res-torque">--.-%</div>
+                </div>
+
+                <!-- MTOW Result -->
+                <div class="result-container" id="box-mtow">
+                    <div class="result-info">
+                        <div class="result-label">Climb Limit MTOW <span class="limit-badge" id="badge-mtow">MAX</span></div>
+                        <div class="result-desc">To achieve climb req.</div>
+                    </div>
+                    <div class="result-value" id="res-mtow">----- LBS</div>
+                </div>
+
+                <!-- V-Speeds and TOFL -->
+                <div class="result-container v-speeds-box" id="box-vspeeds">
+                    <div class="result-info" style="width: 100%">
+                        <div class="result-label">V-Speeds & Field Length</div>
                         
-                        <!-- Anti-Ice Toggle -->
-                        <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 flex items-center justify-between">
-                            <div>
-                                <label class="flex items-center gap-2 text-sm font-bold text-slate-700 uppercase tracking-wide mb-1">
-                                    <i data-lucide="power" class="w-5 h-5 text-blue-600"></i> Engine Anti-Ice
-                                </label>
-                                <p class="text-xs text-slate-500">Select the active performance chart</p>
-                            </div>
-                            <button id="toggleAntiIce" class="relative inline-flex h-8 w-16 items-center rounded-full transition-colors focus:outline-none bg-slate-300">
-                                <span id="toggleCircle" class="inline-block h-6 w-6 transform rounded-full bg-white transition-transform translate-x-1 shadow-sm"></span>
-                            </button>
+                        <div class="speeds-grid" id="res-speeds-grid">
+                            <div class="speed-item"><span>V1</span><strong id="res-v1">--</strong></div>
+                            <div class="speed-item"><span>VR</span><strong id="res-vr">--</strong></div>
+                            <div class="speed-item"><span>V2</span><strong id="res-v2">--</strong></div>
+                            <div class="speed-item"><span>V35</span><strong id="res-v35">--</strong></div>
+                            <div class="speed-item tofl-item"><span>TOFL</span><strong id="res-tofl">-- FT</strong></div>
                         </div>
 
-                        <!-- OAT Input -->
-                        <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 transition-all focus-within:border-blue-400 focus-within:ring-1 focus-within:ring-blue-400">
-                            <div class="flex justify-between items-center mb-4">
-                                <label class="flex items-center gap-2 text-sm font-bold text-slate-700 uppercase tracking-wide">
-                                    <i data-lucide="thermometer" class="w-5 h-5 text-blue-600"></i> OAT (Outside Air Temp)
-                                </label>
-                                <div class="flex items-center gap-1 bg-white px-3 py-1 rounded-lg border border-slate-200 shadow-sm">
-                                    <input type="number" id="oatNum" value="28" class="w-16 text-right font-bold text-lg focus:outline-none text-slate-900 bg-transparent">
-                                    <span class="text-slate-500 font-semibold">°C</span>
-                                </div>
-                            </div>
-                            <input type="range" id="oatRange" min="-40" max="60" step="1" value="28" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
-                            <div class="flex justify-between mt-2 text-xs font-medium text-slate-400">
-                                <span>-40°C</span>
-                                <span>0°C</span>
-                                <span id="oatMaxLabel">60°C (Max)</span>
-                            </div>
-                        </div>
-
-                        <!-- Altitude Input -->
-                        <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 transition-all focus-within:border-blue-400 focus-within:ring-1 focus-within:ring-blue-400">
-                            <div class="flex justify-between items-center mb-4">
-                                <label class="flex items-center gap-2 text-sm font-bold text-slate-700 uppercase tracking-wide">
-                                    <i data-lucide="mountain" class="w-5 h-5 text-blue-600"></i> Field Pressure Altitude
-                                </label>
-                                <div class="flex items-center gap-1 bg-white px-3 py-1 rounded-lg border border-slate-200 shadow-sm">
-                                    <input type="number" id="altNum" value="5000" class="w-20 text-right font-bold text-lg focus:outline-none text-slate-900 bg-transparent">
-                                    <span class="text-slate-500 font-semibold">FT</span>
-                                </div>
-                            </div>
-                            <input type="range" id="altRange" min="0" max="10000" step="100" value="5000" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
-                            <div class="flex justify-between mt-2 text-xs font-medium text-slate-400">
-                                <span>SL (0 FT)</span>
-                                <span>5,000 FT</span>
-                                <span>10,000 FT</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Resultado (Direita) -->
-                <div id="resultPanel" class="w-full lg:w-2/5 bg-gradient-to-br from-slate-800 to-slate-950 text-white p-8 md:p-12 flex flex-col relative overflow-hidden transition-colors duration-500">
-                    <div class="absolute -right-20 -top-20 opacity-5 pointer-events-none">
-                        <i data-lucide="plane-takeoff" class="w-96 h-96"></i>
-                    </div>
-
-                    <div class="relative z-10 flex-grow flex flex-col justify-center">
-                        <h3 class="text-slate-400 text-sm font-bold uppercase tracking-widest mb-2" id="panelSubtitle">Take-Off Power</h3>
-                        
-                        <div class="flex items-baseline gap-2 mb-8">
-                            <span id="torqueDisplay" class="text-7xl font-black tracking-tighter tabular-nums drop-shadow-md">89.7</span>
-                            <span class="text-3xl font-semibold opacity-50">%</span>
-                        </div>
-
-                        <div class="bg-white/5 backdrop-blur-md rounded-xl p-5 border border-white/10 mb-8">
-                            <h4 class="flex items-center gap-2 font-semibold text-sm mb-4 uppercase tracking-wider text-slate-300 border-b border-white/10 pb-2">
-                                <i data-lucide="wind" class="w-4 h-4"></i> Associated Conditions
-                            </h4>
-                            <ul class="space-y-3 text-sm text-slate-300">
-                                <li class="flex justify-between items-center">
-                                    <span class="opacity-80">Bleed Air Valves</span>
-                                    <span class="font-bold bg-slate-800 px-2 py-1 rounded">BOTH</span>
-                                </li>
-                                <li class="flex justify-between items-center">
-                                    <span class="opacity-80">Torque</span>
-                                    <span class="font-bold text-right ml-4">SET BEFORE BRAKE RELEASE</span>
-                                </li>
-                            </ul>
-                        </div>
-                        
-                        <!-- Avisos -->
-                        <div id="warningAntiIce" class="hidden flex gap-3 text-sm bg-amber-500/20 border border-amber-500/30 p-4 rounded-lg text-amber-200 mt-4">
-                            <i data-lucide="alert-circle" class="w-6 h-6 shrink-0 text-amber-400"></i>
-                            <p><strong>Warning:</strong> Maximum temperature with Engine Anti-Ice ON is 10°C.</p>
-                        </div>
-
-                        <div id="warningISA" class="hidden flex gap-3 text-sm bg-red-500/20 border border-red-500/30 p-4 rounded-lg text-red-200 mt-4">
-                            <i data-lucide="alert-circle" class="w-6 h-6 shrink-0 text-red-400"></i>
-                            <p><strong>Envelope Limit:</strong> OAT is outside the normal operating limit (ISA + 37°C).</p>
-                        </div>
+                        <div class="warning-msg" id="speeds-warning"></div>
                     </div>
                 </div>
             </div>
+
+            <div class="error-msg" id="error"></div>
         </div>
-    </section>
+    </div>
 
-    <!-- FEATURES SECTION -->
-    <section id="features" class="py-24 bg-white border-t border-slate-100">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center max-w-3xl mx-auto mb-16">
-                <h2 class="text-3xl font-bold text-slate-900 sm:text-4xl mb-4">Why use AeroCalc?</h2>
-                <p class="text-lg text-slate-600">Replace time-consuming visual interpolation on paper charts with a precise, instant mathematical tool.</p>
-            </div>
-            <div class="grid md:grid-cols-3 gap-10">
-                <div class="bg-slate-50 rounded-2xl p-8 border border-slate-100 hover:shadow-lg transition-shadow">
-                    <div class="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center mb-6">
-                        <i data-lucide="bar-chart-3" class="w-7 h-7 text-blue-600"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-slate-900 mb-3">Exact Interpolation</h3>
-                    <p class="text-slate-600 leading-relaxed">Algorithm engineered to map the exact curves from Sea Level up to 10,000 feet.</p>
-                </div>
-                <div class="bg-slate-50 rounded-2xl p-8 border border-slate-100 hover:shadow-lg transition-shadow">
-                    <div class="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center mb-6">
-                        <i data-lucide="zap" class="w-7 h-7 text-blue-600"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-slate-900 mb-3">Real-Time Calculation</h3>
-                    <p class="text-slate-600 leading-relaxed">Adjust the sliders and see the results update instantly.</p>
-                </div>
-                <div class="bg-slate-50 rounded-2xl p-8 border border-slate-100 hover:shadow-lg transition-shadow">
-                    <div class="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center mb-6">
-                        <i data-lucide="shield-check" class="w-7 h-7 text-blue-600"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-slate-900 mb-3">Operational Limits</h3>
-                    <p class="text-slate-600 leading-relaxed">Integrated visual warnings alert the pilot if parameters exceed aircraft manual limitations.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- FOOTER -->
-    <footer class="bg-slate-900 text-slate-400 py-12 border-t border-slate-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid md:grid-cols-2 gap-8 items-center mb-8">
-                <div class="flex items-center gap-2">
-                    <i data-lucide="plane-takeoff" class="w-6 h-6 text-slate-500"></i>
-                    <span class="font-bold text-xl text-white">AeroCalc</span>
-                </div>
-                <div class="flex md:justify-end gap-6 text-sm">
-                    <a href="#" class="hover:text-white transition-colors">Terms of Use</a>
-                    <a href="#" class="hover:text-white transition-colors">Privacy Policy</a>
-                </div>
-            </div>
-            <div class="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs">
-                <p>&copy; 2026 AeroCalc. All rights reserved.</p>
-                <p class="text-center md:text-right max-w-lg text-slate-500">
-                    <strong>Disclaimer:</strong> Based on the "STATIC TAKE-OFF POWER" chart. For simulation and training purposes only. <strong>Always consult your aircraft's official AFM/POH.</strong>
-                </p>
-            </div>
-        </div>
-    </footer>
-
-    <!-- LÓGICA JAVASCRIPT -->
     <script>
-        // Inicializa os ícones do Lucide
-        lucide.createIcons();
+        // DOM Elements
+        const inputAlt = document.getElementById('alt');
+        const inputOat = document.getElementById('oat');
+        const inputWeight = document.getElementById('weight');
+        const radiosAntiIce = document.querySelectorAll('input[name="antiIce"]');
+        const radiosFlaps = document.querySelectorAll('input[name="flaps"]');
+        
+        const resTorque = document.getElementById('res-torque');
+        const resMtow = document.getElementById('res-mtow');
+        const resV1 = document.getElementById('res-v1');
+        const resVr = document.getElementById('res-vr');
+        const resV2 = document.getElementById('res-v2');
+        const resV35 = document.getElementById('res-v35');
+        const resTofl = document.getElementById('res-tofl');
 
-        // Estado da Calculadora
-        let state = {
-            antiIceOn: false,
-            oat: 28,
-            altitude: 5000
+        const boxTorque = document.getElementById('box-torque');
+        const boxMtow = document.getElementById('box-mtow');
+        const boxVspeeds = document.getElementById('box-vspeeds');
+        const badgeMtow = document.getElementById('badge-mtow');
+        
+        const errorDisplay = document.getElementById('error');
+        const speedsWarning = document.getElementById('speeds-warning');
+        const speedsGrid = document.getElementById('res-speeds-grid');
+
+        // Event Listeners
+        inputAlt.addEventListener('input', calculateAll);
+        inputOat.addEventListener('input', calculateAll);
+        inputWeight.addEventListener('input', calculateAll);
+        radiosAntiIce.forEach(r => r.addEventListener('change', calculateAll));
+        radiosFlaps.forEach(r => r.addEventListener('change', calculateAll));
+
+        // --- DATA TABLES ---
+        // Axes (Apply to both Flaps Extended and Retracted sets)
+        const tAxis = [-30, -10, 0, 10, 20, 30, 40, 52];
+        const wAxis = [12000, 13000, 13450, 14000, 14900];
+
+        // Format: [weightIndex][tempIndex]
+        
+        // --- FLAPS EXTENDED TABLES ---
+        const data0_ext = {
+            v1: [
+                [91, 91, 91, 91, 91, 91, 91, 91],
+                [91, 91, 91, 91, 91, 91, 91, 94],
+                [93, 93, 93, 93, 93, 93, 93, 97],
+                [94, 94, 94, 94, 95, 95, 96, 100],
+                [97, 98, 99, 99, 100, 100, 100, null]
+            ],
+            vr: [
+                [91, 91, 91, 91, 91, 91, 91, 91],
+                [94, 94, 94, 94, 94, 94, 94, 95],
+                [96, 96, 96, 96, 96, 96, 96, 98],
+                [97, 98, 98, 98, 98, 98, 99, 100],
+                [101, 101, 101, 101, 101, 102, 102, null]
+            ],
+            v2: [
+                [105, 105, 105, 105, 105, 105, 105, 104],
+                [107, 107, 107, 107, 107, 107, 107, 107],
+                [109, 109, 109, 109, 109, 109, 109, 109],
+                [110, 110, 110, 110, 110, 110, 110, 110],
+                [113, 113, 113, 113, 113, 113, 113, null]
+            ],
+            tofl: [
+                [2535, 2730, 2830, 2945, 3065, 3188, 3313, 3653],
+                [2620, 2823, 2927, 3049, 3175, 3304, 3436, 4029],
+                [2727, 2941, 3051, 3179, 3312, 3447, 3586, 4346],
+                [2858, 3086, 3203, 3339, 3500, 3680, 3864, 4797],
+                [3087, 3397, 3565, 3755, 3953, 4163, 4366, null]
+            ]
         };
 
-        // Elementos do DOM
-        const toggleAntiIce = document.getElementById('toggleAntiIce');
-        const toggleCircle = document.getElementById('toggleCircle');
-        const statusBadge = document.getElementById('statusBadge');
-        const statusIcon = document.getElementById('statusIcon');
-        const statusText = document.getElementById('statusText');
-        const resultPanel = document.getElementById('resultPanel');
-        const panelSubtitle = document.getElementById('panelSubtitle');
-        
-        const oatNum = document.getElementById('oatNum');
-        const oatRange = document.getElementById('oatRange');
-        const oatMaxLabel = document.getElementById('oatMaxLabel');
-        
-        const altNum = document.getElementById('altNum');
-        const altRange = document.getElementById('altRange');
-        
-        const torqueDisplay = document.getElementById('torqueDisplay');
-        const warningAntiIce = document.getElementById('warningAntiIce');
-        const warningISA = document.getElementById('warningISA');
+        const data1000_ext = {
+            v1: [
+                [91, 91, 91, 91, 91, 91, 91, 91],
+                [91, 91, 91, 91, 91, 91, 91, 96],
+                [93, 93, 93, 93, 93, 93, 94, 98],
+                [94, 94, 94, 95, 95, 96, 97, null],
+                [97, 99, 99, 100, 100, 101, 102, null]
+            ],
+            vr: [
+                [91, 91, 91, 91, 91, 91, 91, 92],
+                [94, 94, 94, 94, 94, 94, 95, 96],
+                [96, 96, 96, 96, 96, 96, 97, 98],
+                [98, 98, 98, 98, 98, 99, 99, null],
+                [101, 101, 101, 101, 102, 102, 102, null]
+            ],
+            v2: [
+                [105, 105, 105, 105, 105, 105, 104, 104],
+                [107, 107, 107, 107, 107, 107, 107, 107],
+                [109, 109, 109, 109, 109, 109, 109, 109],
+                [110, 110, 110, 110, 110, 110, 110, null],
+                [113, 113, 113, 113, 113, 113, 113, null]
+            ],
+            tofl: [
+                [2621, 2827, 2946, 3070, 3197, 3327, 3485, 3867],
+                [2710, 2924, 3049, 3180, 3314, 3451, 3619, 4384],
+                [2821, 3047, 3179, 3317, 3458, 3602, 3867, 4826],
+                [2959, 3199, 3339, 3507, 3695, 3885, 4159, null],
+                [3218, 3559, 3755, 3961, 4180, 4390, 4711, null]
+            ]
+        };
 
-        // Função Matemática Principal
-        function calculateTorque(alt, temp, isAntiIceOn) {
-            let t = parseFloat(temp);
-            let a = parseFloat(alt);
+        const data2000_ext = {
+            v1: [
+                [91, 91, 91, 91, 91, 91, 91, 91],
+                [91, 91, 91, 91, 91, 91, 92, 96],
+                [93, 93, 93, 93, 93, 93, 95, null],
+                [94, 94, 95, 95, 96, 96, 98, null],
+                [98, 99, 100, 100, 101, 101, 102, null]
+            ],
+            vr: [
+                [91, 91, 91, 91, 91, 91, 91, 92],
+                [94, 94, 94, 94, 94, 95, 95, 96],
+                [96, 96, 96, 96, 96, 97, 97, null],
+                [98, 98, 98, 98, 99, 99, 99, null],
+                [101, 101, 101, 102, 102, 102, 102, null]
+            ],
+            v2: [
+                [105, 105, 105, 105, 105, 105, 104, 104],
+                [107, 107, 107, 107, 107, 107, 107, 107],
+                [109, 109, 109, 109, 109, 109, 109, null],
+                [110, 110, 110, 110, 110, 110, 110, null],
+                [113, 113, 113, 113, 113, 113, 113, null]
+            ],
+            tofl: [
+                [2713, 2943, 3072, 3203, 3338, 3475, 3676, 4101],
+                [2805, 3046, 3182, 3321, 3463, 3608, 3886, 4902],
+                [2922, 3176, 3319, 3465, 3615, 3800, 4172, null],
+                [3066, 3336, 3509, 3704, 3901, 4105, 4521, null],
+                [3366, 3750, 3962, 4191, 4408, 4642, 5216, null]
+            ]
+        };
 
-            if (a < 0) a = 0;
-            if (a > 10000) a = 10000;
+        const data3000_ext = {
+            v1: [
+                [91, 91, 91, 91, 91, 91, 91, 92],
+                [91, 91, 91, 91, 91, 91, 93, null],
+                [93, 93, 93, 93, 93, 94, 96, null],
+                [94, 95, 95, 96, 96, 97, 99, null],
+                [98, 100, 100, 101, 101, 102, null, null]
+            ],
+            vr: [
+                [91, 91, 91, 91, 91, 91, 91, 92],
+                [94, 94, 94, 94, 95, 95, 95, null],
+                [96, 96, 96, 97, 97, 97, 97, null],
+                [98, 98, 98, 99, 99, 99, 99, null],
+                [101, 101, 102, 102, 102, 102, null, null]
+            ],
+            v2: [
+                [105, 105, 105, 105, 105, 105, 104, 104],
+                [107, 107, 107, 107, 107, 107, 107, null],
+                [109, 109, 109, 109, 109, 109, 109, null],
+                [110, 110, 110, 110, 110, 110, 110, null],
+                [113, 113, 113, 113, 113, 113, null, null]
+            ],
+            tofl: [
+                [2810, 3069, 3206, 3345, 3488, 3634, 3886, 4436],
+                [2906, 3179, 3323, 3470, 3621, 3776, 4215, null],
+                [3029, 3316, 3467, 3625, 3818, 4023, 4544, null],
+                [3179, 3505, 3707, 3911, 4124, 4337, 4923, null],
+                [3530, 3958, 4194, 4420, 4664, 4914, null, null]
+            ]
+        };
 
-            const baseMax = 94.4;
+        const data4000_ext = {
+            v1: [
+                [91, 91, 91, 91, 91, 91, 91, 93],
+                [91, 91, 91, 91, 91, 92, 95, null],
+                [93, 93, 93, 93, 94, 95, 98, null],
+                [94, 95, 96, 96, 97, 98, 100, null],
+                [99, 100, 101, 101, 102, 102, null, null]
+            ],
+            vr: [
+                [91, 91, 91, 91, 91, 91, 91, 93],
+                [94, 94, 94, 95, 95, 95, 96, null],
+                [96, 96, 97, 97, 97, 97, 98, null],
+                [98, 98, 99, 99, 99, 99, 100, null],
+                [101, 102, 102, 102, 102, 102, null, null]
+            ],
+            v2: [
+                [105, 105, 105, 105, 105, 104, 104, 104],
+                [107, 107, 107, 107, 107, 107, 107, null],
+                [109, 109, 109, 109, 109, 109, 109, null],
+                [110, 110, 110, 110, 110, 110, 110, null],
+                [113, 113, 113, 113, 113, 113, null, null]
+            ],
+            tofl: [
+                [2924, 3204, 3349, 3497, 3649, 3828, 4116, 5022],
+                [3026, 3321, 3474, 3631, 3791, 4038, 4594, null],
+                [3154, 3465, 3629, 3831, 4043, 4334, 4957, null],
+                [3313, 3704, 3915, 4136, 4390, 4686, 5546, null],
+                [3717, 4190, 4424, 4678, 4941, 5364, null, null]
+            ]
+        };
 
-            if (isAntiIceOn) {
-                if (t < -40) t = -40;
-                if (t > 10) t = 10;
+        const data5000_ext = {
+            v1: [
+                [91, 91, 91, 91, 91, 91, 91, null],
+                [91, 91, 91, 91, 92, 93, 96, null],
+                [93, 93, 93, 94, 94, 96, 98, null],
+                [95, 96, 96, 97, 97, 99, null, null],
+                [100, 101, 101, 102, 102, null, null, null]
+            ],
+            vr: [
+                [91, 91, 91, 91, 91, 91, 92, null],
+                [94, 94, 95, 95, 95, 95, 96, null],
+                [96, 97, 97, 97, 97, 97, 98, null],
+                [98, 99, 99, 99, 99, 99, null, null],
+                [101, 102, 102, 102, 102, null, null, null]
+            ],
+            v2: [
+                [105, 105, 105, 105, 105, 104, 104, null],
+                [107, 107, 107, 107, 107, 107, 107, null],
+                [109, 109, 109, 109, 109, 109, 109, null],
+                [110, 110, 110, 110, 110, 110, null, null],
+                [113, 113, 113, 113, 113, null, null, null]
+            ],
+            tofl: [
+                [3051, 3348, 3502, 3660, 3821, 4045, 4370, null],
+                [3160, 3473, 3636, 3802, 3982, 4364, 5045, null],
+                [3295, 3627, 3837, 4057, 4283, 4700, 5608, null],
+                [3477, 3914, 4143, 4376, 4627, 5090, null, null],
+                [3926, 4422, 4685, 4960, 5243, null, null, null]
+            ]
+        };
 
-                const torqueAt10k = (t) => t <= -3 ? baseMax : baseMax - ((t - (-3)) * 0.7692);
-                const torqueAt9k = (t) => t <= 3.2 ? baseMax : baseMax - ((t - 3.2) * 0.7708);
-                const torqueAt8k = (t) => t <= 8.0 ? baseMax : baseMax - ((t - 8.0) * 0.95);
-                const torqueAtSL = () => baseMax;
+        const data6000_ext = {
+            v1: [
+                [91, 91, 91, 91, 91, 91, 91, null],
+                [91, 91, 91, 92, 92, 94, null, null],
+                [93, 93, 94, 94, 95, 97, null, null],
+                [95, 96, 97, 97, 98, 100, null, null],
+                [100, 101, 102, 102, 102, null, null, null]
+            ],
+            vr: [
+                [91, 91, 91, 91, 91, 91, 92, null],
+                [94, 95, 95, 95, 95, 96, null, null],
+                [96, 97, 97, 97, 97, 98, null, null],
+                [98, 99, 99, 99, 99, 100, null, null],
+                [102, 102, 102, 102, 102, null, null, null]
+            ],
+            v2: [
+                [105, 105, 105, 105, 105, 104, 104, null],
+                [107, 107, 107, 107, 107, 107, null, null],
+                [109, 109, 109, 109, 109, 109, null, null],
+                [110, 110, 110, 110, 110, 110, null, null],
+                [113, 113, 113, 113, 113, null, null, null]
+            ],
+            tofl: [
+                [3186, 3502, 3665, 3833, 4008, 4280, 4651, null],
+                [3302, 3636, 3809, 3998, 4238, 4738, null, null],
+                [3445, 3836, 4064, 4299, 4558, 5121, null, null],
+                [3675, 4142, 4386, 4645, 4931, 5637, null, null],
+                [4156, 4685, 4971, 5264, 5658, null, null, null]
+            ]
+        };
 
-                if (a === 10000) return torqueAt10k(t);
-                if (a === 9000) return torqueAt9k(t);
-                if (a === 8000) return torqueAt8k(t);
-                if (a === 0) return torqueAtSL();
+        const data7000_ext = {
+            v1: [
+                [91, 91, 91, 91, 91, 91, 92, null],
+                [91, 91, 92, 92, 93, 96, null, null],
+                [93, 94, 94, 95, 96, 98, null, null],
+                [96, 97, 97, 98, 99, null, null, null],
+                [101, 102, 102, 102, null, null, null, null]
+            ],
+            vr: [
+                [91, 91, 91, 91, 91, 91, 92, null],
+                [94, 95, 95, 95, 95, 96, null, null],
+                [96, 97, 97, 97, 97, 98, null, null],
+                [99, 99, 99, 99, 100, null, null, null],
+                [102, 102, 102, 102, null, null, null, null]
+            ],
+            v2: [
+                [105, 105, 105, 104, 104, 104, 104, null],
+                [107, 107, 107, 107, 107, 107, null, null],
+                [109, 109, 109, 109, 109, 109, null, null],
+                [110, 110, 110, 110, 110, null, null, null],
+                [113, 113, 113, 113, null, null, null, null]
+            ],
+            tofl: [
+                [3331, 3667, 3841, 4014, 4241, 4538, 5148, null],
+                [3455, 3810, 4008, 4237, 4604, 5162, null, null],
+                [3606, 4065, 4309, 4552, 4956, 5667, null, null],
+                [3887, 4386, 4656, 4926, 5365, null, null, null],
+                [4392, 4971, 5276, 5636, null, null, null, null]
+            ]
+        };
 
-                if (a > 9000) return torqueAt9k(t) + ((a - 9000) / 1000) * (torqueAt10k(t) - torqueAt9k(t));
-                if (a > 8000) return torqueAt8k(t) + ((a - 8000) / 1000) * (torqueAt9k(t) - torqueAt8k(t));
-                return torqueAtSL() + (a / 8000) * (torqueAt8k(t) - torqueAtSL());
-            } else {
-                if (t < -40) t = -40;
-                if (t > 60) t = 60;
+        const data8000_ext = {
+            v1: [
+                [91, 91, 91, 91, 91, 91, null, null],
+                [91, 92, 92, 93, 95, 96, null, null],
+                [93, 94, 95, 96, 98, null, null, null],
+                [96, 97, 98, 99, 100, null, null, null],
+                [101, 102, 102, 102, null, null, null, null]
+            ],
+            vr: [
+                [91, 91, 91, 91, 91, 92, null, null],
+                [95, 95, 95, 95, 96, 96, null, null],
+                [97, 97, 97, 97, 98, null, null, null],
+                [99, 99, 99, 99, 100, null, null, null],
+                [102, 102, 102, 102, null, null, null, null]
+            ],
+            v2: [
+                [105, 105, 105, 105, 104, 104, null, null],
+                [107, 107, 107, 107, 107, 107, null, null],
+                [109, 109, 109, 109, 109, null, null, null],
+                [110, 110, 110, 110, 110, null, null, null],
+                [113, 113, 113, 113, null, null, null, null]
+            ],
+            tofl: [
+                [3486, 3843, 4023, 4208, 4493, 4827, null, null],
+                [3619, 4010, 4248, 4494, 5003, 5792, null, null],
+                [3811, 4312, 4564, 4836, 5393, null, null, null],
+                [4116, 4658, 4939, 5229, 5982, null, null, null],
+                [4655, 5278, 5652, 6059, null, null, null, null]
+            ]
+        };
 
-                const slope = 1.6667; 
-                const lapseRate = 1.964; 
-                const tempAt90 = 37.64 - (a / 1000) * lapseRate;
-                const kinkTemp = tempAt90 - ((baseMax - 90) / slope);
+        const data9000_ext = {
+            v1: [
+                [91, 91, 91, 91, 91, 92, null, null],
+                [91, 92, 93, 94, 96, null, null, null],
+                [94, 95, 96, 97, 98, null, null, null],
+                [97, 98, 98, 100, null, null, null, null],
+                [102, 102, 102, null, null, null, null, null]
+            ],
+            vr: [
+                [91, 91, 91, 91, 91, 92, null, null],
+                [95, 95, 95, 95, 96, null, null, null],
+                [97, 97, 97, 97, 98, null, null, null],
+                [99, 99, 99, 100, null, null, null, null],
+                [102, 102, 102, null, null, null, null, null]
+            ],
+            v2: [
+                [105, 104, 104, 104, 104, 104, null, null],
+                [107, 107, 107, 107, 107, null, null, null],
+                [109, 109, 109, 109, 109, null, null, null],
+                [110, 110, 110, 110, null, null, null, null],
+                [113, 113, 113, null, null, null, null, null]
+            ],
+            tofl: [
+                [3652, 4027, 4218, 4449, 4767, 5196, null, null],
+                [3794, 4251, 4508, 4860, 5445, null, null, null],
+                [4043, 4568, 4850, 5233, 5998, null, null, null],
+                [4359, 4943, 5235, 5662, null, null, null, null],
+                [4939, 5657, 6080, null, null, null, null, null]
+            ]
+        };
 
-                if (t <= kinkTemp) {
-                    return baseMax;
-                } else {
-                    const calc = baseMax - ((t - kinkTemp) * slope);
-                    return Math.max(calc, 0);
+        const data10000_ext = {
+            v1: [
+                [91, 91, 91, 91, 91, 91, 92, null],
+                [92, 93, 93, 95, 96, null, null, null],
+                [94, 96, 96, 98, null, null, null, null],
+                [97, 98, 99, null, null, null, null, null],
+                [102, 102, null, null, null, null, null, null]
+            ],
+            vr: [
+                [91, 91, 91, 91, 91, 91, 92, null],
+                [95, 95, 95, 96, 96, null, null, null],
+                [97, 97, 97, 98, null, null, null, null],
+                [99, 99, 99, null, null, null, null, null],
+                [102, 102, null, null, null, null, null, null]
+            ],
+            v2: [
+                [105, 104, 104, 104, 104, 104, 104, null],
+                [107, 107, 107, 107, 107, null, null, null],
+                [109, 109, 109, 109, null, null, null, null],
+                [110, 110, 110, null, null, null, null, null],
+                [113, 113, null, null, null, null, null, null]
+            ],
+            tofl: [
+                [3830, 4224, 4429, 4720, 5068, 5895, null, null],
+                [3990, 4513, 4790, 5282, 6078, null, null, null],
+                [4291, 4856, 5154, 5702, null, null, null, null],
+                [4636, 5242, 5574, null, null, null, null, null],
+                [5252, 6088, null, null, null, null, null, null]
+            ]
+        };
+
+        // --- FLAPS RETRACTED TABLES ---
+        const data0_retract = {
+            v1: [
+                [96, 97, 97, 97, 98, 98, 98, 101],
+                [97, 98, 98, 99, 99, 99, 99, 103],
+                [98, 98, 99, 99, 99, 100, 100, 104],
+                [98, 99, 99, 100, 100, 100, 100, 104],
+                [101, 102, 103, 103, 104, 105, 105, null]
+            ],
+            vr: [
+                [106, 106, 106, 106, 106, 106, 106, 106],
+                [106, 106, 106, 106, 106, 106, 106, 106],
+                [106, 106, 106, 106, 106, 106, 106, 106],
+                [106, 106, 106, 106, 106, 106, 106, 106],
+                [107, 108, 108, 108, 108, 108, 108, null]
+            ],
+            v2: [
+                [118, 117, 117, 117, 117, 117, 116, 114],
+                [117, 117, 116, 116, 116, 116, 115, 114],
+                [117, 116, 116, 116, 116, 115, 115, 114],
+                [116, 116, 116, 115, 115, 115, 115, 114],
+                [117, 117, 117, 117, 117, 117, 117, null]
+            ],
+            tofl: [
+                [2589, 2828, 2952, 3093, 3239, 3391, 3496, 4180],
+                [2739, 2993, 3125, 3276, 3433, 3595, 3709, 4554],
+                [2808, 3070, 3206, 3362, 3524, 3692, 3831, 4702],
+                [2894, 3166, 3308, 3470, 3639, 3815, 3992, 4873],
+                [3128, 3468, 3648, 3853, 4069, 4298, 4539, null]
+            ]
+        };
+
+        const data1000_retract = {
+            v1: [
+                [97, 97, 97, 98, 98, 98, 98, 103],
+                [98, 98, 99, 99, 99, 99, 100, 104],
+                [98, 99, 99, 99, 100, 100, 101, 104],
+                [99, 99, 100, 100, 100, 101, 102, null],
+                [102, 103, 103, 104, 105, 106, 107, null]
+            ],
+            vr: [
+                [106, 106, 106, 106, 106, 106, 106, 106],
+                [106, 106, 106, 106, 106, 106, 106, 106],
+                [106, 106, 106, 106, 106, 106, 106, 106],
+                [106, 106, 106, 106, 106, 106, 106, null],
+                [108, 108, 108, 108, 108, 108, 109, null]
+            ],
+            v2: [
+                [118, 117, 117, 117, 116, 116, 115, 114],
+                [117, 116, 116, 116, 116, 115, 115, 114],
+                [117, 116, 116, 116, 115, 115, 115, 114],
+                [116, 116, 115, 115, 115, 115, 114, null],
+                [117, 117, 117, 117, 117, 117, 117, null]
+            ],
+            tofl: [
+                [2694, 2947, 3093, 3245, 3403, 3565, 3732, 4585],
+                [2850, 3120, 3276, 3439, 3608, 3782, 4001, 4927],
+                [2923, 3201, 3362, 3530, 3704, 3886, 4142, 5075],
+                [3013, 3303, 3470, 3645, 3829, 4033, 4328, null],
+                [3276, 3641, 3853, 4077, 4315, 4566, 4905, null]
+            ]
+        };
+
+        const data2000_retract = {
+            v1: [
+                [97, 97, 98, 98, 98, 98, 99, 104],
+                [98, 99, 99, 99, 99, 99, 101, 105],
+                [98, 99, 99, 100, 100, 100, 102, null],
+                [99, 100, 100, 100, 101, 101, 103, null],
+                [102, 103, 104, 105, 106, 106, 107, null]
+            ],
+            vr: [
+                [106, 106, 106, 106, 106, 106, 106, 106],
+                [106, 106, 106, 106, 106, 106, 106, 106],
+                [106, 106, 106, 106, 106, 106, 106, null],
+                [106, 106, 106, 106, 106, 106, 106, null],
+                [108, 108, 108, 108, 108, 108, 109, null]
+            ],
+            v2: [
+                [118, 117, 117, 116, 116, 116, 115, 114],
+                [117, 116, 116, 116, 115, 115, 114, 114],
+                [116, 116, 116, 115, 115, 115, 114, null],
+                [116, 115, 115, 115, 115, 115, 114, null],
+                [117, 117, 117, 117, 117, 117, 117, null]
+            ],
+            tofl: [
+                [2806, 3088, 3246, 3410, 3578, 3727, 4018, 4992],
+                [2970, 3271, 3440, 3615, 3797, 3958, 4348, 5336],
+                [3046, 3357, 3531, 3712, 3900, 4085, 4514, null],
+                [3141, 3465, 3647, 3838, 4050, 4262, 4722, null],
+                [3436, 3846, 4079, 4326, 4586, 4821, 5304, null]
+            ]
+        };
+
+        const data3000_retract = {
+            v1: [
+                [97, 98, 98, 98, 99, 99, 100, 104],
+                [98, 99, 99, 99, 100, 100, 102, null],
+                [99, 99, 100, 100, 100, 101, 103, null],
+                [99, 100, 100, 101, 101, 102, 104, null],
+                [103, 104, 105, 106, 106, 106, null, null]
+            ],
+            vr: [
+                [106, 106, 106, 106, 106, 106, 106, 106],
+                [106, 106, 106, 106, 106, 106, 106, null],
+                [106, 106, 106, 106, 106, 106, 106, null],
+                [106, 106, 106, 106, 106, 106, 106, null],
+                [108, 108, 108, 108, 109, 109, null, null]
+            ],
+            v2: [
+                [117, 117, 116, 116, 116, 115, 114, 114],
+                [116, 116, 116, 115, 115, 115, 114, null],
+                [116, 116, 115, 115, 115, 115, 114, null],
+                [116, 115, 115, 115, 115, 115, 114, null],
+                [117, 117, 117, 117, 117, 117, null, null]
+            ],
+            tofl: [
+                [2925, 3242, 3412, 3587, 3765, 3901, 4370, 5424],
+                [3097, 3436, 3618, 3806, 3998, 4171, 4755, null],
+                [3177, 3527, 3715, 3910, 4111, 4318, 4924, null],
+                [3278, 3642, 3841, 4061, 4290, 4511, 5101, null],
+                [3609, 4073, 4329, 4599, 4843, 5101, null, null]
+            ]
+        };
+
+        const data4000_retract = {
+            v1: [
+                [97, 98, 98, 99, 99, 99, 102, null],
+                [98, 99, 99, 100, 100, 101, 103, null],
+                [99, 100, 100, 100, 101, 102, 104, null],
+                [100, 100, 101, 101, 102, 103, 105, null],
+                [103, 105, 106, 106, 106, 107, null, null]
+            ],
+            vr: [
+                [106, 106, 106, 106, 106, 106, 106, null],
+                [106, 106, 106, 106, 106, 106, 106, null],
+                [106, 106, 106, 106, 106, 106, 106, null],
+                [106, 106, 106, 106, 106, 106, 106, null],
+                [108, 108, 108, 109, 109, 109, null, null]
+            ],
+            v2: [
+                [117, 116, 116, 116, 116, 115, 114, null],
+                [116, 116, 115, 115, 115, 115, 114, null],
+                [116, 115, 115, 115, 115, 114, 114, null],
+                [115, 115, 115, 115, 115, 114, 114, null],
+                [117, 117, 117, 117, 117, 117, null, null]
+            ],
+            tofl: [
+                [3064, 3409, 3590, 3775, 3966, 4167, 4778, null],
+                [3245, 3615, 3810, 4010, 4216, 4505, 5167, null],
+                [3330, 3712, 3914, 4124, 4357, 4674, 5329, null],
+                [3437, 3837, 4066, 4303, 4553, 4902, 5521, null],
+                [3811, 4324, 4605, 4857, 5129, 5496, null, null]
+            ]
+        };
+
+        const data5000_retract = {
+            v1: [
+                [98, 98, 99, 99, 99, 100, 103, null],
+                [99, 99, 100, 100, 100, 102, 104, null],
+                [99, 100, 100, 101, 101, 103, 105, null],
+                [100, 101, 101, 102, 102, 104, null, null],
+                [104, 106, 106, 107, 107, 108, null, null]
+            ],
+            vr: [
+                [106, 106, 106, 106, 106, 106, 106, null],
+                [106, 106, 106, 106, 106, 106, 106, null],
+                [106, 106, 106, 106, 106, 106, 106, null],
+                [106, 106, 106, 106, 106, 106, null, null],
+                [108, 108, 109, 109, 109, 109, null, null]
+            ],
+            v2: [
+                [117, 116, 116, 116, 115, 115, 114, null],
+                [116, 115, 115, 115, 115, 114, 114, null],
+                [116, 115, 115, 115, 115, 114, 114, null],
+                [115, 115, 115, 115, 115, 114, null, null],
+                [117, 117, 117, 117, 117, 117, null, null]
+            ],
+            tofl: [
+                [3218, 3588, 3781, 3979, 4160, 4518, 5245, null],
+                [3411, 3808, 4015, 4229, 4453, 4908, 5610, null],
+                [3501, 3912, 4130, 4372, 4615, 5111, 5778, null],
+                [3615, 4063, 4309, 4569, 4831, 5281, null, null],
+                [4037, 4601, 4864, 5149, 5422, 5953, null, null]
+            ]
+        };
+
+        const data8000_retract = {
+            v1: [
+                [99, 99, 100, 100, 102, 104, null, null],
+                [100, 101, 101, 101, 103, 105, null, null],
+                [100, 101, 102, 102, 104, null, null, null],
+                [101, 103, 103, 103, 104, null, null, null],
+                [106, 107, 107, 108, null, null, null, null]
+            ],
+            vr: [
+                [106, 106, 106, 106, 106, 106, null, null],
+                [106, 106, 106, 106, 106, 106, null, null],
+                [106, 106, 106, 106, 106, null, null, null],
+                [106, 106, 106, 106, 106, null, null, null],
+                [108, 109, 109, 109, null, null, null, null]
+            ],
+            v2: [
+                [116, 115, 115, 115, 114, 114, null, null],
+                [115, 115, 115, 114, 114, 114, null, null],
+                [115, 115, 115, 114, 114, null, null, null],
+                [115, 115, 115, 114, 114, null, null, null],
+                [117, 117, 117, 117, null, null, null, null]
+            ],
+            tofl: [
+                [3758, 4209, 4440, 4642, 5193, 5864, null, null],
+                [3991, 4490, 4762, 5029, 5628, 6290, null, null],
+                [4102, 4654, 4942, 5225, 5797, null, null, null],
+                [4280, 4872, 5166, 5438, 6006, null, null, null],
+                [4832, 5455, 5785, 6100, null, null, null, null]
+            ]
+        };
+
+        const data9000_retract = {
+            v1: [
+                [99, 100, 100, 101, 103, 104, null, null],
+                [100, 101, 102, 103, 104, null, null, null],
+                [101, 102, 103, 103, 104, null, null, null],
+                [102, 103, 103, 104, null, null, null, null],
+                [106, 107, 108, null, null, null, null, null]
+            ],
+            vr: [
+                [106, 106, 106, 106, 106, 106, null, null],
+                [106, 106, 106, 106, 106, null, null, null],
+                [106, 106, 106, 106, 106, null, null, null],
+                [106, 106, 106, 106, null, null, null, null],
+                [109, 109, 109, null, null, null, null, null]
+            ],
+            v2: [
+                [116, 115, 115, 115, 114, 114, null, null],
+                [115, 115, 115, 114, 114, null, null, null],
+                [115, 115, 115, 114, 114, null, null, null],
+                [115, 115, 114, 114, null, null, null, null],
+                [117, 117, 117, null, null, null, null, null]
+            ],
+            tofl: [
+                [3965, 4443, 4691, 5024, 5689, 6380, null, null],
+                [4215, 4766, 5058, 5471, 6088, null, null, null],
+                [4355, 4945, 5256, 5649, 6267, null, null, null],
+                [4550, 5170, 5465, 5853, null, null, null, null],
+                [5124, 5790, 6117, null, null, null, null, null]
+            ]
+        };
+
+        const data10000_retract = {
+            v1: [
+                [99, 100, 100, 102, 104, null, null, null],
+                [100, 102, 102, 104, 105, null, null, null],
+                [101, 103, 103, 104, null, null, null, null],
+                [103, 103, 104, 105, null, null, null, null],
+                [107, 108, 108, null, null, null, null, null]
+            ],
+            vr: [
+                [106, 106, 106, 106, 106, null, null, null],
+                [106, 106, 106, 106, 106, null, null, null],
+                [106, 106, 106, 106, null, null, null, null],
+                [106, 106, 106, 106, null, null, null, null],
+                [109, 109, 109, null, null, null, null, null]
+            ],
+            v2: [
+                [115, 115, 115, 114, 114, null, null, null],
+                [115, 115, 114, 114, 114, null, null, null],
+                [115, 115, 114, 114, null, null, null, null],
+                [115, 114, 114, 114, null, null, null, null],
+                [117, 117, 117, null, null, null, null, null]
+            ],
+            tofl: [
+                [4189, 4696, 4949, 5492, 6158, null, null, null],
+                [4467, 5064, 5374, 5948, 6589, null, null, null],
+                [4629, 5262, 5578, 6111, null, null, null, null],
+                [4846, 5471, 5780, 6338, null, null, null, null],
+                [5428, 6124, 6504, null, null, null, null, null]
+            ]
+        };
+
+        function getBilinear(w, t, gridArray) {
+            // Clamp temp within table boundaries
+            let temp = Math.max(-30, Math.min(t, 52));
+            // Clamp weight to min 12000 (chart: "12,000 AND UNDER")
+            let weight = Math.max(12000, w);
+            if (weight > 14900) return null; // Over absolute MTOW
+
+            let t1 = 0, t2 = 0;
+            for(let i=0; i<tAxis.length; i++) {
+                if (tAxis[i] >= temp) {
+                    t2 = i;
+                    t1 = i > 0 ? i - 1 : i;
+                    break;
                 }
             }
-        }
+            if (temp > tAxis[tAxis.length-1]) { t1 = tAxis.length-1; t2 = tAxis.length-1; }
 
-        // Função para atualizar tudo na tela
-        function updateUI() {
-            // Sincroniza OAT
-            let maxOat = state.antiIceOn ? 10 : 60;
-            if (state.oat > maxOat) state.oat = maxOat;
-            if (state.oat < -40) state.oat = -40;
-            
-            oatNum.value = state.oat;
-            oatRange.value = state.oat;
-            oatRange.max = maxOat;
-            oatNum.max = maxOat;
-            oatMaxLabel.innerText = state.antiIceOn ? '10°C (Limit)' : '60°C (Max)';
-
-            // Sincroniza Altitude
-            if (state.altitude > 10000) state.altitude = 10000;
-            if (state.altitude < 0) state.altitude = 0;
-            altNum.value = state.altitude;
-            altRange.value = state.altitude;
-
-            // Calcula Torque
-            const torque = calculateTorque(state.altitude, state.oat, state.antiIceOn);
-            torqueDisplay.innerText = torque.toFixed(1);
-
-            // Calcula Alertas
-            const isaTemp = 15 - (state.altitude / 1000) * 1.98;
-            const isIsaExceeded = !state.antiIceOn && state.oat > (isaTemp + 37);
-
-            // Atualiza Visibilidade dos Alertas
-            warningAntiIce.style.display = (state.antiIceOn && state.oat >= 10) ? 'flex' : 'none';
-            warningISA.style.display = isIsaExceeded ? 'flex' : 'none';
-
-            // Estilos do Toggle
-            if (state.antiIceOn) {
-                toggleAntiIce.classList.replace('bg-slate-300', 'bg-amber-500');
-                toggleCircle.classList.replace('translate-x-1', 'translate-x-9');
-                statusBadge.classList.replace('border-slate-700', 'border-amber-500/50');
-                statusIcon.classList.replace('text-slate-400', 'text-amber-400');
-                statusText.classList.replace('text-slate-400', 'text-amber-400');
-                statusText.innerText = 'Anti-Ice ON';
-                
-                // Muda a cor do painel
-                resultPanel.classList.replace('from-slate-800', 'from-blue-800');
-                resultPanel.classList.replace('to-slate-950', 'to-blue-950');
-                panelSubtitle.classList.replace('text-slate-400', 'text-blue-300');
-            } else {
-                toggleAntiIce.classList.replace('bg-amber-500', 'bg-slate-300');
-                toggleCircle.classList.replace('translate-x-9', 'translate-x-1');
-                statusBadge.classList.replace('border-amber-500/50', 'border-slate-700');
-                statusIcon.classList.replace('text-amber-400', 'text-slate-400');
-                statusText.classList.replace('text-amber-400', 'text-slate-400');
-                statusText.innerText = 'Anti-Ice OFF';
-                
-                // Volta a cor do painel
-                resultPanel.classList.replace('from-blue-800', 'from-slate-800');
-                resultPanel.classList.replace('to-blue-950', 'to-slate-950');
-                panelSubtitle.classList.replace('text-blue-300', 'text-slate-400');
+            let w1 = 0, w2 = 0;
+            for(let i=0; i<wAxis.length; i++) {
+                if (wAxis[i] >= weight) {
+                    w2 = i;
+                    w1 = i > 0 ? i - 1 : i;
+                    break;
+                }
             }
+            if (weight > wAxis[wAxis.length-1]) { w1 = wAxis.length-1; w2 = wAxis.length-1; }
+
+            const q11 = gridArray[w1][t1];
+            const q21 = gridArray[w2][t1];
+            const q12 = gridArray[w1][t2];
+            const q22 = gridArray[w2][t2];
+
+            // If any corner is a dash (null), interpolation fails for this zone
+            if (q11 === null || q21 === null || q12 === null || q22 === null) return null;
+
+            const tFrac = t1 === t2 ? 0 : (temp - tAxis[t1]) / (tAxis[t2] - tAxis[t1]);
+            const wFrac = w1 === w2 ? 0 : (weight - wAxis[w1]) / (wAxis[w2] - wAxis[w1]);
+
+            const r1 = q11 + tFrac * (q12 - q11);
+            const r2 = q21 + tFrac * (q22 - q21);
+
+            return r1 + wFrac * (r2 - r1);
         }
 
-        // Event Listeners (Gatilhos de ação)
-        toggleAntiIce.addEventListener('click', () => {
-            state.antiIceOn = !state.antiIceOn;
-            updateUI();
-        });
+        // -----------------------------------------------------------------
 
-        oatNum.addEventListener('input', (e) => { state.oat = e.target.value; updateUI(); });
-        oatRange.addEventListener('input', (e) => { state.oat = e.target.value; updateUI(); });
-        
-        altNum.addEventListener('input', (e) => { state.altitude = e.target.value; updateUI(); });
-        altRange.addEventListener('input', (e) => { state.altitude = e.target.value; updateUI(); });
+        function showError(message) {
+            errorDisplay.innerHTML = message;
+            errorDisplay.style.display = 'block';
+            
+            resTorque.textContent = '---%';
+            resMtow.textContent = '-----';
+            
+            boxTorque.classList.remove('active');
+            boxMtow.classList.remove('active');
+            badgeMtow.style.display = 'none';
 
-        // Chamada inicial para preencher a tela
-        updateUI();
+            disableSpeeds();
+        }
+
+        function hideError() {
+            errorDisplay.style.display = 'none';
+            boxTorque.classList.add('active');
+            boxMtow.classList.add('active');
+        }
+
+        function disableSpeeds(msg) {
+            speedsGrid.style.display = 'none';
+            speedsWarning.style.display = 'block';
+            speedsWarning.textContent = msg || 'Speeds unavailable.';
+            boxVspeeds.classList.remove('active');
+        }
+
+        function enableSpeeds() {
+            speedsGrid.style.display = 'grid';
+            speedsWarning.style.display = 'none';
+            boxVspeeds.classList.add('active');
+        }
+
+        function resetSpeedsUI() {
+            resV1.textContent = '--';
+            resVr.textContent = '--';
+            resV2.textContent = '--';
+            resV35.textContent = '--';
+            resTofl.textContent = '-- FT';
+        }
+
+        function calculateAll() {
+            const alt = parseFloat(inputAlt.value);
+            const oat = parseFloat(inputOat.value);
+            const plannedWeight = parseFloat(inputWeight.value);
+            const antiIce = document.querySelector('input[name="antiIce"]:checked').value;
+            const flaps = document.querySelector('input[name="flaps"]:checked').value;
+
+            // Basic validation
+            if (isNaN(alt) || isNaN(oat)) {
+                showError("Please enter valid numbers for Altitude and OAT.");
+                return;
+            }
+
+            if (alt < 0 || alt > 10000) {
+                showError("Field Pressure Altitude must be between 0 and 10,000 FT.");
+                return;
+            }
+
+            if (oat < -40) {
+                showError("OAT is below minimum chart limit (-40°C).");
+                return;
+            }
+
+            // Global Anti-Ice ON limit
+            if (antiIce === 'on' && oat > 10) {
+                showError("OAT exceeds MAXIMUM TEMPERATURE limit for Engine Anti-Ice ON (10°C).");
+                return;
+            }
+
+            // ISA + 37 limit check
+            const isaTemp = 15 - (2 * (alt / 1000));
+            const maxOAT = isaTemp + 37;
+            if (oat > maxOAT) {
+                showError(`OAT exceeds ISA+37°C limit for this altitude.<br>Max permitted OAT: ${maxOAT.toFixed(1)}°C`);
+                return;
+            }
+
+            hideError();
+
+            // --- 1. TAKE-OFF POWER (TORQUE) ---
+            let torque = 0;
+            const FLAT_RATING = 94.5;
+
+            if (antiIce === 'off') {
+                const kinks = [
+                    { a: 0, t: 39.0 }, { a: 2000, t: 33.5 }, { a: 4000, t: 27.5 },
+                    { a: 6000, t: 21.0 }, { a: 8000, t: 14.5 }, { a: 10000, t: 8.0 }
+                ];
+                let tKink = 0;
+                for (let i = 0; i < kinks.length - 1; i++) {
+                    if (alt >= kinks[i].a && alt <= kinks[i+1].a) {
+                        const fraction = (alt - kinks[i].a) / (kinks[i+1].a - kinks[i].a);
+                        tKink = kinks[i].t + fraction * (kinks[i+1].t - kinks[i].t);
+                        break;
+                    }
+                }
+                const slope = 1.27;
+                torque = oat <= tKink ? FLAT_RATING : FLAT_RATING - slope * (oat - tKink);
+            } else {
+                const tKink = 1.0 + (10000 - alt) * 0.0035;
+                const slope = 1.0857;
+                torque = oat <= tKink ? FLAT_RATING : FLAT_RATING - slope * (oat - tKink);
+            }
+
+            // --- 2. MAXIMUM TAKE-OFF WEIGHT (MTOW) ---
+            let mtowOat = oat;
+            if (antiIce === 'on') {
+                mtowOat += 7; // Chart Note
+            }
+
+            let mtow = 0;
+            if (flaps === 'retracted') {
+                mtow = 17377.7 - (50 * mtowOat) - (0.28777 * alt);
+            } else {
+                mtow = 17658 - (50 * mtowOat) - (0.3758 * alt);
+            }
+
+            badgeMtow.style.display = 'none';
+            if (mtow >= 14900) {
+                mtow = 14900;
+                badgeMtow.style.display = 'inline-block';
+            }
+
+            // Check if Planned Weight is safe
+            let weightError = false;
+            if (isNaN(plannedWeight)) {
+                weightError = "Please enter a valid Planned T.O. Weight to see speeds.";
+            } else if (plannedWeight > mtow) {
+                weightError = `Planned Weight (${plannedWeight} LBS) exceeds Climb Limit MTOW (${Math.round(mtow)} LBS). Reduce weight or change conditions.`;
+            }
+
+            // --- 3. V-SPEEDS & TOFL (Trilinear Interpolation) ---
+            resetSpeedsUI();
+            
+            // Hallucination Guards
+            if (weightError) {
+                disableSpeeds(weightError);
+            } else if (flaps === 'retracted' && alt > 5000 && alt < 8000) {
+                disableSpeeds("Flaps Retracted data for 6000-7000 FT is missing (Pages 0218-0219).");
+            } else if (flaps === 'retracted' && alt > 10000) {
+                disableSpeeds("Flaps Retracted speed data currently limited to 0 - 10000 FT.");
+            } else if (flaps === 'extended' && alt > 10000) {
+                disableSpeeds("Speed data only provided for 0-10000 FT. Provide more pages.");
+            } else {
+                // We are inside safe bounds
+                enableSpeeds();
+
+                const altitudeLevelsExtended = [
+                    { alt: 0, data: data0_ext },
+                    { alt: 1000, data: data1000_ext },
+                    { alt: 2000, data: data2000_ext },
+                    { alt: 3000, data: data3000_ext },
+                    { alt: 4000, data: data4000_ext },
+                    { alt: 5000, data: data5000_ext },
+                    { alt: 6000, data: data6000_ext },
+                    { alt: 7000, data: data7000_ext },
+                    { alt: 8000, data: data8000_ext },
+                    { alt: 9000, data: data9000_ext },
+                    { alt: 10000, data: data10000_ext }
+                ];
+
+                const altitudeLevelsRetracted = [
+                    { alt: 0, data: data0_retract },
+                    { alt: 1000, data: data1000_retract },
+                    { alt: 2000, data: data2000_retract },
+                    { alt: 3000, data: data3000_retract },
+                    { alt: 4000, data: data4000_retract },
+                    { alt: 5000, data: data5000_retract },
+                    { alt: 8000, data: data8000_retract },
+                    { alt: 9000, data: data9000_retract },
+                    { alt: 10000, data: data10000_retract }
+                ];
+
+                const activeLevels = flaps === 'extended' ? altitudeLevelsExtended : altitudeLevelsRetracted;
+
+                let lowerData = null, upperData = null, lowerAlt = 0, upperAlt = 0;
+                for (let i = 0; i < activeLevels.length - 1; i++) {
+                    if (alt >= activeLevels[i].alt && alt <= activeLevels[i+1].alt) {
+                        lowerData = activeLevels[i].data;
+                        upperData = activeLevels[i+1].data;
+                        lowerAlt = activeLevels[i].alt;
+                        upperAlt = activeLevels[i+1].alt;
+                        break;
+                    }
+                }
+                
+                // Fallback for upper boundary
+                if (lowerData === null && alt === activeLevels[activeLevels.length - 1].alt) {
+                    lowerData = activeLevels[activeLevels.length - 1].data;
+                    upperData = activeLevels[activeLevels.length - 1].data;
+                    lowerAlt = activeLevels[activeLevels.length - 1].alt;
+                    upperAlt = activeLevels[activeLevels.length - 1].alt;
+                }
+
+                const v1_lower = getBilinear(plannedWeight, oat, lowerData.v1);
+                const vr_lower = getBilinear(plannedWeight, oat, lowerData.vr);
+                const v2_lower = getBilinear(plannedWeight, oat, lowerData.v2);
+                const tofl_lower = getBilinear(plannedWeight, oat, lowerData.tofl);
+
+                const v1_upper = getBilinear(plannedWeight, oat, upperData.v1);
+                const vr_upper = getBilinear(plannedWeight, oat, upperData.vr);
+                const v2_upper = getBilinear(plannedWeight, oat, upperData.v2);
+                const tofl_upper = getBilinear(plannedWeight, oat, upperData.tofl);
+
+                if (v1_lower === null || v1_upper === null) {
+                    // This happens if we hit a "dash" in the chart (e.g. W=14000, T=52, Alt=2000)
+                    disableSpeeds("Conditions outside certified speed limits (dashed area in chart).");
+                } else {
+                    const altFrac = upperAlt === lowerAlt ? 0 : (alt - lowerAlt) / (upperAlt - lowerAlt);
+                    
+                    const v1 = v1_lower + altFrac * (v1_upper - v1_lower);
+                    const vr = vr_lower + altFrac * (vr_upper - vr_lower);
+                    const v2 = v2_lower + altFrac * (v2_upper - v2_lower);
+                    
+                    // V35 formula shifts based on flap configuration according to the manual images
+                    const v35_add = flaps === 'retracted' ? 11 : 5;
+                    const v35 = v2 + v35_add; 
+                    
+                    const tofl = tofl_lower + altFrac * (tofl_upper - tofl_lower);
+
+                    resV1.textContent = Math.round(v1);
+                    resVr.textContent = Math.round(vr);
+                    resV2.textContent = Math.round(v2);
+                    resV35.textContent = Math.round(v35);
+                    resTofl.textContent = Math.round(tofl) + ' FT';
+                }
+            }
+
+            // Update Text UI
+            resTorque.textContent = torque.toFixed(1) + '%';
+            resMtow.textContent = Math.round(mtow).toLocaleString('en-US') + ' LBS';
+        }
+
+        // Initialize on load
+        calculateAll();
+
     </script>
 </body>
 </html>
