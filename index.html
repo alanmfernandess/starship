@@ -1,92 +1,229 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Starship AeroCalc - Take-Off Performance</title>
+    <title>Starship Aerocalc | Takeoff Precision</title>
+    <!-- Fonte Moderna -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <style>
-        /* Modern, lightweight CSS reset and base styles */
+        /* Variáveis do Tema Starship (Dark/Neon) */
         :root {
-            --primary: #0f172a;
-            --primary-light: #1e293b;
-            --accent: #0284c7;
-            --bg-body: #f1f5f9;
-            --bg-card: #ffffff;
-            --text-main: #334155;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
-            --error-bg: #fef2f2;
-            --error-text: #ef4444;
-            --error-border: #fecaca;
-            --success-bg: #f0fdf4;
-            --success-border: #bbf7d0;
-            --warning-bg: #fffbeb;
-            --warning-text: #d97706;
-            --warning-border: #fde68a;
+            --bg-dark: #020617;
+            --bg-card: #0f172a;
+            --bg-input: #1e293b;
+            --primary: #0ea5e9;
+            --primary-hover: #0284c7;
+            --accent: #38bdf8;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Inter', sans-serif;
         }
 
         body {
-            background-color: var(--bg-body);
+            background-color: var(--bg-dark);
             color: var(--text-main);
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Nav */
+        nav {
+            padding: 24px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(2, 6, 23, 0.8);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo span {
+            color: var(--primary);
+        }
+
+        .nav-contact {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-contact:hover {
+            color: var(--primary);
+        }
+
+        /* Hero Section */
+        .hero {
+            margin-top: 80px;
+            padding: 100px 5% 80px;
+            text-align: center;
+            background: radial-gradient(circle at 50% 0%, rgba(14, 165, 233, 0.15) 0%, transparent 50%);
+        }
+
+        .hero h1 {
+            font-size: clamp(40px, 8vw, 72px);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            background: linear-gradient(to right, #fff, #7dd3fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -2px;
+        }
+
+        .hero p {
+            font-size: clamp(16px, 4vw, 20px);
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto 40px;
+            line-height: 1.6;
+        }
+
+        .btn-primary {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 16px 32px;
+            border-radius: 99px;
+            font-weight: 600;
+            font-size: 16px;
+            text-decoration: none;
+            transition: all 0.3s;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 10px 25px -5px rgba(14, 165, 233, 0.4);
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px -5px rgba(14, 165, 233, 0.5);
+        }
+
+        /* Layout Principal */
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 5%;
+            flex: 1;
+        }
+
+        /* Marketing Features */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            width: 100%;
+            max-width: 1000px;
+            margin-bottom: 80px;
+        }
+
+        .feature-card {
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid var(--border);
+            padding: 32px;
+            border-radius: 16px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            background: rgba(15, 23, 42, 0.8);
+        }
+
+        .feature-icon {
+            font-size: 32px;
+            margin-bottom: 16px;
+            display: inline-block;
+        }
+
+        .feature-card h3 {
+            font-size: 18px;
+            margin-bottom: 12px;
+            color: white;
+        }
+
+        .feature-card p {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* Calculadora App */
+        .app-section {
+            width: 100%;
             display: flex;
             justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
+            margin-bottom: 80px;
         }
 
         .card {
             background-color: var(--bg-card);
             width: 100%;
-            max-width: 480px;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05), 0 4px 10px rgba(0, 0, 0, 0.02);
+            max-width: 500px;
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             overflow: hidden;
+            position: relative;
         }
 
-        .header {
-            background-color: var(--primary);
-            color: #ffffff;
-            padding: 24px;
-            text-align: center;
-            border-bottom: 4px solid var(--accent);
-        }
-
-        .header h1 {
-            font-size: 26px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            margin-bottom: 6px;
-        }
-
-        .header p {
-            font-size: 13px;
-            color: #94a3b8;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: 500;
+        /* Brilho de fundo no card */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
         }
 
         .content {
-            padding: 24px;
+            padding: 32px;
         }
 
         .form-row {
             display: flex;
             gap: 16px;
-            margin-bottom: 18px;
+            margin-bottom: 20px;
         }
 
         .form-group {
             flex: 1;
-            margin-bottom: 18px;
+            margin-bottom: 20px;
         }
 
         .form-row .form-group {
@@ -96,9 +233,9 @@
         label {
             display: block;
             font-size: 12px;
-            font-weight: 700;
+            font-weight: 600;
             margin-bottom: 8px;
-            color: var(--text-main);
+            color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
@@ -109,31 +246,30 @@
 
         input[type="number"] {
             width: 100%;
-            padding: 12px 14px;
+            padding: 14px 16px;
             border: 1px solid var(--border);
-            border-radius: 8px;
+            border-radius: 12px;
             font-size: 16px;
-            font-weight: 500;
-            color: var(--primary);
+            font-weight: 600;
+            color: white;
+            background-color: var(--bg-input);
             transition: all 0.2s ease;
             outline: none;
-            background-color: #f8fafc;
         }
 
         input[type="number"]:focus {
-            border-color: var(--accent);
-            background-color: #fff;
-            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
         }
 
         .unit {
             position: absolute;
-            right: 14px;
+            right: 16px;
             top: 50%;
             transform: translateY(-50%);
             color: var(--text-muted);
-            font-size: 13px;
-            font-weight: 600;
+            font-size: 12px;
+            font-weight: 700;
             pointer-events: none;
         }
 
@@ -147,14 +283,14 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 10px;
+            padding: 12px;
             border: 1px solid var(--border);
-            border-radius: 8px;
+            border-radius: 12px;
             cursor: pointer;
             transition: all 0.2s ease;
             font-size: 14px;
             font-weight: 600;
-            background-color: #f8fafc;
+            background-color: var(--bg-input);
             color: var(--text-muted);
         }
 
@@ -163,35 +299,34 @@
         }
 
         .radio-label:has(input:checked) {
-            background-color: var(--accent);
-            color: #ffffff;
-            border-color: var(--accent);
-            box-shadow: 0 4px 10px rgba(2, 132, 199, 0.2);
+            background-color: rgba(14, 165, 233, 0.1);
+            color: var(--accent);
+            border-color: var(--primary);
         }
 
         .results-wrapper {
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            margin-top: 24px;
+            gap: 16px;
+            margin-top: 32px;
         }
 
         .result-container {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 16px 20px;
-            background: #f8fafc;
-            border-radius: 12px;
+            padding: 20px;
+            background: var(--bg-input);
+            border-radius: 16px;
             border: 1px solid var(--border);
-            border-left: 4px solid var(--text-muted);
+            border-left: 4px solid var(--border);
             transition: all 0.3s;
         }
 
         .result-container.active {
-            border-color: var(--success-border);
-            background: var(--success-bg);
-            border-left-color: #10b981;
+            border-color: rgba(16, 185, 129, 0.3);
+            background: rgba(16, 185, 129, 0.05);
+            border-left-color: var(--success);
         }
 
         .result-info {
@@ -201,8 +336,8 @@
         }
 
         .result-label {
-            font-size: 12px;
-            color: var(--text-muted);
+            font-size: 13px;
+            color: white;
             text-transform: uppercase;
             font-weight: 700;
             letter-spacing: 0.5px;
@@ -210,11 +345,11 @@
 
         .result-desc {
             font-size: 11px;
-            color: #94a3b8;
+            color: var(--text-muted);
         }
 
         .result-value {
-            font-size: 24px;
+            font-size: 26px;
             font-weight: 800;
             color: var(--text-muted);
             letter-spacing: -0.5px;
@@ -223,36 +358,36 @@
         }
 
         .result-container.active .result-value {
-            color: var(--primary);
+            color: var(--accent);
         }
 
         .limit-badge {
             display: inline-block;
             font-size: 10px;
-            background: var(--accent);
+            background: var(--primary);
             color: white;
-            padding: 2px 6px;
+            padding: 3px 6px;
             border-radius: 4px;
             margin-left: 8px;
             vertical-align: middle;
             display: none;
+            font-weight: 800;
         }
 
         .error-msg {
             display: none;
-            color: var(--error-text);
+            color: #fca5a5;
             font-size: 13px;
-            margin-top: 16px;
+            margin-top: 20px;
             text-align: center;
-            background: var(--error-bg);
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid var(--error-border);
+            background: rgba(239, 68, 68, 0.1);
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(239, 68, 68, 0.3);
             font-weight: 500;
-            line-height: 1.4;
+            line-height: 1.5;
         }
 
-        /* Speeds Panel Specifics */
         .v-speeds-box {
             flex-direction: column;
             align-items: flex-start;
@@ -263,14 +398,14 @@
             grid-template-columns: repeat(4, 1fr);
             gap: 12px;
             width: 100%;
-            margin-top: 12px;
+            margin-top: 16px;
         }
 
         .speed-item {
-            background: #ffffff;
+            background: rgba(0,0,0,0.2);
             border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 10px 8px;
+            border-radius: 12px;
+            padding: 12px 8px;
             text-align: center;
         }
 
@@ -284,139 +419,240 @@
 
         .speed-item strong {
             display: block;
-            font-size: 18px;
-            color: var(--primary);
+            font-size: 20px;
+            color: white;
         }
 
         .tofl-item {
             grid-column: span 4;
-            background: var(--primary);
-            border-color: var(--primary);
+            background: rgba(14, 165, 233, 0.1);
+            border-color: rgba(14, 165, 233, 0.3);
         }
 
-        .tofl-item span { color: #cbd5e1; }
-        .tofl-item strong { color: #ffffff; font-size: 20px; }
+        .tofl-item span { color: var(--accent); }
+        .tofl-item strong { color: white; font-size: 24px; }
 
         .warning-msg {
             display: none;
-            color: var(--warning-text);
-            font-size: 12px;
-            margin-top: 12px;
-            padding: 10px;
-            background: var(--warning-bg);
-            border: 1px solid var(--warning-border);
-            border-radius: 6px;
+            color: #fcd34d;
+            font-size: 13px;
+            margin-top: 16px;
+            padding: 12px;
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 8px;
             font-weight: 500;
             width: 100%;
+            text-align: center;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #020617;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding: 40px 5%;
+            text-align: center;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .dev-credit {
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 8px;
+        }
+
+        .contact-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .contact-link:hover {
+            color: var(--primary);
+        }
+
+        /* Responsividade */
+        @media (max-width: 600px) {
+            .form-row {
+                flex-direction: column;
+                gap: 20px;
+            }
+            .speeds-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .tofl-item {
+                grid-column: span 2;
+            }
+        }
+        
+        html {
+            scroll-behavior: smooth;
         }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <div class="header">
-            <h1>AeroCalc</h1>
-            <p>Take-Off Performance</p>
+    <!-- Navegação -->
+    <nav>
+        <div class="logo">🚀 Starship <span>Aerocalc</span></div>
+        <a href="mailto:alanfernandes@icloud.com" class="nav-contact">Contact Developer</a>
+    </nav>
+
+    <!-- Hero de Marketing -->
+    <section class="hero">
+        <h1>Absolute Takeoff Precision</h1>
+        <p>The ultimate tool for performance calculations, V-Speeds, MTOW, and power. Starship Aerocalc brings cutting-edge technology to your flight plan in seconds.</p>
+        <a href="#calculator" class="btn-primary">Access Calculator</a>
+    </section>
+
+    <!-- Seção Principal -->
+    <main class="main-container">
+        
+        <!-- Benefícios -->
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">⚡️</div>
+                <h3>Real-Time Results</h3>
+                <p>Our engine processes complex performance tables instantly as you type.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3>Extreme Precision</h3>
+                <p>Bi-linear and tri-linear interpolation based on the original aircraft manual ensure exact numbers.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📱</div>
+                <h3>100% Responsive</h3>
+                <p>Designed to work flawlessly on your iPad in the cockpit or on your phone on the go.</p>
+            </div>
         </div>
 
-        <div class="content">
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="alt">Field Press. Alt</label>
-                    <div class="input-wrapper">
-                        <input type="number" id="alt" value="1000" min="0" max="10000" step="1">
-                        <span class="unit">FT</span>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="oat">OAT</label>
-                    <div class="input-wrapper">
-                        <input type="number" id="oat" value="10" min="-40" max="60" step="1">
-                        <span class="unit">°C</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="weight">Planned T.O. Weight</label>
-                <div class="input-wrapper">
-                    <input type="number" id="weight" value="14000" min="10000" max="14900" step="10">
-                    <span class="unit">LBS</span>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group" style="margin-bottom: 0;">
-                    <label>Flaps</label>
-                    <div class="radio-group">
-                        <label class="radio-label">
-                            <input type="radio" name="flaps" value="retracted">
-                            Retract
-                        </label>
-                        <label class="radio-label">
-                            <input type="radio" name="flaps" value="extended" checked>
-                            Extend
-                        </label>
-                    </div>
-                </div>
-
-                <div class="form-group" style="margin-bottom: 0;">
-                    <label>Eng Anti-Ice</label>
-                    <div class="radio-group">
-                        <label class="radio-label">
-                            <input type="radio" name="antiIce" value="off" checked>
-                            OFF
-                        </label>
-                        <label class="radio-label">
-                            <input type="radio" name="antiIce" value="on">
-                            ON
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <div class="results-wrapper">
-                <!-- Torque Result -->
-                <div class="result-container" id="box-torque">
-                    <div class="result-info">
-                        <div class="result-label">Take-Off Power</div>
-                        <div class="result-desc">Set before brake release</div>
-                    </div>
-                    <div class="result-value" id="res-torque">--.-%</div>
-                </div>
-
-                <!-- MTOW Result -->
-                <div class="result-container" id="box-mtow">
-                    <div class="result-info">
-                        <div class="result-label">Climb Limit MTOW <span class="limit-badge" id="badge-mtow">MAX</span></div>
-                        <div class="result-desc">To achieve climb req.</div>
-                    </div>
-                    <div class="result-value" id="res-mtow">----- LBS</div>
-                </div>
-
-                <!-- V-Speeds and TOFL -->
-                <div class="result-container v-speeds-box" id="box-vspeeds">
-                    <div class="result-info" style="width: 100%">
-                        <div class="result-label">V-Speeds & Field Length</div>
-                        
-                        <div class="speeds-grid" id="res-speeds-grid">
-                            <div class="speed-item"><span>V1</span><strong id="res-v1">--</strong></div>
-                            <div class="speed-item"><span>VR</span><strong id="res-vr">--</strong></div>
-                            <div class="speed-item"><span>V2</span><strong id="res-v2">--</strong></div>
-                            <div class="speed-item"><span>V35</span><strong id="res-v35">--</strong></div>
-                            <div class="speed-item tofl-item"><span>TOFL</span><strong id="res-tofl">-- FT</strong></div>
+        <!-- Calculadora (Âncora) -->
+        <div id="calculator" class="app-section">
+            <div class="card">
+                <div class="content">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="alt">Pressure Altitude (Field)</label>
+                            <div class="input-wrapper">
+                                <input type="number" id="alt" value="1000" min="0" max="10000" step="1">
+                                <span class="unit">FT</span>
+                            </div>
                         </div>
 
-                        <div class="warning-msg" id="speeds-warning"></div>
+                        <div class="form-group">
+                            <label for="oat">OAT Temperature</label>
+                            <div class="input-wrapper">
+                                <input type="number" id="oat" value="10" min="-40" max="60" step="1">
+                                <span class="unit">°C</span>
+                            </div>
+                        </div>
                     </div>
+
+                    <div class="form-group">
+                        <label for="weight">Planned Takeoff Weight</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="weight" value="14000" min="10000" max="14900" step="10">
+                            <span class="unit">LBS</span>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label>Flaps</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="flaps" value="retracted">
+                                    Retracted
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="flaps" value="extended" checked>
+                                    Extended
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label>Eng Anti-Ice</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="antiIce" value="off" checked>
+                                    OFF
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="antiIce" value="on">
+                                    ON
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="results-wrapper">
+                        <!-- Torque Result -->
+                        <div class="result-container" id="box-torque">
+                            <div class="result-info">
+                                <div class="result-label">Takeoff Power</div>
+                                <div class="result-desc">Set before brake release</div>
+                            </div>
+                            <div class="result-value" id="res-torque">--.-%</div>
+                        </div>
+
+                        <!-- MTOW Result -->
+                        <div class="result-container" id="box-mtow">
+                            <div class="result-info">
+                                <div class="result-label">Climb Limit MTOW <span class="limit-badge" id="badge-mtow">MAX</span></div>
+                                <div class="result-desc">To meet requirements</div>
+                            </div>
+                            <div class="result-value" id="res-mtow">----- LBS</div>
+                        </div>
+
+                        <!-- V-Speeds and TOFL -->
+                        <div class="result-container v-speeds-box" id="box-vspeeds">
+                            <div class="result-info" style="width: 100%">
+                                <div class="result-label">V-Speeds & Distance (TOFL)</div>
+                                
+                                <div class="speeds-grid" id="res-speeds-grid">
+                                    <div class="speed-item"><span>V1</span><strong id="res-v1">--</strong></div>
+                                    <div class="speed-item"><span>VR</span><strong id="res-vr">--</strong></div>
+                                    <div class="speed-item"><span>V2</span><strong id="res-v2">--</strong></div>
+                                    <div class="speed-item"><span>V35</span><strong id="res-v35">--</strong></div>
+                                    <div class="speed-item tofl-item"><span>TOFL</span><strong id="res-tofl">-- FT</strong></div>
+                                </div>
+
+                                <div class="warning-msg" id="speeds-warning"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="error-msg" id="error"></div>
                 </div>
             </div>
-
-            <div class="error-msg" id="error"></div>
         </div>
-    </div>
+    </main>
 
+    <!-- Rodapé & Créditos -->
+    <footer>
+        <div class="footer-content">
+            <p class="dev-credit">Developed by Alan Fernandes</p>
+            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 12px;">All rights reserved &copy; 2026 Starship Aerocalc</p>
+            <a href="mailto:alanfernandes@icloud.com" class="contact-link">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                alanfernandes@icloud.com
+            </a>
+        </div>
+    </footer>
+
+    <!-- Scripts de Cálculo da Calculadora -->
     <script>
         // DOM Elements
         const inputAlt = document.getElementById('alt');
@@ -1147,7 +1383,7 @@
         function disableSpeeds(msg) {
             speedsGrid.style.display = 'none';
             speedsWarning.style.display = 'block';
-            speedsWarning.textContent = msg || 'Speeds unavailable.';
+            speedsWarning.textContent = msg || 'Speed calculation unavailable for these parameters.';
             boxVspeeds.classList.remove('active');
         }
 
@@ -1174,23 +1410,23 @@
 
             // Basic validation
             if (isNaN(alt) || isNaN(oat)) {
-                showError("Please enter valid numbers for Altitude and OAT.");
+                showError("Please enter valid values for Altitude and OAT.");
                 return;
             }
 
             if (alt < 0 || alt > 10000) {
-                showError("Field Pressure Altitude must be between 0 and 10,000 FT.");
+                showError("Pressure Altitude must be between 0 and 10,000 FT.");
                 return;
             }
 
             if (oat < -40) {
-                showError("OAT is below minimum chart limit (-40°C).");
+                showError("OAT is below the chart's minimum limit (-40°C).");
                 return;
             }
 
             // Global Anti-Ice ON limit
             if (antiIce === 'on' && oat > 10) {
-                showError("OAT exceeds MAXIMUM TEMPERATURE limit for Engine Anti-Ice ON (10°C).");
+                showError("OAT exceeds the MAXIMUM temperature limit for Anti-Ice ON (10°C).");
                 return;
             }
 
@@ -1198,7 +1434,7 @@
             const isaTemp = 15 - (2 * (alt / 1000));
             const maxOAT = isaTemp + 37;
             if (oat > maxOAT) {
-                showError(`OAT exceeds ISA+37°C limit for this altitude.<br>Max permitted OAT: ${maxOAT.toFixed(1)}°C`);
+                showError(`OAT exceeds the ISA+37°C limit for this altitude.<br>Maximum allowed OAT: ${maxOAT.toFixed(1)}°C`);
                 return;
             }
 
@@ -1251,9 +1487,9 @@
             // Check if Planned Weight is safe
             let weightError = false;
             if (isNaN(plannedWeight)) {
-                weightError = "Please enter a valid Planned T.O. Weight to see speeds.";
+                weightError = "Please enter Planned Takeoff Weight.";
             } else if (plannedWeight > mtow) {
-                weightError = `Planned Weight (${plannedWeight} LBS) exceeds Climb Limit MTOW (${Math.round(mtow)} LBS). Reduce weight or change conditions.`;
+                weightError = `Planned Weight (${plannedWeight} LBS) exceeds Climb Limit MTOW (${Math.round(mtow)} LBS). Reduce weight.`;
             }
 
             // --- 3. V-SPEEDS & TOFL (Trilinear Interpolation) ---
@@ -1263,11 +1499,11 @@
             if (weightError) {
                 disableSpeeds(weightError);
             } else if (flaps === 'retracted' && alt > 5000 && alt < 8000) {
-                disableSpeeds("Flaps Retracted data for 6000-7000 FT is missing (Pages 0218-0219).");
+                disableSpeeds("Flaps retracted speed data is currently unavailable for altitudes between 6000-7000 FT.");
             } else if (flaps === 'retracted' && alt > 10000) {
-                disableSpeeds("Flaps Retracted speed data currently limited to 0 - 10000 FT.");
+                disableSpeeds("Flaps retracted speed data is limited to 10,000 FT.");
             } else if (flaps === 'extended' && alt > 10000) {
-                disableSpeeds("Speed data only provided for 0-10000 FT. Provide more pages.");
+                disableSpeeds("Speed data is limited to 10,000 FT.");
             } else {
                 // We are inside safe bounds
                 enableSpeeds();
@@ -1331,7 +1567,7 @@
 
                 if (v1_lower === null || v1_upper === null) {
                     // This happens if we hit a "dash" in the chart (e.g. W=14000, T=52, Alt=2000)
-                    disableSpeeds("Conditions outside certified speed limits (dashed area in chart).");
+                    disableSpeeds("Conditions outside certified speed limits (dashed area on chart).");
                 } else {
                     const altFrac = upperAlt === lowerAlt ? 0 : (alt - lowerAlt) / (upperAlt - lowerAlt);
                     
