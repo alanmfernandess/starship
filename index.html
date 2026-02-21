@@ -4,31 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Starship Aerocalc | Takeoff Precision</title>
-    <!-- Fonte Moderna -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Fonte Terminal -->
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
-        /* Variáveis do Tema Starship (Dark/Neon) */
+        /* Variáveis do Tema Starship (Claro/Terminal) */
         :root {
-            --bg-dark: #020617;
-            --bg-card: #0f172a;
-            --bg-input: #1e293b;
-            --primary: #0ea5e9;
-            --primary-hover: #0284c7;
-            --accent: #38bdf8;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --border: #334155;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --error: #ef4444;
+            --bg-dark: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-input: #f1f5f9;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --accent: #0ea5e9;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --success: #059669;
+            --warning: #d97706;
+            --error: #dc2626;
+            --red-line: #dc2626;
+            --blue-line: #2563eb;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Inter', sans-serif;
+            font-family: 'JetBrains Mono', monospace;
         }
 
         body {
@@ -40,14 +42,14 @@
             min-height: 100vh;
         }
 
-        /* Nav */
+        /* Navegação */
         nav {
             padding: 24px 5%;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            background: rgba(2, 6, 23, 0.8);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            background: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(10px);
             position: fixed;
             top: 0;
@@ -59,7 +61,7 @@
             font-size: 24px;
             font-weight: 800;
             letter-spacing: -0.5px;
-            color: white;
+            color: var(--text-main);
             display: flex;
             align-items: center;
             gap: 8px;
@@ -69,7 +71,12 @@
             color: var(--primary);
         }
 
-        .nav-contact {
+        .nav-links {
+            display: flex;
+            gap: 24px;
+        }
+
+        .nav-link {
             color: var(--text-muted);
             text-decoration: none;
             font-size: 14px;
@@ -77,16 +84,16 @@
             transition: color 0.3s;
         }
 
-        .nav-contact:hover {
+        .nav-link:hover {
             color: var(--primary);
         }
 
-        /* Hero Section */
+        /* Secção Hero */
         .hero {
             margin-top: 80px;
             padding: 100px 5% 80px;
             text-align: center;
-            background: radial-gradient(circle at 50% 0%, rgba(14, 165, 233, 0.15) 0%, transparent 50%);
+            background: radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.08) 0%, transparent 50%);
         }
 
         .hero h1 {
@@ -94,7 +101,7 @@
             font-weight: 800;
             line-height: 1.1;
             margin-bottom: 24px;
-            background: linear-gradient(to right, #fff, #7dd3fc);
+            background: linear-gradient(to right, #0f172a, #2563eb);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             letter-spacing: -2px;
@@ -108,6 +115,13 @@
             line-height: 1.6;
         }
 
+        .hero-btns {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
         .btn-primary {
             display: inline-block;
             background: var(--primary);
@@ -118,18 +132,38 @@
             font-size: 16px;
             text-decoration: none;
             transition: all 0.3s;
-            border: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 0 10px 25px -5px rgba(14, 165, 233, 0.4);
+            border: 1px solid rgba(0,0,0,0.1);
+            box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.3);
             cursor: pointer;
         }
 
         .btn-primary:hover {
             background: var(--primary-hover);
             transform: translateY(-2px);
-            box-shadow: 0 15px 35px -5px rgba(14, 165, 233, 0.5);
+            box-shadow: 0 15px 35px -5px rgba(37, 99, 235, 0.4);
         }
 
-        /* Layout Principal */
+        .btn-secondary {
+            display: inline-block;
+            background: white;
+            color: var(--text-main);
+            padding: 16px 32px;
+            border-radius: 99px;
+            font-weight: 600;
+            font-size: 16px;
+            text-decoration: none;
+            transition: all 0.3s;
+            border: 1px solid var(--border);
+            cursor: pointer;
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-input);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        /* Estrutura Principal */
         .main-container {
             display: flex;
             flex-direction: column;
@@ -138,7 +172,7 @@
             flex: 1;
         }
 
-        /* Marketing Features */
+        /* Funcionalidades */
         .features {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -149,7 +183,7 @@
         }
 
         .feature-card {
-            background: rgba(15, 23, 42, 0.4);
+            background: white;
             border: 1px solid var(--border);
             padding: 32px;
             border-radius: 16px;
@@ -160,7 +194,7 @@
         .feature-card:hover {
             transform: translateY(-5px);
             border-color: var(--primary);
-            background: rgba(15, 23, 42, 0.8);
+            background: var(--bg-input);
         }
 
         .feature-icon {
@@ -172,7 +206,7 @@
         .feature-card h3 {
             font-size: 18px;
             margin-bottom: 12px;
-            color: white;
+            color: var(--text-main);
         }
 
         .feature-card p {
@@ -181,12 +215,29 @@
             line-height: 1.5;
         }
 
-        /* Calculadora App */
+        /* Secções da Aplicação */
         .app-section {
             width: 100%;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
+            align-items: center;
             margin-bottom: 80px;
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .section-header h2 {
+            font-size: 32px;
+            color: var(--text-main);
+            margin-bottom: 8px;
+        }
+
+        .section-header p {
+            color: var(--text-muted);
+            font-size: 16px;
         }
 
         .card {
@@ -195,12 +246,16 @@
             max-width: 500px;
             border-radius: 24px;
             border: 1px solid var(--border);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
             overflow: hidden;
             position: relative;
         }
 
-        /* Brilho de fundo no card */
+        .card-wide {
+            max-width: 1000px; /* Alargado para as tabelas de limites */
+        }
+
+        /* Brilho no topo dos cartões */
         .card::before {
             content: '';
             position: absolute;
@@ -215,6 +270,7 @@
             padding: 32px;
         }
 
+        /* Entradas da Calculadora */
         .form-row {
             display: flex;
             gap: 16px;
@@ -251,7 +307,7 @@
             border-radius: 12px;
             font-size: 16px;
             font-weight: 600;
-            color: white;
+            color: var(--text-main);
             background-color: var(--bg-input);
             transition: all 0.2s ease;
             outline: none;
@@ -259,7 +315,7 @@
 
         input[type="number"]:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
         }
 
         .unit {
@@ -299,11 +355,12 @@
         }
 
         .radio-label:has(input:checked) {
-            background-color: rgba(14, 165, 233, 0.1);
-            color: var(--accent);
+            background-color: rgba(37, 99, 235, 0.1);
+            color: var(--primary);
             border-color: var(--primary);
         }
 
+        /* Resultados da Calculadora */
         .results-wrapper {
             display: flex;
             flex-direction: column;
@@ -324,8 +381,8 @@
         }
 
         .result-container.active {
-            border-color: rgba(16, 185, 129, 0.3);
-            background: rgba(16, 185, 129, 0.05);
+            border-color: rgba(5, 150, 105, 0.3);
+            background: rgba(5, 150, 105, 0.05);
             border-left-color: var(--success);
         }
 
@@ -337,7 +394,7 @@
 
         .result-label {
             font-size: 13px;
-            color: white;
+            color: var(--text-main);
             text-transform: uppercase;
             font-weight: 700;
             letter-spacing: 0.5px;
@@ -376,14 +433,14 @@
 
         .error-msg {
             display: none;
-            color: #fca5a5;
+            color: var(--error);
             font-size: 13px;
             margin-top: 20px;
             text-align: center;
-            background: rgba(239, 68, 68, 0.1);
+            background: rgba(220, 38, 38, 0.1);
             padding: 16px;
             border-radius: 12px;
-            border: 1px solid rgba(239, 68, 68, 0.3);
+            border: 1px solid rgba(220, 38, 38, 0.3);
             font-weight: 500;
             line-height: 1.5;
         }
@@ -402,7 +459,7 @@
         }
 
         .speed-item {
-            background: rgba(0,0,0,0.2);
+            background: var(--bg-input);
             border: 1px solid var(--border);
             border-radius: 12px;
             padding: 12px 8px;
@@ -420,36 +477,258 @@
         .speed-item strong {
             display: block;
             font-size: 20px;
-            color: white;
+            color: var(--text-main);
         }
 
         .tofl-item {
             grid-column: span 4;
-            background: rgba(14, 165, 233, 0.1);
-            border-color: rgba(14, 165, 233, 0.3);
+            background: rgba(37, 99, 235, 0.1);
+            border-color: rgba(37, 99, 235, 0.3);
         }
 
         .tofl-item span { color: var(--accent); }
-        .tofl-item strong { color: white; font-size: 24px; }
+        .tofl-item strong { color: var(--text-main); font-size: 24px; }
 
         .warning-msg {
             display: none;
-            color: #fcd34d;
+            color: var(--warning);
             font-size: 13px;
             margin-top: 16px;
             padding: 12px;
-            background: rgba(245, 158, 11, 0.1);
-            border: 1px solid rgba(245, 158, 11, 0.3);
+            background: rgba(217, 119, 6, 0.1);
+            border: 1px solid rgba(217, 119, 6, 0.3);
             border-radius: 8px;
             font-weight: 500;
             width: 100%;
             text-align: center;
         }
 
-        /* Footer */
+        /* Tabelas e Limitações Estilizadas */
+        .limitations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 24px;
+            width: 100%;
+        }
+
+        .limits-table-wrapper {
+            overflow-x: auto;
+            margin-top: 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .limits-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            text-align: left;
+            background: white;
+        }
+
+        .limits-table th {
+            background: var(--bg-input);
+            color: var(--text-main);
+            font-weight: 700;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        .limits-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-main);
+        }
+
+        .limits-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .limits-table tr:hover td {
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        .limits-table .highlight {
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .limits-table .red-limit {
+            color: var(--red-line);
+            font-weight: 700;
+        }
+
+        .limits-table small {
+            display: block;
+            color: var(--text-muted);
+            font-size: 11px;
+            margin-top: 2px;
+        }
+
+        /* Mostrador Dinâmico */
+        .dynamic-speed-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            background: var(--bg-input);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-bottom: 12px;
+        }
+
+        .dynamic-speed-title {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .dynamic-speed-title strong {
+            font-size: 15px;
+            color: var(--text-main);
+        }
+        
+        .dynamic-speed-title span {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .dynamic-speed-value {
+            font-size: 24px;
+            font-weight: 800;
+            padding: 4px 12px;
+            border-radius: 8px;
+        }
+
+        .val-red {
+            background: rgba(220, 38, 38, 0.15);
+            color: var(--red-line);
+            border: 1px solid rgba(220, 38, 38, 0.3);
+        }
+
+        .val-blue {
+            background: rgba(37, 99, 235, 0.15);
+            color: var(--blue-line);
+            border: 1px solid rgba(37, 99, 235, 0.3);
+        }
+
+        /* Estilos KOEL (Equipment List) */
+        .koel-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            background: var(--bg-input);
+            padding: 6px;
+            border-radius: 16px;
+            overflow-x: auto;
+            border: 1px solid var(--border);
+        }
+
+        .koel-tab-btn {
+            flex: 1;
+            min-width: 100px;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .koel-tab-btn:hover {
+            color: var(--text-main);
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .koel-tab-btn.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .koel-list-container {
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+
+        /* Estilização da barra de rolagem */
+        .koel-list-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        .koel-list-container::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.05);
+            border-radius: 10px;
+        }
+        .koel-list-container::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 10px;
+        }
+
+        .koel-category {
+            margin-bottom: 24px;
+        }
+
+        .koel-category-title {
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .koel-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .koel-item:hover {
+            background: rgba(0,0,0,0.03);
+        }
+
+        .koel-item-name {
+            font-size: 14px;
+            color: var(--text-main);
+            flex: 1;
+            padding-right: 16px;
+        }
+
+        .koel-item-req {
+            font-size: 14px;
+            font-weight: 700;
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--primary);
+            padding: 4px 12px;
+            border-radius: 99px;
+            min-width: 40px;
+            text-align: center;
+            border: 1px solid rgba(37, 99, 235, 0.2);
+        }
+
+        .koel-item-req.zero {
+            background: transparent;
+            color: var(--text-muted);
+            border-color: var(--border);
+            font-weight: 500;
+        }
+
+        /* Rodapé */
         footer {
-            background-color: #020617;
-            border-top: 1px solid rgba(255,255,255,0.05);
+            background-color: white;
+            border-top: 1px solid var(--border);
             padding: 40px 5%;
             text-align: center;
             margin-top: auto;
@@ -463,7 +742,7 @@
         .dev-credit {
             font-size: 16px;
             font-weight: 600;
-            color: white;
+            color: var(--text-main);
             margin-bottom: 8px;
         }
 
@@ -493,6 +772,20 @@
             .tofl-item {
                 grid-column: span 2;
             }
+            .nav-links {
+                display: none; 
+            }
+            .koel-tabs {
+                border-radius: 12px;
+            }
+            .koel-tab-btn {
+                padding: 10px 12px;
+                font-size: 13px;
+                min-width: 80px;
+            }
+            .limitations-grid {
+                grid-template-columns: 1fr;
+            }
         }
         
         html {
@@ -505,47 +798,59 @@
     <!-- Navegação -->
     <nav>
         <div class="logo">🚀 Starship <span>Aerocalc</span></div>
-        <a href="mailto:alanfernandes@icloud.com" class="nav-contact">Contact Developer</a>
+        <div class="nav-links">
+            <a href="#calculator" class="nav-link">Performance</a>
+            <a href="#wind" class="nav-link">Wind</a>
+            <a href="#limitations" class="nav-link">Limitations</a>
+            <a href="#koel" class="nav-link">Equipment (KOEL)</a>
+        </div>
     </nav>
 
-    <!-- Hero de Marketing -->
+    <!-- Secção de Apresentação -->
     <section class="hero">
         <h1>Absolute Takeoff Precision</h1>
         <p>The ultimate tool for performance calculations, V-Speeds, MTOW, and power. Starship Aerocalc brings cutting-edge technology to your flight plan in seconds.</p>
-        <a href="#calculator" class="btn-primary">Access Calculator</a>
+        <div class="hero-btns">
+            <a href="#calculator" class="btn-primary">Access Calculator</a>
+            <a href="#limitations" class="btn-secondary">View Limitations</a>
+        </div>
     </section>
 
-    <!-- Seção Principal -->
+    <!-- Recipiente Principal -->
     <main class="main-container">
         
-        <!-- Benefícios -->
+        <!-- Vantagens -->
         <div class="features">
             <div class="feature-card">
                 <div class="feature-icon">⚡️</div>
                 <h3>Real-Time Results</h3>
-                <p>Our engine processes complex performance tables instantly as you type.</p>
+                <p>Our engine instantly processes complex performance tables as you input data.</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">🎯</div>
                 <h3>Extreme Precision</h3>
-                <p>Bi-linear and tri-linear interpolation based on the original aircraft manual ensure exact numbers.</p>
+                <p>Bi-linear and tri-linear interpolation based on the original Aircraft Flight Manual (AFM).</p>
             </div>
             <div class="feature-card">
-                <div class="feature-icon">📱</div>
-                <h3>100% Responsive</h3>
-                <p>Designed to work flawlessly on your iPad in the cockpit or on your phone on the go.</p>
+                <div class="feature-icon">✅</div>
+                <h3>Dispatch Ready</h3>
+                <p>Check exactly which equipment is mandatory with the integrated KOEL checker.</p>
             </div>
         </div>
 
         <!-- Calculadora (Âncora) -->
         <div id="calculator" class="app-section">
+            <div class="section-header">
+                <h2>Performance Calculator</h2>
+                <p>Enter planned flight conditions</p>
+            </div>
             <div class="card">
                 <div class="content">
                     <div class="form-row">
                         <div class="form-group">
                             <label for="alt">Pressure Altitude (Field)</label>
                             <div class="input-wrapper">
-                                <input type="number" id="alt" value="1000" min="0" max="10000" step="1">
+                                <input type="number" id="alt" value="1000" min="0" max="41000" step="1">
                                 <span class="unit">FT</span>
                             </div>
                         </div>
@@ -560,7 +865,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="weight">Planned Takeoff Weight</label>
+                        <label for="weight">Planned Weight (Takeoff)</label>
                         <div class="input-wrapper">
                             <input type="number" id="weight" value="14000" min="10000" max="14900" step="10">
                             <span class="unit">LBS</span>
@@ -583,7 +888,7 @@
                         </div>
 
                         <div class="form-group" style="margin-bottom: 0;">
-                            <label>Eng Anti-Ice</label>
+                            <label>Engine Anti-Ice</label>
                             <div class="radio-group">
                                 <label class="radio-label">
                                     <input type="radio" name="antiIce" value="off" checked>
@@ -597,26 +902,40 @@
                         </div>
                     </div>
 
+                    <div class="form-group" style="margin-bottom: 0; margin-top: 20px;">
+                        <label>Ice Accumulation</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="iceAcc" value="clean" checked>
+                                Clean
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="iceAcc" value="ice">
+                                Icing
+                            </label>
+                        </div>
+                    </div>
+
                     <div class="results-wrapper">
-                        <!-- Torque Result -->
+                        <!-- Resultado Potência -->
                         <div class="result-container" id="box-torque">
                             <div class="result-info">
-                                <div class="result-label">Takeoff Power</div>
+                                <div class="result-label">Power (Torque)</div>
                                 <div class="result-desc">Set before brake release</div>
                             </div>
                             <div class="result-value" id="res-torque">--.-%</div>
                         </div>
 
-                        <!-- MTOW Result -->
+                        <!-- Resultado MTOW -->
                         <div class="result-container" id="box-mtow">
                             <div class="result-info">
-                                <div class="result-label">Climb Limit MTOW <span class="limit-badge" id="badge-mtow">MAX</span></div>
-                                <div class="result-desc">To meet requirements</div>
+                                <div class="result-label">MTOW (Climb Limit) <span class="limit-badge" id="badge-mtow">MAX</span></div>
+                                <div class="result-desc">To meet climb gradient</div>
                             </div>
                             <div class="result-value" id="res-mtow">----- LBS</div>
                         </div>
 
-                        <!-- V-Speeds and TOFL -->
+                        <!-- Velocidades V e TOFL -->
                         <div class="result-container v-speeds-box" id="box-vspeeds">
                             <div class="result-info" style="width: 100%">
                                 <div class="result-label">V-Speeds & Distance (TOFL)</div>
@@ -632,9 +951,278 @@
                                 <div class="warning-msg" id="speeds-warning"></div>
                             </div>
                         </div>
+
+                        <!-- Resultado Stall Speed -->
+                        <div class="result-container" id="box-stall">
+                            <div class="result-info">
+                                <div class="result-label">Stall Speed (Vs)</div>
+                                <div class="result-desc">Power Idle</div>
+                            </div>
+                            <div class="result-value" id="res-stall">-- KIAS</div>
+                        </div>
                     </div>
 
                     <div class="error-msg" id="error"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nova Secção: Wind Components -->
+        <div id="wind" class="app-section">
+            <div class="section-header">
+                <h2>Wind Components</h2>
+                <p>Calculate crosswind and headwind components</p>
+            </div>
+            <div class="card">
+                <div class="content">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="windSpeed">Wind Speed</label>
+                            <div class="input-wrapper">
+                                <input type="number" id="windSpeed" value="10" min="0" max="100">
+                                <span class="unit">KTS</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="windAngle">Wind Angle</label>
+                            <div class="input-wrapper">
+                                <input type="number" id="windAngle" value="20" min="0" max="180">
+                                <span class="unit">DEG</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="results-wrapper" style="margin-top: 24px;">
+                        <div class="result-container active" id="box-headwind">
+                            <div class="result-info">
+                                <div class="result-label" id="lbl-headwind">Headwind Component</div>
+                                <div class="result-desc">Component along flight path</div>
+                            </div>
+                            <div class="result-value" id="res-headwind">9.4 KTS</div>
+                        </div>
+
+                        <div class="result-container active" id="box-crosswind">
+                            <div class="result-info">
+                                <div class="result-label">Crosswind Component</div>
+                                <div class="result-desc">Perpendicular to flight path</div>
+                            </div>
+                            <div class="result-value" id="res-crosswind">3.4 KTS</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nova Secção: Limitações da Aeronave -->
+        <div id="limitations" class="app-section">
+            <div class="section-header">
+                <h2>Aircraft Limitations</h2>
+                <p>According to ASI markings and AFM operating restrictions</p>
+            </div>
+            
+            <div class="limitations-grid card-wide">
+                <!-- Cartão: Limites Dinâmicos -->
+                <div class="card" style="width: 100%; max-width: none;">
+                    <div class="content">
+                        <h3 style="margin-bottom: 24px; color: var(--text-main);">Dynamic Flight Limits</h3>
+                        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
+                            These values are automatically updated based on the <strong>Pressure Altitude</strong> entered in the calculator.
+                        </p>
+                        
+                        <div class="dynamic-speed-box">
+                            <div class="dynamic-speed-title">
+                                <strong>Max Operating Speed (V<sub>MO</sub>)</strong>
+                                <span>Red pointer on ASI (Varies with altitude)</span>
+                            </div>
+                            <div class="dynamic-speed-value val-red" id="dyn-vmo">--- KIAS</div>
+                        </div>
+
+                        <div class="dynamic-speed-box">
+                            <div class="dynamic-speed-title">
+                                <strong>Best OEI Rate of Climb (V<sub>YSE</sub>)</strong>
+                                <span>Blue Line (Reduces 0.55 KIAS per 1000 ft)</span>
+                            </div>
+                            <div class="dynamic-speed-value val-blue" id="dyn-vyse">--- KIAS</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cartão: Limitações de Velocidade (Estático) -->
+                <div class="card" style="width: 100%; max-width: none;">
+                    <div class="content">
+                        <h3 style="color: var(--text-main);">Airspeed Limits (KIAS)</h3>
+                        <p style="font-size: 12px; color: var(--text-muted);">Reference for max weight of 14,900 lbs</p>
+                        
+                        <div class="limits-table-wrapper">
+                            <table class="limits-table">
+                                <thead>
+                                    <tr>
+                                        <th>Speed / Indication</th>
+                                        <th>KIAS</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Maneuvering Speed (V<sub>A</sub>)</td>
+                                        <td class="highlight">181</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Maximum Flap Extension (V<sub>FE</sub>)<small>Fully extended position</small></td>
+                                        <td class="highlight">180</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Landing Gear Operation (V<sub>LO</sub>)<small>Extension / Retraction</small></td>
+                                        <td class="highlight">200 / 180</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Landing Gear Extended (V<sub>LE</sub>)</td>
+                                        <td class="highlight">200</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Air Minimum Control (V<sub>MCA</sub>)<small>Flaps Extended / Retracted</small></td>
+                                        <td class="red-limit">89 / 94</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Single White Arc<small>V<sub>S</sub> to V<sub>FE</sub> (Flaps Retracted, Idle)</small></td>
+                                        <td>97 to 180</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Double White Arc<small>V<sub>S0</sub> to 97 (Flaps Extended, Idle)</small></td>
+                                        <td>92 to 97</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cartão Larga: Limites do Motor -->
+            <div class="card card-wide" style="margin-top: 24px;">
+                <div class="content">
+                    <h3 style="color: var(--text-main); margin-bottom: 8px;">Engine Operating Limits (PT6A-67A)</h3>
+                    <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">
+                        Each column presents individual limits. Normal oil pressures are 90 to 135 psig at N1 speeds above 72%.
+                    </p>
+                    
+                    <div class="limits-table-wrapper">
+                        <table class="limits-table">
+                            <thead>
+                                <tr>
+                                    <th>Condition</th>
+                                    <th>SHP</th>
+                                    <th>Torque (%)</th>
+                                    <th>Max ITT (°C)</th>
+                                    <th>N<sub>1</sub> (%)</th>
+                                    <th>N<sub>2</sub> (RPM)</th>
+                                    <th>Oil (PSI)</th>
+                                    <th>Oil Temp (°C)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Starting</strong></td>
+                                    <td>---</td>
+                                    <td>---</td>
+                                    <td class="red-limit">1000 <small>(5s limit)</small></td>
+                                    <td>---</td>
+                                    <td>---</td>
+                                    <td>200 (max)</td>
+                                    <td>-40 (min)</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Idle</strong></td>
+                                    <td>---</td>
+                                    <td>---</td>
+                                    <td>750</td>
+                                    <td>65 (min)</td>
+                                    <td>1000 (min)</td>
+                                    <td>60 (min)</td>
+                                    <td>-40 to 110</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Takeoff</strong></td>
+                                    <td>1200</td>
+                                    <td class="highlight">100</td>
+                                    <td class="red-limit">850 <small>(5m limit)</small></td>
+                                    <td>104</td>
+                                    <td>1700</td>
+                                    <td>90 to 135</td>
+                                    <td>10 to 110</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Max Continuous</strong></td>
+                                    <td>1193</td>
+                                    <td class="highlight">100</td>
+                                    <td>840</td>
+                                    <td>104</td>
+                                    <td>1690</td>
+                                    <td>90 to 135</td>
+                                    <td>10 to 105</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Max Cruise</strong></td>
+                                    <td>1100</td>
+                                    <td>97</td>
+                                    <td>840</td>
+                                    <td>104</td>
+                                    <td>1600</td>
+                                    <td>90 to 135</td>
+                                    <td>10 to 105</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Transient</strong></td>
+                                    <td>---</td>
+                                    <td class="red-limit">138 <small>(20s limit)</small></td>
+                                    <td class="red-limit">870 <small>(20s limit)</small></td>
+                                    <td>104</td>
+                                    <td>1870 <small>(20s limit)</small></td>
+                                    <td>40 to 200</td>
+                                    <td>-40 to 110</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Outras Informações (Combustível e Sistemas) -->
+            <div class="limitations-grid card-wide" style="margin-top: 24px;">
+                <div class="card" style="width: 100%; max-width: none;">
+                    <div class="content">
+                        <h3 style="color: var(--text-main); margin-bottom: 16px;">Additional Systems</h3>
+                        <ul style="color: var(--text-muted); font-size: 14px; padding-left: 20px; line-height: 1.8;">
+                            <li><strong>Usable Fuel:</strong> 565 gallons or <strong>3785 pounds</strong> (At 6.7 lbs/gallon). Each main tank holds 282.5 gallons (1892.5 lbs).</li>
+                            <li><strong>Starter Limits:</strong> 30s ON, 5min OFF / 30s ON, 5min OFF / 30s ON, followed by 30 minutes OFF.</li>
+                            <li><strong>Generator Limits (Ground):</strong> If Load &le; 50% &rarr; Min N1: 65%. If Load > 50% &rarr; Min N1: 72%.</li>
+                            <li><strong>Generator Limits (Flight):</strong> Load > 50% &rarr; Min N1 80% (S.L. to 25,000ft) / Min N1 90% (Above 25,000ft).</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Secção KOEL (Kinds of Operations Equipment List) -->
+        <div id="koel" class="app-section">
+            <div class="section-header">
+                <h2>Equipment Requirements</h2>
+                <p>Kinds of Operations Equipment List (KOEL)</p>
+            </div>
+            
+            <div class="card card-wide">
+                <div class="content">
+                    <div class="koel-tabs" id="koel-tabs">
+                        <button class="koel-tab-btn active" data-op="0">VFR Day</button>
+                        <button class="koel-tab-btn" data-op="1">VFR Night</button>
+                        <button class="koel-tab-btn" data-op="2">IFR Day</button>
+                        <button class="koel-tab-btn" data-op="3">IFR Night</button>
+                        <button class="koel-tab-btn" data-op="4">Icing</button>
+                    </div>
+
+                    <div class="koel-list-container" id="koel-list-container">
+                        <!-- Itens preenchidos via JavaScript -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -652,14 +1240,17 @@
         </div>
     </footer>
 
-    <!-- Scripts de Cálculo da Calculadora -->
+    <!-- Scripts -->
     <script>
-        // DOM Elements
+        // ==========================================
+        // LÓGICA DA CALCULADORA E LIMITES DINÂMICOS
+        // ==========================================
         const inputAlt = document.getElementById('alt');
         const inputOat = document.getElementById('oat');
         const inputWeight = document.getElementById('weight');
         const radiosAntiIce = document.querySelectorAll('input[name="antiIce"]');
         const radiosFlaps = document.querySelectorAll('input[name="flaps"]');
+        const radiosIceAcc = document.querySelectorAll('input[name="iceAcc"]');
         
         const resTorque = document.getElementById('res-torque');
         const resMtow = document.getElementById('res-mtow');
@@ -668,6 +1259,20 @@
         const resV2 = document.getElementById('res-v2');
         const resV35 = document.getElementById('res-v35');
         const resTofl = document.getElementById('res-tofl');
+        const resStall = document.getElementById('res-stall');
+        const boxStall = document.getElementById('box-stall');
+
+        // Elementos de Vento
+        const inputWindSpeed = document.getElementById('windSpeed');
+        const inputWindAngle = document.getElementById('windAngle');
+        const resHeadwind = document.getElementById('res-headwind');
+        const resCrosswind = document.getElementById('res-crosswind');
+        const lblHeadwind = document.getElementById('lbl-headwind');
+        const boxHeadwind = document.getElementById('box-headwind');
+
+        // Referências Dinâmicas
+        const dynVmo = document.getElementById('dyn-vmo');
+        const dynVyse = document.getElementById('dyn-vyse');
 
         const boxTorque = document.getElementById('box-torque');
         const boxMtow = document.getElementById('box-mtow');
@@ -678,648 +1283,149 @@
         const speedsWarning = document.getElementById('speeds-warning');
         const speedsGrid = document.getElementById('res-speeds-grid');
 
-        // Event Listeners
+        // Listeners da Calculadora
         inputAlt.addEventListener('input', calculateAll);
         inputOat.addEventListener('input', calculateAll);
         inputWeight.addEventListener('input', calculateAll);
         radiosAntiIce.forEach(r => r.addEventListener('change', calculateAll));
         radiosFlaps.forEach(r => r.addEventListener('change', calculateAll));
+        radiosIceAcc.forEach(r => r.addEventListener('change', calculateAll));
 
-        // --- DATA TABLES ---
-        // Axes (Apply to both Flaps Extended and Retracted sets)
+        inputWindSpeed.addEventListener('input', calculateWind);
+        inputWindAngle.addEventListener('input', calculateWind);
+
+        // --- TABELAS DE DADOS (Velocidades V e TOFL) ---
         const tAxis = [-30, -10, 0, 10, 20, 30, 40, 52];
         const wAxis = [12000, 13000, 13450, 14000, 14900];
-
-        // Format: [weightIndex][tempIndex]
         
-        // --- FLAPS EXTENDED TABLES ---
+        // --- TABELAS FLAPS ESTENDIDOS ---
         const data0_ext = {
-            v1: [
-                [91, 91, 91, 91, 91, 91, 91, 91],
-                [91, 91, 91, 91, 91, 91, 91, 94],
-                [93, 93, 93, 93, 93, 93, 93, 97],
-                [94, 94, 94, 94, 95, 95, 96, 100],
-                [97, 98, 99, 99, 100, 100, 100, null]
-            ],
-            vr: [
-                [91, 91, 91, 91, 91, 91, 91, 91],
-                [94, 94, 94, 94, 94, 94, 94, 95],
-                [96, 96, 96, 96, 96, 96, 96, 98],
-                [97, 98, 98, 98, 98, 98, 99, 100],
-                [101, 101, 101, 101, 101, 102, 102, null]
-            ],
-            v2: [
-                [105, 105, 105, 105, 105, 105, 105, 104],
-                [107, 107, 107, 107, 107, 107, 107, 107],
-                [109, 109, 109, 109, 109, 109, 109, 109],
-                [110, 110, 110, 110, 110, 110, 110, 110],
-                [113, 113, 113, 113, 113, 113, 113, null]
-            ],
-            tofl: [
-                [2535, 2730, 2830, 2945, 3065, 3188, 3313, 3653],
-                [2620, 2823, 2927, 3049, 3175, 3304, 3436, 4029],
-                [2727, 2941, 3051, 3179, 3312, 3447, 3586, 4346],
-                [2858, 3086, 3203, 3339, 3500, 3680, 3864, 4797],
-                [3087, 3397, 3565, 3755, 3953, 4163, 4366, null]
-            ]
+            v1: [[91, 91, 91, 91, 91, 91, 91, 91],[91, 91, 91, 91, 91, 91, 91, 94],[93, 93, 93, 93, 93, 93, 93, 97],[94, 94, 94, 94, 95, 95, 96, 100],[97, 98, 99, 99, 100, 100, 100, null]],
+            vr: [[91, 91, 91, 91, 91, 91, 91, 91],[94, 94, 94, 94, 94, 94, 94, 95],[96, 96, 96, 96, 96, 96, 96, 98],[97, 98, 98, 98, 98, 98, 99, 100],[101, 101, 101, 101, 101, 102, 102, null]],
+            v2: [[105, 105, 105, 105, 105, 105, 105, 104],[107, 107, 107, 107, 107, 107, 107, 107],[109, 109, 109, 109, 109, 109, 109, 109],[110, 110, 110, 110, 110, 110, 110, 110],[113, 113, 113, 113, 113, 113, 113, null]],
+            tofl: [[2535, 2730, 2830, 2945, 3065, 3188, 3313, 3653],[2620, 2823, 2927, 3049, 3175, 3304, 3436, 4029],[2727, 2941, 3051, 3179, 3312, 3447, 3586, 4346],[2858, 3086, 3203, 3339, 3500, 3680, 3864, 4797],[3087, 3397, 3565, 3755, 3953, 4163, 4366, null]]
         };
-
         const data1000_ext = {
-            v1: [
-                [91, 91, 91, 91, 91, 91, 91, 91],
-                [91, 91, 91, 91, 91, 91, 91, 96],
-                [93, 93, 93, 93, 93, 93, 94, 98],
-                [94, 94, 94, 95, 95, 96, 97, null],
-                [97, 99, 99, 100, 100, 101, 102, null]
-            ],
-            vr: [
-                [91, 91, 91, 91, 91, 91, 91, 92],
-                [94, 94, 94, 94, 94, 94, 95, 96],
-                [96, 96, 96, 96, 96, 96, 97, 98],
-                [98, 98, 98, 98, 98, 99, 99, null],
-                [101, 101, 101, 101, 102, 102, 102, null]
-            ],
-            v2: [
-                [105, 105, 105, 105, 105, 105, 104, 104],
-                [107, 107, 107, 107, 107, 107, 107, 107],
-                [109, 109, 109, 109, 109, 109, 109, 109],
-                [110, 110, 110, 110, 110, 110, 110, null],
-                [113, 113, 113, 113, 113, 113, 113, null]
-            ],
-            tofl: [
-                [2621, 2827, 2946, 3070, 3197, 3327, 3485, 3867],
-                [2710, 2924, 3049, 3180, 3314, 3451, 3619, 4384],
-                [2821, 3047, 3179, 3317, 3458, 3602, 3867, 4826],
-                [2959, 3199, 3339, 3507, 3695, 3885, 4159, null],
-                [3218, 3559, 3755, 3961, 4180, 4390, 4711, null]
-            ]
+            v1: [[91, 91, 91, 91, 91, 91, 91, 91],[91, 91, 91, 91, 91, 91, 91, 96],[93, 93, 93, 93, 93, 93, 94, 98],[94, 94, 94, 95, 95, 96, 97, null],[97, 99, 99, 100, 100, 101, 102, null]],
+            vr: [[91, 91, 91, 91, 91, 91, 91, 92],[94, 94, 94, 94, 94, 94, 95, 96],[96, 96, 96, 96, 96, 96, 97, 98],[98, 98, 98, 98, 98, 99, 99, null],[101, 101, 101, 101, 102, 102, 102, null]],
+            v2: [[105, 105, 105, 105, 105, 105, 104, 104],[107, 107, 107, 107, 107, 107, 107, 107],[109, 109, 109, 109, 109, 109, 109, 109],[110, 110, 110, 110, 110, 110, 110, null],[113, 113, 113, 113, 113, 113, 113, null]],
+            tofl: [[2621, 2827, 2946, 3070, 3197, 3327, 3485, 3867],[2710, 2924, 3049, 3180, 3314, 3451, 3619, 4384],[2821, 3047, 3179, 3317, 3458, 3602, 3867, 4826],[2959, 3199, 3339, 3507, 3695, 3885, 4159, null],[3218, 3559, 3755, 3961, 4180, 4390, 4711, null]]
         };
-
         const data2000_ext = {
-            v1: [
-                [91, 91, 91, 91, 91, 91, 91, 91],
-                [91, 91, 91, 91, 91, 91, 92, 96],
-                [93, 93, 93, 93, 93, 93, 95, null],
-                [94, 94, 95, 95, 96, 96, 98, null],
-                [98, 99, 100, 100, 101, 101, 102, null]
-            ],
-            vr: [
-                [91, 91, 91, 91, 91, 91, 91, 92],
-                [94, 94, 94, 94, 94, 95, 95, 96],
-                [96, 96, 96, 96, 96, 97, 97, null],
-                [98, 98, 98, 98, 99, 99, 99, null],
-                [101, 101, 101, 102, 102, 102, 102, null]
-            ],
-            v2: [
-                [105, 105, 105, 105, 105, 105, 104, 104],
-                [107, 107, 107, 107, 107, 107, 107, 107],
-                [109, 109, 109, 109, 109, 109, 109, null],
-                [110, 110, 110, 110, 110, 110, 110, null],
-                [113, 113, 113, 113, 113, 113, 113, null]
-            ],
-            tofl: [
-                [2713, 2943, 3072, 3203, 3338, 3475, 3676, 4101],
-                [2805, 3046, 3182, 3321, 3463, 3608, 3886, 4902],
-                [2922, 3176, 3319, 3465, 3615, 3800, 4172, null],
-                [3066, 3336, 3509, 3704, 3901, 4105, 4521, null],
-                [3366, 3750, 3962, 4191, 4408, 4642, 5216, null]
-            ]
+            v1: [[91, 91, 91, 91, 91, 91, 91, 91],[91, 91, 91, 91, 91, 91, 92, 96],[93, 93, 93, 93, 93, 93, 95, null],[94, 94, 95, 95, 96, 96, 98, null],[98, 99, 100, 100, 101, 101, 102, null]],
+            vr: [[91, 91, 91, 91, 91, 91, 91, 92],[94, 94, 94, 94, 94, 95, 95, 96],[96, 96, 96, 96, 96, 97, 97, null],[98, 98, 98, 98, 99, 99, 99, null],[101, 101, 101, 102, 102, 102, 102, null]],
+            v2: [[105, 105, 105, 105, 105, 105, 104, 104],[107, 107, 107, 107, 107, 107, 107, 107],[109, 109, 109, 109, 109, 109, 109, null],[110, 110, 110, 110, 110, 110, 110, null],[113, 113, 113, 113, 113, 113, 113, null]],
+            tofl: [[2713, 2943, 3072, 3203, 3338, 3475, 3676, 4101],[2805, 3046, 3182, 3321, 3463, 3608, 3886, 4902],[2922, 3176, 3319, 3465, 3615, 3800, 4172, null],[3066, 3336, 3509, 3704, 3901, 4105, 4521, null],[3366, 3750, 3962, 4191, 4408, 4642, 5216, null]]
         };
-
         const data3000_ext = {
-            v1: [
-                [91, 91, 91, 91, 91, 91, 91, 92],
-                [91, 91, 91, 91, 91, 91, 93, null],
-                [93, 93, 93, 93, 93, 94, 96, null],
-                [94, 95, 95, 96, 96, 97, 99, null],
-                [98, 100, 100, 101, 101, 102, null, null]
-            ],
-            vr: [
-                [91, 91, 91, 91, 91, 91, 91, 92],
-                [94, 94, 94, 94, 95, 95, 95, null],
-                [96, 96, 96, 97, 97, 97, 97, null],
-                [98, 98, 98, 99, 99, 99, 99, null],
-                [101, 101, 102, 102, 102, 102, null, null]
-            ],
-            v2: [
-                [105, 105, 105, 105, 105, 105, 104, 104],
-                [107, 107, 107, 107, 107, 107, 107, null],
-                [109, 109, 109, 109, 109, 109, 109, null],
-                [110, 110, 110, 110, 110, 110, 110, null],
-                [113, 113, 113, 113, 113, 113, null, null]
-            ],
-            tofl: [
-                [2810, 3069, 3206, 3345, 3488, 3634, 3886, 4436],
-                [2906, 3179, 3323, 3470, 3621, 3776, 4215, null],
-                [3029, 3316, 3467, 3625, 3818, 4023, 4544, null],
-                [3179, 3505, 3707, 3911, 4124, 4337, 4923, null],
-                [3530, 3958, 4194, 4420, 4664, 4914, null, null]
-            ]
+            v1: [[91, 91, 91, 91, 91, 91, 91, 92],[91, 91, 91, 91, 91, 91, 93, null],[93, 93, 93, 93, 93, 94, 96, null],[94, 95, 95, 96, 96, 97, 99, null],[98, 100, 100, 101, 101, 102, null, null]],
+            vr: [[91, 91, 91, 91, 91, 91, 91, 92],[94, 94, 94, 94, 95, 95, 95, null],[96, 96, 96, 97, 97, 97, 97, null],[98, 98, 98, 99, 99, 99, 99, null],[101, 101, 102, 102, 102, 102, null, null]],
+            v2: [[105, 105, 105, 105, 105, 105, 104, 104],[107, 107, 107, 107, 107, 107, 107, null],[109, 109, 109, 109, 109, 109, 109, null],[110, 110, 110, 110, 110, 110, 110, null],[113, 113, 113, 113, 113, 113, null, null]],
+            tofl: [[2810, 3069, 3206, 3345, 3488, 3634, 3886, 4436],[2906, 3179, 3323, 3470, 3621, 3776, 4215, null],[3029, 3316, 3467, 3625, 3818, 4023, 4544, null],[3179, 3505, 3707, 3911, 4124, 4337, 4923, null],[3530, 3958, 4194, 4420, 4664, 4914, null, null]]
         };
-
         const data4000_ext = {
-            v1: [
-                [91, 91, 91, 91, 91, 91, 91, 93],
-                [91, 91, 91, 91, 91, 92, 95, null],
-                [93, 93, 93, 93, 94, 95, 98, null],
-                [94, 95, 96, 96, 97, 98, 100, null],
-                [99, 100, 101, 101, 102, 102, null, null]
-            ],
-            vr: [
-                [91, 91, 91, 91, 91, 91, 91, 93],
-                [94, 94, 94, 95, 95, 95, 96, null],
-                [96, 96, 97, 97, 97, 97, 98, null],
-                [98, 98, 99, 99, 99, 99, 100, null],
-                [101, 102, 102, 102, 102, 102, null, null]
-            ],
-            v2: [
-                [105, 105, 105, 105, 105, 104, 104, 104],
-                [107, 107, 107, 107, 107, 107, 107, null],
-                [109, 109, 109, 109, 109, 109, 109, null],
-                [110, 110, 110, 110, 110, 110, 110, null],
-                [113, 113, 113, 113, 113, 113, null, null]
-            ],
-            tofl: [
-                [2924, 3204, 3349, 3497, 3649, 3828, 4116, 5022],
-                [3026, 3321, 3474, 3631, 3791, 4038, 4594, null],
-                [3154, 3465, 3629, 3831, 4043, 4334, 4957, null],
-                [3313, 3704, 3915, 4136, 4390, 4686, 5546, null],
-                [3717, 4190, 4424, 4678, 4941, 5364, null, null]
-            ]
+            v1: [[91, 91, 91, 91, 91, 91, 91, 93],[91, 91, 91, 91, 91, 92, 95, null],[93, 93, 93, 93, 94, 95, 98, null],[94, 95, 96, 96, 97, 98, 100, null],[99, 100, 101, 101, 102, 102, null, null]],
+            vr: [[91, 91, 91, 91, 91, 91, 91, 93],[94, 94, 94, 95, 95, 95, 96, null],[96, 96, 97, 97, 97, 97, 98, null],[98, 98, 99, 99, 99, 99, 100, null],[101, 102, 102, 102, 102, 102, null, null]],
+            v2: [[105, 105, 105, 105, 105, 104, 104, 104],[107, 107, 107, 107, 107, 107, 107, null],[109, 109, 109, 109, 109, 109, 109, null],[110, 110, 110, 110, 110, 110, 110, null],[113, 113, 113, 113, 113, 113, null, null]],
+            tofl: [[2924, 3204, 3349, 3497, 3649, 3828, 4116, 5022],[3026, 3321, 3474, 3631, 3791, 4038, 4594, null],[3154, 3465, 3629, 3831, 4043, 4334, 4957, null],[3313, 3704, 3915, 4136, 4390, 4686, 5546, null],[3717, 4190, 4424, 4678, 4941, 5364, null, null]]
         };
-
         const data5000_ext = {
-            v1: [
-                [91, 91, 91, 91, 91, 91, 91, null],
-                [91, 91, 91, 91, 92, 93, 96, null],
-                [93, 93, 93, 94, 94, 96, 98, null],
-                [95, 96, 96, 97, 97, 99, null, null],
-                [100, 101, 101, 102, 102, null, null, null]
-            ],
-            vr: [
-                [91, 91, 91, 91, 91, 91, 92, null],
-                [94, 94, 95, 95, 95, 95, 96, null],
-                [96, 97, 97, 97, 97, 97, 98, null],
-                [98, 99, 99, 99, 99, 99, null, null],
-                [101, 102, 102, 102, 102, null, null, null]
-            ],
-            v2: [
-                [105, 105, 105, 105, 105, 104, 104, null],
-                [107, 107, 107, 107, 107, 107, 107, null],
-                [109, 109, 109, 109, 109, 109, 109, null],
-                [110, 110, 110, 110, 110, 110, null, null],
-                [113, 113, 113, 113, 113, null, null, null]
-            ],
-            tofl: [
-                [3051, 3348, 3502, 3660, 3821, 4045, 4370, null],
-                [3160, 3473, 3636, 3802, 3982, 4364, 5045, null],
-                [3295, 3627, 3837, 4057, 4283, 4700, 5608, null],
-                [3477, 3914, 4143, 4376, 4627, 5090, null, null],
-                [3926, 4422, 4685, 4960, 5243, null, null, null]
-            ]
+            v1: [[91, 91, 91, 91, 91, 91, 91, null],[91, 91, 91, 91, 92, 93, 96, null],[93, 93, 93, 94, 94, 96, 98, null],[95, 96, 96, 97, 97, 99, null, null],[100, 101, 101, 102, 102, null, null, null]],
+            vr: [[91, 91, 91, 91, 91, 91, 92, null],[94, 94, 95, 95, 95, 95, 96, null],[96, 97, 97, 97, 97, 97, 98, null],[98, 99, 99, 99, 99, 99, null, null],[101, 102, 102, 102, 102, null, null, null]],
+            v2: [[105, 105, 105, 105, 105, 104, 104, null],[107, 107, 107, 107, 107, 107, 107, null],[109, 109, 109, 109, 109, 109, 109, null],[110, 110, 110, 110, 110, 110, null, null],[113, 113, 113, 113, 113, null, null, null]],
+            tofl: [[3051, 3348, 3502, 3660, 3821, 4045, 4370, null],[3160, 3473, 3636, 3802, 3982, 4364, 5045, null],[3295, 3627, 3837, 4057, 4283, 4700, 5608, null],[3477, 3914, 4143, 4376, 4627, 5090, null, null],[3926, 4422, 4685, 4960, 5243, null, null, null]]
         };
-
         const data6000_ext = {
-            v1: [
-                [91, 91, 91, 91, 91, 91, 91, null],
-                [91, 91, 91, 92, 92, 94, null, null],
-                [93, 93, 94, 94, 95, 97, null, null],
-                [95, 96, 97, 97, 98, 100, null, null],
-                [100, 101, 102, 102, 102, null, null, null]
-            ],
-            vr: [
-                [91, 91, 91, 91, 91, 91, 92, null],
-                [94, 95, 95, 95, 95, 96, null, null],
-                [96, 97, 97, 97, 97, 98, null, null],
-                [98, 99, 99, 99, 99, 100, null, null],
-                [102, 102, 102, 102, 102, null, null, null]
-            ],
-            v2: [
-                [105, 105, 105, 105, 105, 104, 104, null],
-                [107, 107, 107, 107, 107, 107, null, null],
-                [109, 109, 109, 109, 109, 109, null, null],
-                [110, 110, 110, 110, 110, 110, null, null],
-                [113, 113, 113, 113, 113, null, null, null]
-            ],
-            tofl: [
-                [3186, 3502, 3665, 3833, 4008, 4280, 4651, null],
-                [3302, 3636, 3809, 3998, 4238, 4738, null, null],
-                [3445, 3836, 4064, 4299, 4558, 5121, null, null],
-                [3675, 4142, 4386, 4645, 4931, 5637, null, null],
-                [4156, 4685, 4971, 5264, 5658, null, null, null]
-            ]
+            v1: [[91, 91, 91, 91, 91, 91, 91, null],[91, 91, 91, 92, 92, 94, null, null],[93, 93, 94, 94, 95, 97, null, null],[95, 96, 97, 97, 98, 100, null, null],[100, 101, 102, 102, 102, null, null, null]],
+            vr: [[91, 91, 91, 91, 91, 91, 92, null],[94, 95, 95, 95, 95, 96, null, null],[96, 97, 97, 97, 97, 98, null, null],[98, 99, 99, 99, 99, 100, null, null],[102, 102, 102, 102, 102, null, null, null]],
+            v2: [[105, 105, 105, 105, 105, 104, 104, null],[107, 107, 107, 107, 107, 107, null, null],[109, 109, 109, 109, 109, 109, null, null],[110, 110, 110, 110, 110, 110, null, null],[113, 113, 113, 113, 113, null, null, null]],
+            tofl: [[3186, 3502, 3665, 3833, 4008, 4280, 4651, null],[3302, 3636, 3809, 3998, 4238, 4738, null, null],[3445, 3836, 4064, 4299, 4558, 5121, null, null],[3675, 4142, 4386, 4645, 4931, 5637, null, null],[4156, 4685, 4971, 5264, 5658, null, null, null]]
         };
-
         const data7000_ext = {
-            v1: [
-                [91, 91, 91, 91, 91, 91, 92, null],
-                [91, 91, 92, 92, 93, 96, null, null],
-                [93, 94, 94, 95, 96, 98, null, null],
-                [96, 97, 97, 98, 99, null, null, null],
-                [101, 102, 102, 102, null, null, null, null]
-            ],
-            vr: [
-                [91, 91, 91, 91, 91, 91, 92, null],
-                [94, 95, 95, 95, 95, 96, null, null],
-                [96, 97, 97, 97, 97, 98, null, null],
-                [99, 99, 99, 99, 100, null, null, null],
-                [102, 102, 102, 102, null, null, null, null]
-            ],
-            v2: [
-                [105, 105, 105, 104, 104, 104, 104, null],
-                [107, 107, 107, 107, 107, 107, null, null],
-                [109, 109, 109, 109, 109, 109, null, null],
-                [110, 110, 110, 110, 110, null, null, null],
-                [113, 113, 113, 113, null, null, null, null]
-            ],
-            tofl: [
-                [3331, 3667, 3841, 4014, 4241, 4538, 5148, null],
-                [3455, 3810, 4008, 4237, 4604, 5162, null, null],
-                [3606, 4065, 4309, 4552, 4956, 5667, null, null],
-                [3887, 4386, 4656, 4926, 5365, null, null, null],
-                [4392, 4971, 5276, 5636, null, null, null, null]
-            ]
+            v1: [[91, 91, 91, 91, 91, 91, 92, null],[91, 91, 92, 92, 93, 96, null, null],[93, 94, 94, 95, 96, 98, null, null],[96, 97, 97, 98, 99, null, null, null],[101, 102, 102, 102, null, null, null, null]],
+            vr: [[91, 91, 91, 91, 91, 91, 92, null],[94, 95, 95, 95, 95, 96, null, null],[96, 97, 97, 97, 97, 98, null, null],[99, 99, 99, 99, 100, null, null, null],[102, 102, 102, 102, null, null, null, null]],
+            v2: [[105, 105, 105, 104, 104, 104, 104, null],[107, 107, 107, 107, 107, 107, null, null],[109, 109, 109, 109, 109, 109, null, null],[110, 110, 110, 110, 110, null, null, null],[113, 113, 113, 113, null, null, null, null]],
+            tofl: [[3331, 3667, 3841, 4014, 4241, 4538, 5148, null],[3455, 3810, 4008, 4237, 4604, 5162, null, null],[3606, 4065, 4309, 4552, 4956, 5667, null, null],[3887, 4386, 4656, 4926, 5365, null, null, null],[4392, 4971, 5276, 5636, null, null, null, null]]
         };
-
         const data8000_ext = {
-            v1: [
-                [91, 91, 91, 91, 91, 91, null, null],
-                [91, 92, 92, 93, 95, 96, null, null],
-                [93, 94, 95, 96, 98, null, null, null],
-                [96, 97, 98, 99, 100, null, null, null],
-                [101, 102, 102, 102, null, null, null, null]
-            ],
-            vr: [
-                [91, 91, 91, 91, 91, 92, null, null],
-                [95, 95, 95, 95, 96, 96, null, null],
-                [97, 97, 97, 97, 98, null, null, null],
-                [99, 99, 99, 99, 100, null, null, null],
-                [102, 102, 102, 102, null, null, null, null]
-            ],
-            v2: [
-                [105, 105, 105, 105, 104, 104, null, null],
-                [107, 107, 107, 107, 107, 107, null, null],
-                [109, 109, 109, 109, 109, null, null, null],
-                [110, 110, 110, 110, 110, null, null, null],
-                [113, 113, 113, 113, null, null, null, null]
-            ],
-            tofl: [
-                [3486, 3843, 4023, 4208, 4493, 4827, null, null],
-                [3619, 4010, 4248, 4494, 5003, 5792, null, null],
-                [3811, 4312, 4564, 4836, 5393, null, null, null],
-                [4116, 4658, 4939, 5229, 5982, null, null, null],
-                [4655, 5278, 5652, 6059, null, null, null, null]
-            ]
+            v1: [[91, 91, 91, 91, 91, 91, null, null],[91, 92, 92, 93, 95, 96, null, null],[93, 94, 95, 96, 98, null, null, null],[96, 97, 98, 99, 100, null, null, null],[101, 102, 102, 102, null, null, null, null]],
+            vr: [[91, 91, 91, 91, 91, 92, null, null],[95, 95, 95, 95, 96, 96, null, null],[97, 97, 97, 97, 98, null, null, null],[99, 99, 99, 99, 100, null, null, null],[102, 102, 102, 102, null, null, null, null]],
+            v2: [[105, 105, 105, 105, 104, 104, null, null],[107, 107, 107, 107, 107, 107, null, null],[109, 109, 109, 109, 109, null, null, null],[110, 110, 110, 110, 110, null, null, null],[113, 113, 113, 113, null, null, null, null]],
+            tofl: [[3486, 3843, 4023, 4208, 4493, 4827, null, null],[3619, 4010, 4248, 4494, 5003, 5792, null, null],[3811, 4312, 4564, 4836, 5393, null, null, null],[4116, 4658, 4939, 5229, 5982, null, null, null],[4655, 5278, 5652, 6059, null, null, null, null]]
         };
-
         const data9000_ext = {
-            v1: [
-                [91, 91, 91, 91, 91, 92, null, null],
-                [91, 92, 93, 94, 96, null, null, null],
-                [94, 95, 96, 97, 98, null, null, null],
-                [97, 98, 98, 100, null, null, null, null],
-                [102, 102, 102, null, null, null, null, null]
-            ],
-            vr: [
-                [91, 91, 91, 91, 91, 92, null, null],
-                [95, 95, 95, 95, 96, null, null, null],
-                [97, 97, 97, 97, 98, null, null, null],
-                [99, 99, 99, 100, null, null, null, null],
-                [102, 102, 102, null, null, null, null, null]
-            ],
-            v2: [
-                [105, 104, 104, 104, 104, 104, null, null],
-                [107, 107, 107, 107, 107, null, null, null],
-                [109, 109, 109, 109, 109, null, null, null],
-                [110, 110, 110, 110, null, null, null, null],
-                [113, 113, 113, null, null, null, null, null]
-            ],
-            tofl: [
-                [3652, 4027, 4218, 4449, 4767, 5196, null, null],
-                [3794, 4251, 4508, 4860, 5445, null, null, null],
-                [4043, 4568, 4850, 5233, 5998, null, null, null],
-                [4359, 4943, 5235, 5662, null, null, null, null],
-                [4939, 5657, 6080, null, null, null, null, null]
-            ]
+            v1: [[91, 91, 91, 91, 91, 92, null, null],[91, 92, 93, 94, 96, null, null, null],[94, 95, 96, 97, 98, null, null, null],[97, 98, 98, 100, null, null, null, null],[102, 102, 102, null, null, null, null, null]],
+            vr: [[91, 91, 91, 91, 91, 92, null, null],[95, 95, 95, 95, 96, null, null, null],[97, 97, 97, 97, 98, null, null, null],[99, 99, 99, 100, null, null, null, null],[102, 102, 102, null, null, null, null, null]],
+            v2: [[105, 104, 104, 104, 104, 104, null, null],[107, 107, 107, 107, 107, null, null, null],[109, 109, 109, 109, 109, null, null, null],[110, 110, 110, 110, null, null, null, null],[113, 113, 113, null, null, null, null, null]],
+            tofl: [[3652, 4027, 4218, 4449, 4767, 5196, null, null],[3794, 4251, 4508, 4860, 5445, null, null, null],[4043, 4568, 4850, 5233, 5998, null, null, null],[4359, 4943, 5235, 5662, null, null, null, null],[4939, 5657, 6080, null, null, null, null, null]]
         };
-
         const data10000_ext = {
-            v1: [
-                [91, 91, 91, 91, 91, 91, 92, null],
-                [92, 93, 93, 95, 96, null, null, null],
-                [94, 96, 96, 98, null, null, null, null],
-                [97, 98, 99, null, null, null, null, null],
-                [102, 102, null, null, null, null, null, null]
-            ],
-            vr: [
-                [91, 91, 91, 91, 91, 91, 92, null],
-                [95, 95, 95, 96, 96, null, null, null],
-                [97, 97, 97, 98, null, null, null, null],
-                [99, 99, 99, null, null, null, null, null],
-                [102, 102, null, null, null, null, null, null]
-            ],
-            v2: [
-                [105, 104, 104, 104, 104, 104, 104, null],
-                [107, 107, 107, 107, 107, null, null, null],
-                [109, 109, 109, 109, null, null, null, null],
-                [110, 110, 110, null, null, null, null, null],
-                [113, 113, null, null, null, null, null, null]
-            ],
-            tofl: [
-                [3830, 4224, 4429, 4720, 5068, 5895, null, null],
-                [3990, 4513, 4790, 5282, 6078, null, null, null],
-                [4291, 4856, 5154, 5702, null, null, null, null],
-                [4636, 5242, 5574, null, null, null, null, null],
-                [5252, 6088, null, null, null, null, null, null]
-            ]
+            v1: [[91, 91, 91, 91, 91, 91, 92, null],[92, 93, 93, 95, 96, null, null, null],[94, 96, 96, 98, null, null, null, null],[97, 98, 99, null, null, null, null, null],[102, 102, null, null, null, null, null, null]],
+            vr: [[91, 91, 91, 91, 91, 91, 92, null],[95, 95, 95, 96, 96, null, null, null],[97, 97, 97, 98, null, null, null, null],[99, 99, 99, null, null, null, null, null],[102, 102, null, null, null, null, null, null]],
+            v2: [[105, 104, 104, 104, 104, 104, 104, null],[107, 107, 107, 107, 107, null, null, null],[109, 109, 109, 109, null, null, null, null],[110, 110, 110, null, null, null, null, null],[113, 113, null, null, null, null, null, null]],
+            tofl: [[3830, 4224, 4429, 4720, 5068, 5895, null, null],[3990, 4513, 4790, 5282, 6078, null, null, null],[4291, 4856, 5154, 5702, null, null, null, null],[4636, 5242, 5574, null, null, null, null, null],[5252, 6088, null, null, null, null, null, null]]
         };
 
-        // --- FLAPS RETRACTED TABLES ---
+        // --- TABELAS FLAPS RECOLHIDOS ---
         const data0_retract = {
-            v1: [
-                [96, 97, 97, 97, 98, 98, 98, 101],
-                [97, 98, 98, 99, 99, 99, 99, 103],
-                [98, 98, 99, 99, 99, 100, 100, 104],
-                [98, 99, 99, 100, 100, 100, 100, 104],
-                [101, 102, 103, 103, 104, 105, 105, null]
-            ],
-            vr: [
-                [106, 106, 106, 106, 106, 106, 106, 106],
-                [106, 106, 106, 106, 106, 106, 106, 106],
-                [106, 106, 106, 106, 106, 106, 106, 106],
-                [106, 106, 106, 106, 106, 106, 106, 106],
-                [107, 108, 108, 108, 108, 108, 108, null]
-            ],
-            v2: [
-                [118, 117, 117, 117, 117, 117, 116, 114],
-                [117, 117, 116, 116, 116, 116, 115, 114],
-                [117, 116, 116, 116, 116, 115, 115, 114],
-                [116, 116, 116, 115, 115, 115, 115, 114],
-                [117, 117, 117, 117, 117, 117, 117, null]
-            ],
-            tofl: [
-                [2589, 2828, 2952, 3093, 3239, 3391, 3496, 4180],
-                [2739, 2993, 3125, 3276, 3433, 3595, 3709, 4554],
-                [2808, 3070, 3206, 3362, 3524, 3692, 3831, 4702],
-                [2894, 3166, 3308, 3470, 3639, 3815, 3992, 4873],
-                [3128, 3468, 3648, 3853, 4069, 4298, 4539, null]
-            ]
+            v1: [[96, 97, 97, 97, 98, 98, 98, 101],[97, 98, 98, 99, 99, 99, 99, 103],[98, 98, 99, 99, 99, 100, 100, 104],[98, 99, 99, 100, 100, 100, 100, 104],[101, 102, 103, 103, 104, 105, 105, null]],
+            vr: [[106, 106, 106, 106, 106, 106, 106, 106],[106, 106, 106, 106, 106, 106, 106, 106],[106, 106, 106, 106, 106, 106, 106, 106],[106, 106, 106, 106, 106, 106, 106, 106],[107, 108, 108, 108, 108, 108, 108, null]],
+            v2: [[118, 117, 117, 117, 117, 117, 116, 114],[117, 117, 116, 116, 116, 116, 115, 114],[117, 116, 116, 116, 116, 115, 115, 114],[116, 116, 116, 115, 115, 115, 115, 114],[117, 117, 117, 117, 117, 117, 117, null]],
+            tofl: [[2589, 2828, 2952, 3093, 3239, 3391, 3496, 4180],[2739, 2993, 3125, 3276, 3433, 3595, 3709, 4554],[2808, 3070, 3206, 3362, 3524, 3692, 3831, 4702],[2894, 3166, 3308, 3470, 3639, 3815, 3992, 4873],[3128, 3468, 3648, 3853, 4069, 4298, 4539, null]]
         };
-
         const data1000_retract = {
-            v1: [
-                [97, 97, 97, 98, 98, 98, 98, 103],
-                [98, 98, 99, 99, 99, 99, 100, 104],
-                [98, 99, 99, 99, 100, 100, 101, 104],
-                [99, 99, 100, 100, 100, 101, 102, null],
-                [102, 103, 103, 104, 105, 106, 107, null]
-            ],
-            vr: [
-                [106, 106, 106, 106, 106, 106, 106, 106],
-                [106, 106, 106, 106, 106, 106, 106, 106],
-                [106, 106, 106, 106, 106, 106, 106, 106],
-                [106, 106, 106, 106, 106, 106, 106, null],
-                [108, 108, 108, 108, 108, 108, 109, null]
-            ],
-            v2: [
-                [118, 117, 117, 117, 116, 116, 115, 114],
-                [117, 116, 116, 116, 116, 115, 115, 114],
-                [117, 116, 116, 116, 115, 115, 115, 114],
-                [116, 116, 115, 115, 115, 115, 114, null],
-                [117, 117, 117, 117, 117, 117, 117, null]
-            ],
-            tofl: [
-                [2694, 2947, 3093, 3245, 3403, 3565, 3732, 4585],
-                [2850, 3120, 3276, 3439, 3608, 3782, 4001, 4927],
-                [2923, 3201, 3362, 3530, 3704, 3886, 4142, 5075],
-                [3013, 3303, 3470, 3645, 3829, 4033, 4328, null],
-                [3276, 3641, 3853, 4077, 4315, 4566, 4905, null]
-            ]
+            v1: [[97, 97, 97, 98, 98, 98, 98, 103],[98, 98, 99, 99, 99, 99, 100, 104],[98, 99, 99, 99, 100, 100, 101, 104],[99, 99, 100, 100, 100, 101, 102, null],[102, 103, 103, 104, 105, 106, 107, null]],
+            vr: [[106, 106, 106, 106, 106, 106, 106, 106],[106, 106, 106, 106, 106, 106, 106, 106],[106, 106, 106, 106, 106, 106, 106, 106],[106, 106, 106, 106, 106, 106, 106, null],[108, 108, 108, 108, 108, 108, 109, null]],
+            v2: [[118, 117, 117, 117, 116, 116, 115, 114],[117, 116, 116, 116, 116, 115, 115, 114],[117, 116, 116, 116, 115, 115, 115, 114],[116, 116, 115, 115, 115, 115, 114, null],[117, 117, 117, 117, 117, 117, 117, null]],
+            tofl: [[2694, 2947, 3093, 3245, 3403, 3565, 3732, 4585],[2850, 3120, 3276, 3439, 3608, 3782, 4001, 4927],[2923, 3201, 3362, 3530, 3704, 3886, 4142, 5075],[3013, 3303, 3470, 3645, 3829, 4033, 4328, null],[3276, 3641, 3853, 4077, 4315, 4566, 4905, null]]
         };
-
         const data2000_retract = {
-            v1: [
-                [97, 97, 98, 98, 98, 98, 99, 104],
-                [98, 99, 99, 99, 99, 99, 101, 105],
-                [98, 99, 99, 100, 100, 100, 102, null],
-                [99, 100, 100, 100, 101, 101, 103, null],
-                [102, 103, 104, 105, 106, 106, 107, null]
-            ],
-            vr: [
-                [106, 106, 106, 106, 106, 106, 106, 106],
-                [106, 106, 106, 106, 106, 106, 106, 106],
-                [106, 106, 106, 106, 106, 106, 106, null],
-                [106, 106, 106, 106, 106, 106, 106, null],
-                [108, 108, 108, 108, 108, 108, 109, null]
-            ],
-            v2: [
-                [118, 117, 117, 116, 116, 116, 115, 114],
-                [117, 116, 116, 116, 115, 115, 114, 114],
-                [116, 116, 116, 115, 115, 115, 114, null],
-                [116, 115, 115, 115, 115, 115, 114, null],
-                [117, 117, 117, 117, 117, 117, 117, null]
-            ],
-            tofl: [
-                [2806, 3088, 3246, 3410, 3578, 3727, 4018, 4992],
-                [2970, 3271, 3440, 3615, 3797, 3958, 4348, 5336],
-                [3046, 3357, 3531, 3712, 3900, 4085, 4514, null],
-                [3141, 3465, 3647, 3838, 4050, 4262, 4722, null],
-                [3436, 3846, 4079, 4326, 4586, 4821, 5304, null]
-            ]
+            v1: [[97, 97, 98, 98, 98, 98, 99, 104],[98, 99, 99, 99, 99, 99, 101, 105],[98, 99, 99, 100, 100, 100, 102, null],[99, 100, 100, 100, 101, 101, 103, null],[102, 103, 104, 105, 106, 106, 107, null]],
+            vr: [[106, 106, 106, 106, 106, 106, 106, 106],[106, 106, 106, 106, 106, 106, 106, 106],[106, 106, 106, 106, 106, 106, 106, null],[106, 106, 106, 106, 106, 106, 106, null],[108, 108, 108, 108, 108, 108, 109, null]],
+            v2: [[118, 117, 117, 116, 116, 116, 115, 114],[117, 116, 116, 116, 115, 115, 114, 114],[116, 116, 116, 115, 115, 115, 114, null],[116, 115, 115, 115, 115, 115, 114, null],[117, 117, 117, 117, 117, 117, 117, null]],
+            tofl: [[2806, 3088, 3246, 3410, 3578, 3727, 4018, 4992],[2970, 3271, 3440, 3615, 3797, 3958, 4348, 5336],[3046, 3357, 3531, 3712, 3900, 4085, 4514, null],[3141, 3465, 3647, 3838, 4050, 4262, 4722, null],[3436, 3846, 4079, 4326, 4586, 4821, 5304, null]]
         };
-
         const data3000_retract = {
-            v1: [
-                [97, 98, 98, 98, 99, 99, 100, 104],
-                [98, 99, 99, 99, 100, 100, 102, null],
-                [99, 99, 100, 100, 100, 101, 103, null],
-                [99, 100, 100, 101, 101, 102, 104, null],
-                [103, 104, 105, 106, 106, 106, null, null]
-            ],
-            vr: [
-                [106, 106, 106, 106, 106, 106, 106, 106],
-                [106, 106, 106, 106, 106, 106, 106, null],
-                [106, 106, 106, 106, 106, 106, 106, null],
-                [106, 106, 106, 106, 106, 106, 106, null],
-                [108, 108, 108, 108, 109, 109, null, null]
-            ],
-            v2: [
-                [117, 117, 116, 116, 116, 115, 114, 114],
-                [116, 116, 116, 115, 115, 115, 114, null],
-                [116, 116, 115, 115, 115, 115, 114, null],
-                [116, 115, 115, 115, 115, 115, 114, null],
-                [117, 117, 117, 117, 117, 117, null, null]
-            ],
-            tofl: [
-                [2925, 3242, 3412, 3587, 3765, 3901, 4370, 5424],
-                [3097, 3436, 3618, 3806, 3998, 4171, 4755, null],
-                [3177, 3527, 3715, 3910, 4111, 4318, 4924, null],
-                [3278, 3642, 3841, 4061, 4290, 4511, 5101, null],
-                [3609, 4073, 4329, 4599, 4843, 5101, null, null]
-            ]
+            v1: [[97, 98, 98, 98, 99, 99, 100, 104],[98, 99, 99, 99, 100, 100, 102, null],[99, 99, 100, 100, 100, 101, 103, null],[99, 100, 100, 101, 101, 102, 104, null],[103, 104, 105, 106, 106, 106, null, null]],
+            vr: [[106, 106, 106, 106, 106, 106, 106, 106],[106, 106, 106, 106, 106, 106, 106, null],[106, 106, 106, 106, 106, 106, 106, null],[106, 106, 106, 106, 106, 106, 106, null],[108, 108, 108, 108, 109, 109, null, null]],
+            v2: [[117, 117, 116, 116, 116, 115, 114, 114],[116, 116, 116, 115, 115, 115, 114, null],[116, 116, 115, 115, 115, 115, 114, null],[116, 115, 115, 115, 115, 115, 114, null],[117, 117, 117, 117, 117, 117, null, null]],
+            tofl: [[2925, 3242, 3412, 3587, 3765, 3901, 4370, 5424],[3097, 3436, 3618, 3806, 3998, 4171, 4755, null],[3177, 3527, 3715, 3910, 4111, 4318, 4924, null],[3278, 3642, 3841, 4061, 4290, 4511, 5101, null],[3609, 4073, 4329, 4599, 4843, 5101, null, null]]
         };
-
         const data4000_retract = {
-            v1: [
-                [97, 98, 98, 99, 99, 99, 102, null],
-                [98, 99, 99, 100, 100, 101, 103, null],
-                [99, 100, 100, 100, 101, 102, 104, null],
-                [100, 100, 101, 101, 102, 103, 105, null],
-                [103, 105, 106, 106, 106, 107, null, null]
-            ],
-            vr: [
-                [106, 106, 106, 106, 106, 106, 106, null],
-                [106, 106, 106, 106, 106, 106, 106, null],
-                [106, 106, 106, 106, 106, 106, 106, null],
-                [106, 106, 106, 106, 106, 106, 106, null],
-                [108, 108, 108, 109, 109, 109, null, null]
-            ],
-            v2: [
-                [117, 116, 116, 116, 116, 115, 114, null],
-                [116, 116, 115, 115, 115, 115, 114, null],
-                [116, 115, 115, 115, 115, 114, 114, null],
-                [115, 115, 115, 115, 115, 114, 114, null],
-                [117, 117, 117, 117, 117, 117, null, null]
-            ],
-            tofl: [
-                [3064, 3409, 3590, 3775, 3966, 4167, 4778, null],
-                [3245, 3615, 3810, 4010, 4216, 4505, 5167, null],
-                [3330, 3712, 3914, 4124, 4357, 4674, 5329, null],
-                [3437, 3837, 4066, 4303, 4553, 4902, 5521, null],
-                [3811, 4324, 4605, 4857, 5129, 5496, null, null]
-            ]
+            v1: [[97, 98, 98, 99, 99, 99, 102, null],[98, 99, 99, 100, 100, 101, 103, null],[99, 100, 100, 100, 101, 102, 104, null],[100, 100, 101, 101, 102, 103, 105, null],[103, 105, 106, 106, 106, 107, null, null]],
+            vr: [[106, 106, 106, 106, 106, 106, 106, null],[106, 106, 106, 106, 106, 106, 106, null],[106, 106, 106, 106, 106, 106, 106, null],[106, 106, 106, 106, 106, 106, 106, null],[108, 108, 108, 109, 109, 109, null, null]],
+            v2: [[117, 116, 116, 116, 116, 115, 114, null],[116, 116, 115, 115, 115, 115, 114, null],[116, 115, 115, 115, 115, 114, 114, null],[115, 115, 115, 115, 115, 114, 114, null],[117, 117, 117, 117, 117, 117, null, null]],
+            tofl: [[3064, 3409, 3590, 3775, 3966, 4167, 4778, null],[3245, 3615, 3810, 4010, 4216, 4505, 5167, null],[3330, 3712, 3914, 4124, 4357, 4674, 5329, null],[3437, 3837, 4066, 4303, 4553, 4902, 5521, null],[3811, 4324, 4605, 4857, 5129, 5496, null, null]]
         };
-
         const data5000_retract = {
-            v1: [
-                [98, 98, 99, 99, 99, 100, 103, null],
-                [99, 99, 100, 100, 100, 102, 104, null],
-                [99, 100, 100, 101, 101, 103, 105, null],
-                [100, 101, 101, 102, 102, 104, null, null],
-                [104, 106, 106, 107, 107, 108, null, null]
-            ],
-            vr: [
-                [106, 106, 106, 106, 106, 106, 106, null],
-                [106, 106, 106, 106, 106, 106, 106, null],
-                [106, 106, 106, 106, 106, 106, 106, null],
-                [106, 106, 106, 106, 106, 106, null, null],
-                [108, 108, 109, 109, 109, 109, null, null]
-            ],
-            v2: [
-                [117, 116, 116, 116, 115, 115, 114, null],
-                [116, 115, 115, 115, 115, 114, 114, null],
-                [116, 115, 115, 115, 115, 114, 114, null],
-                [115, 115, 115, 115, 115, 114, null, null],
-                [117, 117, 117, 117, 117, 117, null, null]
-            ],
-            tofl: [
-                [3218, 3588, 3781, 3979, 4160, 4518, 5245, null],
-                [3411, 3808, 4015, 4229, 4453, 4908, 5610, null],
-                [3501, 3912, 4130, 4372, 4615, 5111, 5778, null],
-                [3615, 4063, 4309, 4569, 4831, 5281, null, null],
-                [4037, 4601, 4864, 5149, 5422, 5953, null, null]
-            ]
+            v1: [[98, 98, 99, 99, 99, 100, 103, null],[99, 99, 100, 100, 100, 102, 104, null],[99, 100, 100, 101, 101, 103, 105, null],[100, 101, 101, 102, 102, 104, null, null],[104, 106, 106, 107, 107, 108, null, null]],
+            vr: [[106, 106, 106, 106, 106, 106, 106, null],[106, 106, 106, 106, 106, 106, 106, null],[106, 106, 106, 106, 106, 106, 106, null],[106, 106, 106, 106, 106, 106, null, null],[108, 108, 109, 109, 109, 109, null, null]],
+            v2: [[117, 116, 116, 116, 115, 115, 114, null],[116, 115, 115, 115, 115, 114, 114, null],[116, 115, 115, 115, 115, 114, 114, null],[115, 115, 115, 115, 115, 114, null, null],[117, 117, 117, 117, 117, 117, null, null]],
+            tofl: [[3218, 3588, 3781, 3979, 4160, 4518, 5245, null],[3411, 3808, 4015, 4229, 4453, 4908, 5610, null],[3501, 3912, 4130, 4372, 4615, 5111, 5778, null],[3615, 4063, 4309, 4569, 4831, 5281, null, null],[4037, 4601, 4864, 5149, 5422, 5953, null, null]]
         };
-
         const data8000_retract = {
-            v1: [
-                [99, 99, 100, 100, 102, 104, null, null],
-                [100, 101, 101, 101, 103, 105, null, null],
-                [100, 101, 102, 102, 104, null, null, null],
-                [101, 103, 103, 103, 104, null, null, null],
-                [106, 107, 107, 108, null, null, null, null]
-            ],
-            vr: [
-                [106, 106, 106, 106, 106, 106, null, null],
-                [106, 106, 106, 106, 106, 106, null, null],
-                [106, 106, 106, 106, 106, null, null, null],
-                [106, 106, 106, 106, 106, null, null, null],
-                [108, 109, 109, 109, null, null, null, null]
-            ],
-            v2: [
-                [116, 115, 115, 115, 114, 114, null, null],
-                [115, 115, 115, 114, 114, 114, null, null],
-                [115, 115, 115, 114, 114, null, null, null],
-                [115, 115, 115, 114, 114, null, null, null],
-                [117, 117, 117, 117, null, null, null, null]
-            ],
-            tofl: [
-                [3758, 4209, 4440, 4642, 5193, 5864, null, null],
-                [3991, 4490, 4762, 5029, 5628, 6290, null, null],
-                [4102, 4654, 4942, 5225, 5797, null, null, null],
-                [4280, 4872, 5166, 5438, 6006, null, null, null],
-                [4832, 5455, 5785, 6100, null, null, null, null]
-            ]
+            v1: [[99, 99, 100, 100, 102, 104, null, null],[100, 101, 101, 101, 103, 105, null, null],[100, 101, 102, 102, 104, null, null, null],[101, 103, 103, 103, 104, null, null, null],[106, 107, 107, 108, null, null, null, null]],
+            vr: [[106, 106, 106, 106, 106, 106, null, null],[106, 106, 106, 106, 106, 106, null, null],[106, 106, 106, 106, 106, null, null, null],[106, 106, 106, 106, 106, null, null, null],[108, 109, 109, 109, null, null, null, null]],
+            v2: [[116, 115, 115, 115, 114, 114, null, null],[115, 115, 115, 114, 114, 114, null, null],[115, 115, 115, 114, 114, null, null, null],[115, 115, 115, 114, 114, null, null, null],[117, 117, 117, 117, null, null, null, null]],
+            tofl: [[3758, 4209, 4440, 4642, 5193, 5864, null, null],[3991, 4490, 4762, 5029, 5628, 6290, null, null],[4102, 4654, 4942, 5225, 5797, null, null, null],[4280, 4872, 5166, 5438, 6006, null, null, null],[4832, 5455, 5785, 6100, null, null, null, null]]
         };
-
         const data9000_retract = {
-            v1: [
-                [99, 100, 100, 101, 103, 104, null, null],
-                [100, 101, 102, 103, 104, null, null, null],
-                [101, 102, 103, 103, 104, null, null, null],
-                [102, 103, 103, 104, null, null, null, null],
-                [106, 107, 108, null, null, null, null, null]
-            ],
-            vr: [
-                [106, 106, 106, 106, 106, 106, null, null],
-                [106, 106, 106, 106, 106, null, null, null],
-                [106, 106, 106, 106, 106, null, null, null],
-                [106, 106, 106, 106, null, null, null, null],
-                [109, 109, 109, null, null, null, null, null]
-            ],
-            v2: [
-                [116, 115, 115, 115, 114, 114, null, null],
-                [115, 115, 115, 114, 114, null, null, null],
-                [115, 115, 115, 114, 114, null, null, null],
-                [115, 115, 114, 114, null, null, null, null],
-                [117, 117, 117, null, null, null, null, null]
-            ],
-            tofl: [
-                [3965, 4443, 4691, 5024, 5689, 6380, null, null],
-                [4215, 4766, 5058, 5471, 6088, null, null, null],
-                [4355, 4945, 5256, 5649, 6267, null, null, null],
-                [4550, 5170, 5465, 5853, null, null, null, null],
-                [5124, 5790, 6117, null, null, null, null, null]
-            ]
+            v1: [[99, 100, 100, 101, 103, 104, null, null],[100, 101, 102, 103, 104, null, null, null],[101, 102, 103, 103, 104, null, null, null],[102, 103, 103, 104, null, null, null, null],[106, 107, 108, null, null, null, null, null]],
+            vr: [[106, 106, 106, 106, 106, 106, null, null],[106, 106, 106, 106, 106, null, null, null],[106, 106, 106, 106, 106, null, null, null],[106, 106, 106, 106, null, null, null, null],[109, 109, 109, null, null, null, null, null]],
+            v2: [[116, 115, 115, 115, 114, 114, null, null],[115, 115, 115, 114, 114, null, null, null],[115, 115, 115, 114, 114, null, null, null],[115, 115, 114, 114, null, null, null, null],[117, 117, 117, null, null, null, null, null]],
+            tofl: [[3965, 4443, 4691, 5024, 5689, 6380, null, null],[4215, 4766, 5058, 5471, 6088, null, null, null],[4355, 4945, 5256, 5649, 6267, null, null, null],[4550, 5170, 5465, 5853, null, null, null, null],[5124, 5790, 6117, null, null, null, null, null]]
         };
-
         const data10000_retract = {
-            v1: [
-                [99, 100, 100, 102, 104, null, null, null],
-                [100, 102, 102, 104, 105, null, null, null],
-                [101, 103, 103, 104, null, null, null, null],
-                [103, 103, 104, 105, null, null, null, null],
-                [107, 108, 108, null, null, null, null, null]
-            ],
-            vr: [
-                [106, 106, 106, 106, 106, null, null, null],
-                [106, 106, 106, 106, 106, null, null, null],
-                [106, 106, 106, 106, null, null, null, null],
-                [106, 106, 106, 106, null, null, null, null],
-                [109, 109, 109, null, null, null, null, null]
-            ],
-            v2: [
-                [115, 115, 115, 114, 114, null, null, null],
-                [115, 115, 114, 114, 114, null, null, null],
-                [115, 115, 114, 114, null, null, null, null],
-                [115, 114, 114, 114, null, null, null, null],
-                [117, 117, 117, null, null, null, null, null]
-            ],
-            tofl: [
-                [4189, 4696, 4949, 5492, 6158, null, null, null],
-                [4467, 5064, 5374, 5948, 6589, null, null, null],
-                [4629, 5262, 5578, 6111, null, null, null, null],
-                [4846, 5471, 5780, 6338, null, null, null, null],
-                [5428, 6124, 6504, null, null, null, null, null]
-            ]
+            v1: [[99, 100, 100, 102, 104, null, null, null],[100, 102, 102, 104, 105, null, null, null],[101, 103, 103, 104, null, null, null, null],[103, 103, 104, 105, null, null, null, null],[107, 108, 108, null, null, null, null, null]],
+            vr: [[106, 106, 106, 106, 106, null, null, null],[106, 106, 106, 106, 106, null, null, null],[106, 106, 106, 106, null, null, null, null],[106, 106, 106, 106, null, null, null, null],[109, 109, 109, null, null, null, null, null]],
+            v2: [[115, 115, 115, 114, 114, null, null, null],[115, 115, 114, 114, 114, null, null, null],[115, 115, 114, 114, null, null, null, null],[115, 114, 114, 114, null, null, null, null],[117, 117, 117, null, null, null, null, null]],
+            tofl: [[4189, 4696, 4949, 5492, 6158, null, null, null],[4467, 5064, 5374, 5948, 6589, null, null, null],[4629, 5262, 5578, 6111, null, null, null, null],[4846, 5471, 5780, 6338, null, null, null, null],[5428, 6124, 6504, null, null, null, null, null]]
         };
 
         function getBilinear(w, t, gridArray) {
-            // Clamp temp within table boundaries
             let temp = Math.max(-30, Math.min(t, 52));
-            // Clamp weight to min 12000 (chart: "12,000 AND UNDER")
             let weight = Math.max(12000, w);
-            if (weight > 14900) return null; // Over absolute MTOW
+            if (weight > 14900) return null; 
 
             let t1 = 0, t2 = 0;
             for(let i=0; i<tAxis.length; i++) {
@@ -1346,7 +1452,6 @@
             const q12 = gridArray[w1][t2];
             const q22 = gridArray[w2][t2];
 
-            // If any corner is a dash (null), interpolation fails for this zone
             if (q11 === null || q21 === null || q12 === null || q22 === null) return null;
 
             const tFrac = t1 === t2 ? 0 : (temp - tAxis[t1]) / (tAxis[t2] - tAxis[t1]);
@@ -1358,17 +1463,17 @@
             return r1 + wFrac * (r2 - r1);
         }
 
-        // -----------------------------------------------------------------
-
         function showError(message) {
             errorDisplay.innerHTML = message;
             errorDisplay.style.display = 'block';
             
             resTorque.textContent = '---%';
             resMtow.textContent = '-----';
+            resStall.textContent = '-- KIAS';
             
             boxTorque.classList.remove('active');
             boxMtow.classList.remove('active');
+            boxStall.classList.remove('active');
             badgeMtow.style.display = 'none';
 
             disableSpeeds();
@@ -1378,12 +1483,13 @@
             errorDisplay.style.display = 'none';
             boxTorque.classList.add('active');
             boxMtow.classList.add('active');
+            boxStall.classList.add('active');
         }
 
         function disableSpeeds(msg) {
             speedsGrid.style.display = 'none';
             speedsWarning.style.display = 'block';
-            speedsWarning.textContent = msg || 'Speed calculation unavailable for these parameters.';
+            speedsWarning.textContent = msg || 'Airspeed calculation unavailable for these parameters.';
             boxVspeeds.classList.remove('active');
         }
 
@@ -1401,49 +1507,67 @@
             resTofl.textContent = '-- FT';
         }
 
+        function updateDynamicLimits(alt) {
+            // Calculate Dynamic VMO
+            let vmo = 245;
+            if (alt <= 10000) {
+                vmo = 245;
+            } else if (alt <= 12000) {
+                vmo = 245 + ((alt - 10000) / 2000) * 20; // Linear from 245 to 265
+            } else if (alt <= 21900) {
+                vmo = 265;
+            } else {
+                vmo = 265 - ((alt - 21900) / (41000 - 21900)) * (265 - 173); // Linear reduction up to Mach 0.60
+            }
+
+            // Calculate Dynamic VYSE (Blue Line)
+            let vyse = 130 - (0.55 * (alt / 1000));
+            if (vyse < 0) vyse = 0;
+
+            dynVmo.textContent = Math.round(vmo) + ' KIAS';
+            dynVyse.textContent = Math.round(vyse) + ' KIAS';
+        }
+
         function calculateAll() {
             const alt = parseFloat(inputAlt.value);
             const oat = parseFloat(inputOat.value);
             const plannedWeight = parseFloat(inputWeight.value);
             const antiIce = document.querySelector('input[name="antiIce"]:checked').value;
             const flaps = document.querySelector('input[name="flaps"]:checked').value;
+            const iceAcc = document.querySelector('input[name="iceAcc"]:checked').value;
 
-            // Basic validation
+            // Updates dynamic limits first
+            updateDynamicLimits(alt);
+
             if (isNaN(alt) || isNaN(oat)) {
                 showError("Please enter valid values for Altitude and OAT.");
                 return;
             }
-
-            if (alt < 0 || alt > 10000) {
-                showError("Pressure Altitude must be between 0 and 10,000 FT.");
+            if (alt < 0 || alt > 41000) {
+                showError("Pressure altitude must be between 0 and 41,000 FT.");
                 return;
             }
-
             if (oat < -40) {
-                showError("OAT is below the chart's minimum limit (-40°C).");
+                showError("Temperature (OAT) is below the chart minimum limit (-40°C).");
                 return;
             }
-
-            // Global Anti-Ice ON limit
             if (antiIce === 'on' && oat > 10) {
-                showError("OAT exceeds the MAXIMUM temperature limit for Anti-Ice ON (10°C).");
+                showError("Temperature (OAT) exceeds the MAXIMUM limit for Engine Anti-Ice ON (10°C).");
                 return;
             }
-
-            // ISA + 37 limit check
+            
             const isaTemp = 15 - (2 * (alt / 1000));
             const maxOAT = isaTemp + 37;
             if (oat > maxOAT) {
-                showError(`OAT exceeds the ISA+37°C limit for this altitude.<br>Maximum allowed OAT: ${maxOAT.toFixed(1)}°C`);
+                showError(`Temperature (OAT) exceeds the ISA+37°C limit for this altitude.<br>Maximum allowed OAT: ${maxOAT.toFixed(1)}°C`);
                 return;
             }
 
+            // Hide errors, but block V-Speeds calc if alt > 10000 (Tables restricted to 10k)
             hideError();
 
-            // --- 1. TAKE-OFF POWER (TORQUE) ---
             let torque = 0;
             const FLAT_RATING = 94.5;
-
             if (antiIce === 'off') {
                 const kinks = [
                     { a: 0, t: 39.0 }, { a: 2000, t: 33.5 }, { a: 4000, t: 27.5 },
@@ -1460,23 +1584,17 @@
                 const slope = 1.27;
                 torque = oat <= tKink ? FLAT_RATING : FLAT_RATING - slope * (oat - tKink);
             } else {
-                const tKink = 1.0 + (10000 - alt) * 0.0035;
+                const tKink = 1.0 + (10000 - Math.min(alt, 10000)) * 0.0035; // Cap to 10k for this generic calculation
                 const slope = 1.0857;
                 torque = oat <= tKink ? FLAT_RATING : FLAT_RATING - slope * (oat - tKink);
             }
 
-            // --- 2. MAXIMUM TAKE-OFF WEIGHT (MTOW) ---
             let mtowOat = oat;
-            if (antiIce === 'on') {
-                mtowOat += 7; // Chart Note
-            }
+            if (antiIce === 'on') mtowOat += 7; 
 
             let mtow = 0;
-            if (flaps === 'retracted') {
-                mtow = 17377.7 - (50 * mtowOat) - (0.28777 * alt);
-            } else {
-                mtow = 17658 - (50 * mtowOat) - (0.3758 * alt);
-            }
+            if (flaps === 'retracted') mtow = 17377.7 - (50 * mtowOat) - (0.28777 * alt);
+            else mtow = 17658 - (50 * mtowOat) - (0.3758 * alt);
 
             badgeMtow.style.display = 'none';
             if (mtow >= 14900) {
@@ -1484,54 +1602,31 @@
                 badgeMtow.style.display = 'inline-block';
             }
 
-            // Check if Planned Weight is safe
             let weightError = false;
-            if (isNaN(plannedWeight)) {
-                weightError = "Please enter Planned Takeoff Weight.";
-            } else if (plannedWeight > mtow) {
-                weightError = `Planned Weight (${plannedWeight} LBS) exceeds Climb Limit MTOW (${Math.round(mtow)} LBS). Reduce weight.`;
-            }
+            if (isNaN(plannedWeight)) weightError = "Please enter the Planned Weight.";
+            else if (plannedWeight > mtow) weightError = `Planned Weight (${plannedWeight} LBS) exceeds the climb MTOW limit (${Math.round(mtow)} LBS). Reduce weight.`;
 
-            // --- 3. V-SPEEDS & TOFL (Trilinear Interpolation) ---
             resetSpeedsUI();
             
-            // Hallucination Guards
-            if (weightError) {
-                disableSpeeds(weightError);
+            if (alt > 10000) {
+                 disableSpeeds("Airspeed data not certified for takeoffs above 10,000 FT.");
+            } else if (weightError) {
+                 disableSpeeds(weightError);
             } else if (flaps === 'retracted' && alt > 5000 && alt < 8000) {
-                disableSpeeds("Flaps retracted speed data is currently unavailable for altitudes between 6000-7000 FT.");
-            } else if (flaps === 'retracted' && alt > 10000) {
-                disableSpeeds("Flaps retracted speed data is limited to 10,000 FT.");
-            } else if (flaps === 'extended' && alt > 10000) {
-                disableSpeeds("Speed data is limited to 10,000 FT.");
+                disableSpeeds("Airspeed data with Flaps Retracted are currently unavailable for altitudes between 6,000 and 7,000 FT.");
             } else {
-                // We are inside safe bounds
                 enableSpeeds();
-
                 const altitudeLevelsExtended = [
-                    { alt: 0, data: data0_ext },
-                    { alt: 1000, data: data1000_ext },
-                    { alt: 2000, data: data2000_ext },
-                    { alt: 3000, data: data3000_ext },
-                    { alt: 4000, data: data4000_ext },
-                    { alt: 5000, data: data5000_ext },
-                    { alt: 6000, data: data6000_ext },
-                    { alt: 7000, data: data7000_ext },
-                    { alt: 8000, data: data8000_ext },
-                    { alt: 9000, data: data9000_ext },
-                    { alt: 10000, data: data10000_ext }
+                    { alt: 0, data: data0_ext }, { alt: 1000, data: data1000_ext }, { alt: 2000, data: data2000_ext },
+                    { alt: 3000, data: data3000_ext }, { alt: 4000, data: data4000_ext }, { alt: 5000, data: data5000_ext },
+                    { alt: 6000, data: data6000_ext }, { alt: 7000, data: data7000_ext }, { alt: 8000, data: data8000_ext },
+                    { alt: 9000, data: data9000_ext }, { alt: 10000, data: data10000_ext }
                 ];
 
                 const altitudeLevelsRetracted = [
-                    { alt: 0, data: data0_retract },
-                    { alt: 1000, data: data1000_retract },
-                    { alt: 2000, data: data2000_retract },
-                    { alt: 3000, data: data3000_retract },
-                    { alt: 4000, data: data4000_retract },
-                    { alt: 5000, data: data5000_retract },
-                    { alt: 8000, data: data8000_retract },
-                    { alt: 9000, data: data9000_retract },
-                    { alt: 10000, data: data10000_retract }
+                    { alt: 0, data: data0_retract }, { alt: 1000, data: data1000_retract }, { alt: 2000, data: data2000_retract },
+                    { alt: 3000, data: data3000_retract }, { alt: 4000, data: data4000_retract }, { alt: 5000, data: data5000_retract },
+                    { alt: 8000, data: data8000_retract }, { alt: 9000, data: data9000_retract }, { alt: 10000, data: data10000_retract }
                 ];
 
                 const activeLevels = flaps === 'extended' ? altitudeLevelsExtended : altitudeLevelsRetracted;
@@ -1539,20 +1634,15 @@
                 let lowerData = null, upperData = null, lowerAlt = 0, upperAlt = 0;
                 for (let i = 0; i < activeLevels.length - 1; i++) {
                     if (alt >= activeLevels[i].alt && alt <= activeLevels[i+1].alt) {
-                        lowerData = activeLevels[i].data;
-                        upperData = activeLevels[i+1].data;
-                        lowerAlt = activeLevels[i].alt;
-                        upperAlt = activeLevels[i+1].alt;
+                        lowerData = activeLevels[i].data; upperData = activeLevels[i+1].data;
+                        lowerAlt = activeLevels[i].alt; upperAlt = activeLevels[i+1].alt;
                         break;
                     }
                 }
                 
-                // Fallback for upper boundary
                 if (lowerData === null && alt === activeLevels[activeLevels.length - 1].alt) {
-                    lowerData = activeLevels[activeLevels.length - 1].data;
-                    upperData = activeLevels[activeLevels.length - 1].data;
-                    lowerAlt = activeLevels[activeLevels.length - 1].alt;
-                    upperAlt = activeLevels[activeLevels.length - 1].alt;
+                    lowerData = activeLevels[activeLevels.length - 1].data; upperData = activeLevels[activeLevels.length - 1].data;
+                    lowerAlt = activeLevels[activeLevels.length - 1].alt; upperAlt = activeLevels[activeLevels.length - 1].alt;
                 }
 
                 const v1_lower = getBilinear(plannedWeight, oat, lowerData.v1);
@@ -1565,17 +1655,13 @@
                 const v2_upper = getBilinear(plannedWeight, oat, upperData.v2);
                 const tofl_upper = getBilinear(plannedWeight, oat, upperData.tofl);
 
-                if (v1_lower === null || v1_upper === null) {
-                    // This happens if we hit a "dash" in the chart (e.g. W=14000, T=52, Alt=2000)
-                    disableSpeeds("Conditions outside certified speed limits (dashed area on chart).");
-                } else {
+                if (v1_lower === null || v1_upper === null) disableSpeeds("Conditions outside certified airspeed limits (dashed area on chart).");
+                else {
                     const altFrac = upperAlt === lowerAlt ? 0 : (alt - lowerAlt) / (upperAlt - lowerAlt);
-                    
                     const v1 = v1_lower + altFrac * (v1_upper - v1_lower);
                     const vr = vr_lower + altFrac * (vr_upper - vr_lower);
                     const v2 = v2_lower + altFrac * (v2_upper - v2_lower);
                     
-                    // V35 formula shifts based on flap configuration according to the manual images
                     const v35_add = flaps === 'retracted' ? 11 : 5;
                     const v35 = v2 + v35_add; 
                     
@@ -1589,13 +1675,201 @@
                 }
             }
 
-            // Update Text UI
-            resTorque.textContent = torque.toFixed(1) + '%';
+            // Stall Speed Calculation
+            let vs0 = 0;
+            if (flaps === 'extended') {
+                vs0 = 75.5 + (plannedWeight - 10000) * 0.0034;
+            } else {
+                vs0 = 83.0 + (plannedWeight - 10000) * 0.0038;
+            }
+            
+            let vsBank = vs0;
+            
+            if (iceAcc === 'ice') {
+                vsBank += (flaps === 'extended') ? 18 : 15;
+            }
+            
+            if (!weightError) {
+                resStall.textContent = Math.round(vsBank) + ' KIAS';
+            }
+
+            // Show limited power if calculated
+            resTorque.textContent = (alt > 10000 ? "N/A" : torque.toFixed(1) + '%');
             resMtow.textContent = Math.round(mtow).toLocaleString('en-US') + ' LBS';
         }
 
-        // Initialize on load
+        function calculateWind() {
+            const speed = parseFloat(inputWindSpeed.value) || 0;
+            let angle = parseFloat(inputWindAngle.value) || 0;
+
+            // Normalize angle
+            angle = Math.abs(angle % 360);
+            if (angle > 180) angle = 360 - angle;
+
+            const rad = angle * Math.PI / 180;
+            const headwind = speed * Math.cos(rad);
+            const crosswind = speed * Math.sin(rad);
+
+            resCrosswind.textContent = Math.abs(crosswind).toFixed(1) + ' KTS';
+            
+            if (headwind >= 0) {
+                lblHeadwind.textContent = "Headwind Component";
+                resHeadwind.textContent = headwind.toFixed(1) + ' KTS';
+                resHeadwind.style.color = "var(--success)";
+                boxHeadwind.style.borderLeftColor = "var(--success)";
+            } else {
+                lblHeadwind.textContent = "Tailwind Component";
+                resHeadwind.textContent = Math.abs(headwind).toFixed(1) + ' KTS';
+                resHeadwind.style.color = "var(--warning)";
+                boxHeadwind.style.borderLeftColor = "var(--warning)";
+            }
+        }
+
+        // Execute immediately on load
         calculateAll();
+        calculateWind();
+
+        // ==========================================
+        // KOEL LOGIC (Equipment List)
+        // ==========================================
+        // Req array index: [VFR Day, VFR Night, IFR Day, IFR Night, Icing]
+        const koelData = [
+            {
+                category: "Electrical Power",
+                items: [
+                    { name: "Battery", req: [1, 1, 1, 1, 1] },
+                    { name: "Battery Monitor System", req: [1, 1, 1, 1, 1] },
+                    { name: "DC Generator", req: [2, 2, 2, 2, 2] },
+                    { name: "DC Loadmeter", req: [2, 2, 2, 2, 2] },
+                    { name: "DC Voltmeter and Selectors", req: [1, 1, 1, 1, 1] },
+                    { name: "Battery Ammeter and Selectors", req: [1, 1, 1, 1, 1] },
+                    { name: "Nose Sealed Battery Packs", req: [2, 2, 2, 2, 2] }
+                ]
+            },
+            {
+                category: "Engine Indications",
+                items: [
+                    { name: "EICAS", req: [1, 1, 1, 1, 1] },
+                    { name: "Multi-Function Display (MFD) (EICAS Rev)", req: [1, 1, 1, 1, 1] },
+                    { name: "Radio Tuning Unit (RTU)", req: [1, 1, 1, 1, 1] }
+                ]
+            },
+            {
+                category: "Engine Oil",
+                items: [
+                    { name: "Low Oil Pressure Annunciator", req: [2, 2, 2, 2, 2] }
+                ]
+            },
+            {
+                category: "Environmental and Pressurization",
+                items: [
+                    { name: "Bleed Air Fail Annunciators", req: [3, 3, 3, 3, 3] },
+                    { name: "Cabin High Altitude Annunciator", req: [1, 1, 1, 1, 1] },
+                    { name: "Cabin Rate of Climb Indicator", req: [1, 1, 1, 1, 1] },
+                    { name: "Bleed Air Shutoff Valve", req: [2, 2, 2, 2, 2] },
+                    { name: "Outflow/Safety Valve", req: [2, 2, 2, 2, 2] },
+                    { name: "Pressurization Controller", req: [1, 1, 1, 1, 1] },
+                    { name: "Blowers", req: [2, 2, 2, 2, 2] },
+                    { name: "Pneumatic System", req: [1, 1, 1, 1, 1] }
+                ]
+            },
+            {
+                category: "Fire Protection",
+                items: [
+                    { name: "Engine Fire Detector System", req: [2, 2, 2, 2, 2] },
+                    { name: "Engine Fire Extinguisher", req: [2, 2, 2, 2, 2] },
+                    { name: "Portable Fire Extinguisher", req: [2, 2, 2, 2, 2] }
+                ]
+            },
+            {
+                category: "Flight Controls",
+                items: [
+                    { name: "Flap/Forward Wing System", req: [1, 1, 1, 1, 1] },
+                    { name: "Trim Position Indicator (All axes)", req: [3, 3, 3, 3, 3] },
+                    { name: "Stall Warning System", req: [1, 1, 1, 1, 1] }
+                ]
+            },
+            {
+                category: "Fuel",
+                items: [
+                    { name: "Standby Electrical Fuel Pump", req: [2, 2, 2, 2, 2] },
+                    { name: "Low Fuel Pressure Annunciator", req: [2, 2, 2, 2, 2] },
+                    { name: "Quantity Indicator System", req: [2, 2, 2, 2, 2] },
+                    { name: "Firewall Fuel Shutoff System", req: [2, 2, 2, 2, 2] },
+                    { name: "Crossfeed System", req: [1, 1, 1, 1, 1] }
+                ]
+            },
+            {
+                category: "Ice and Rain Protection",
+                items: [
+                    { name: "Engine Auto Ignition", req: [2, 2, 2, 2, 2] },
+                    { name: "Engine Anti-Ice", req: [2, 2, 2, 2, 2] },
+                    { name: "Heated Fuel Vent", req: [0, 0, 0, 0, 2] },
+                    { name: "Heated Windshield", req: [2, 2, 2, 2, 2] },
+                    { name: "Pitot and Stall Warning Heat", req: [2, 2, 2, 2, 2] },
+                    { name: "Ice Detector", req: [0, 0, 0, 0, 2] },
+                    { name: "Pneumatic Boot System", req: [0, 0, 0, 0, 1] }
+                ]
+            },
+            {
+                category: "Landing Gear",
+                items: [
+                    { name: "Gear Position Indicator Light", req: [3, 3, 3, 3, 3] },
+                    { name: "Landing Gear Warning Horn", req: [1, 1, 1, 1, 1] },
+                    { name: "Alternate Extension Hand Pump", req: [1, 1, 1, 1, 1] }
+                ]
+            }
+        ];
+
+        const koelContainer = document.getElementById('koel-list-container');
+        const koelTabs = document.querySelectorAll('.koel-tab-btn');
+
+        function renderKOEL(operationIndex) {
+            koelContainer.innerHTML = ''; // Clear current table
+            
+            koelData.forEach(categoryData => {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'koel-category';
+                
+                const catTitle = document.createElement('div');
+                catTitle.className = 'koel-category-title';
+                catTitle.textContent = categoryData.category;
+                categoryDiv.appendChild(catTitle);
+
+                categoryData.items.forEach(item => {
+                    const reqVal = item.req[operationIndex];
+                    
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'koel-item';
+                    
+                    const itemName = document.createElement('div');
+                    itemName.className = 'koel-item-name';
+                    itemName.textContent = item.name;
+                    
+                    const itemReq = document.createElement('div');
+                    itemReq.className = `koel-item-req ${reqVal === 0 ? 'zero' : ''}`;
+                    itemReq.textContent = reqVal;
+
+                    itemDiv.appendChild(itemName);
+                    itemDiv.appendChild(itemReq);
+                    categoryDiv.appendChild(itemDiv);
+                });
+
+                koelContainer.appendChild(categoryDiv);
+            });
+        }
+
+        // KOEL tabs listeners setup
+        koelTabs.forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                koelTabs.forEach(t => t.classList.remove('active'));
+                e.target.classList.add('active');
+                renderKOEL(parseInt(e.target.dataset.op));
+            });
+        });
+
+        // Initialize with the first tab (VFR Day)
+        renderKOEL(0);
 
     </script>
 </body>
