@@ -179,7 +179,7 @@
             gap: 24px;
             width: 100%;
             max-width: 1000px;
-            margin-bottom: 80px;
+            margin-bottom: 60px;
         }
 
         .feature-card {
@@ -221,7 +221,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-bottom: 80px;
+            margin-bottom: 60px;
         }
         
         .section-header {
@@ -887,6 +887,40 @@
 
     <!-- Main Container -->
     <main class="main-container">
+
+        <!-- Global Units Settings -->
+        <div class="app-section" style="margin-bottom: 30px; margin-top: -20px;">
+            <div class="card card-wide" style="display: flex; gap: 24px; flex-wrap: wrap; justify-content: center; align-items: center; padding: 16px 32px; flex-direction: row;">
+                <div style="font-weight: 800; color: var(--text-main); font-size: 14px; text-transform: uppercase;">⚙️ Units:</div>
+                
+                <div class="radio-group" style="min-width: 140px;">
+                    <label class="radio-label" style="padding: 8px 12px;">
+                        <input type="radio" name="global-weight" value="lb" checked> LBS
+                    </label>
+                    <label class="radio-label" style="padding: 8px 12px;">
+                        <input type="radio" name="global-weight" value="kg"> KG
+                    </label>
+                </div>
+
+                <div class="radio-group" style="min-width: 140px;">
+                    <label class="radio-label" style="padding: 8px 12px;">
+                        <input type="radio" name="global-dist" value="ft" checked> FT
+                    </label>
+                    <label class="radio-label" style="padding: 8px 12px;">
+                        <input type="radio" name="global-dist" value="m"> M
+                    </label>
+                </div>
+
+                <div class="radio-group" style="min-width: 140px;">
+                    <label class="radio-label" style="padding: 8px 12px;">
+                        <input type="radio" name="global-temp" value="c" checked> °C
+                    </label>
+                    <label class="radio-label" style="padding: 8px 12px;">
+                        <input type="radio" name="global-temp" value="f"> °F
+                    </label>
+                </div>
+            </div>
+        </div>
         
         <!-- Features -->
         <div class="features">
@@ -919,16 +953,16 @@
                         <div class="form-group">
                             <label for="alt">Pressure Altitude (Field)</label>
                             <div class="input-wrapper">
-                                <input type="number" id="alt" value="1000" min="0" max="41000" step="1">
-                                <span class="unit">FT</span>
+                                <input type="number" id="alt" value="1000" min="-1000" max="41000" step="1">
+                                <span class="unit unit-dist-lbl">FT</span>
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label for="oat">OAT Temperature</label>
                             <div class="input-wrapper">
-                                <input type="number" id="oat" value="10" min="-40" max="60" step="1">
-                                <span class="unit">°C</span>
+                                <input type="number" id="oat" value="10" min="-100" max="150" step="1">
+                                <span class="unit unit-temp-lbl">°C</span>
                             </div>
                         </div>
                     </div>
@@ -936,8 +970,8 @@
                     <div class="form-group">
                         <label for="weight">Planned Weight (Takeoff)</label>
                         <div class="input-wrapper">
-                            <input type="number" id="weight" value="14000" min="10000" max="14900" step="10">
-                            <span class="unit">LBS</span>
+                            <input type="number" id="weight" value="14000" min="4000" max="20000" step="10">
+                            <span class="unit unit-weight-lbl">LBS</span>
                         </div>
                     </div>
 
@@ -1048,16 +1082,16 @@
                         <div class="form-group">
                             <label for="land-alt">Pressure Altitude (Destination)</label>
                             <div class="input-wrapper">
-                                <input type="number" id="land-alt" value="1000" min="0" max="14000" step="1">
-                                <span class="unit">FT</span>
+                                <input type="number" id="land-alt" value="1000" min="-1000" max="14000" step="1">
+                                <span class="unit unit-dist-lbl">FT</span>
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label for="land-oat">OAT Temperature</label>
                             <div class="input-wrapper">
-                                <input type="number" id="land-oat" value="15" min="-40" max="60" step="1">
-                                <span class="unit">°C</span>
+                                <input type="number" id="land-oat" value="15" min="-100" max="150" step="1">
+                                <span class="unit unit-temp-lbl">°C</span>
                             </div>
                         </div>
                     </div>
@@ -1066,8 +1100,8 @@
                         <div class="form-group">
                             <label for="land-weight">Planned Weight (Landing)</label>
                             <div class="input-wrapper">
-                                <input type="number" id="land-weight" value="12500" min="10000" max="14900" step="10">
-                                <span class="unit">LBS</span>
+                                <input type="number" id="land-weight" value="12500" min="4000" max="20000" step="10">
+                                <span class="unit unit-weight-lbl">LBS</span>
                             </div>
                         </div>
                         
@@ -1256,8 +1290,8 @@
                         <div class="form-group" style="margin-bottom: 0;">
                             <label for="wb-fuel-temp" style="color: var(--primary);">Fuel Temp (OAT)</label>
                             <div class="input-wrapper">
-                                <input type="number" id="wb-fuel-temp" value="15" min="-40" max="60" step="1" style="border-color: rgba(37, 99, 235, 0.3);">
-                                <span class="unit">°C</span>
+                                <input type="number" id="wb-fuel-temp" value="15" min="-100" max="150" step="1" style="border-color: rgba(37, 99, 235, 0.3);">
+                                <span class="unit unit-temp-lbl">°C</span>
                             </div>
                         </div>
                         <div class="form-group" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: center; text-align: right;">
@@ -1271,7 +1305,7 @@
                             <thead>
                                 <tr>
                                     <th>Station / Item</th>
-                                    <th>Weight (LBS)</th>
+                                    <th>Weight (<span id="th-weight-lbl">LBS</span>)</th>
                                     <th>Arm (F.S.)</th>
                                     <th>Moment / 100</th>
                                 </tr>
@@ -1280,7 +1314,7 @@
                                 <tr>
                                     <td><strong>Basic Empty Weight</strong></td>
                                     <td><input type="number" class="wb-input" id="wb-bew-w" value="10150" step="10"></td>
-                                    <td><input type="number" class="wb-input" id="wb-bew-a" value="314.0" step="0.1"></td>
+                                    <td><input type="number" class="wb-input" id="wb-bew-a" value="314.0" step="0.1" disabled></td>
                                     <td class="wb-table-val" id="wb-bew-m">31871.0</td>
                                 </tr>
                                 <tr>
@@ -1581,6 +1615,92 @@
     <!-- Scripts -->
     <script>
         // ==========================================
+        // GLOBAL UNIT SETTINGS & CONVERSIONS
+        // ==========================================
+        let currentUnits = {
+            weight: 'lb', // 'lb' or 'kg'
+            dist: 'ft',   // 'ft' or 'm'
+            temp: 'c'     // 'c' or 'f'
+        };
+
+        const LB_TO_KG = 0.453592;
+        const KG_TO_LB = 2.20462;
+        const FT_TO_M = 0.3048;
+        const M_TO_FT = 3.28084;
+
+        // Input Elements mapped for dynamic unit conversion
+        const weightInputs = ['weight', 'land-weight', 'wb-bew-w', 'wb-crew-w', 'wb-fwd-bag-w', 'wb-row1-w', 'wb-row2-w', 'wb-row3-w', 'wb-bag-w'];
+        const distInputs = ['alt', 'land-alt'];
+        const tempInputs = ['oat', 'land-oat', 'wb-fuel-temp'];
+
+        // Unit Toggles Events
+        document.querySelectorAll('input[name="global-weight"]').forEach(r => r.addEventListener('change', (e) => {
+            const newUnit = e.target.value;
+            if(newUnit === currentUnits.weight) return;
+            const isToKg = newUnit === 'kg';
+            
+            // Convert Input Values physically
+            weightInputs.forEach(id => {
+                const el = document.getElementById(id);
+                if(el && el.value !== '') {
+                    let val = parseFloat(el.value);
+                    el.value = isToKg ? Math.round(val * LB_TO_KG) : Math.round(val * KG_TO_LB);
+                }
+            });
+            
+            // Update UI Labels
+            document.querySelectorAll('.unit-weight-lbl').forEach(el => el.textContent = isToKg ? 'KG' : 'LBS');
+            document.getElementById('th-weight-lbl').textContent = isToKg ? 'KG' : 'LBS';
+            
+            currentUnits.weight = newUnit;
+            triggerAllCalculations();
+        }));
+
+        document.querySelectorAll('input[name="global-dist"]').forEach(r => r.addEventListener('change', (e) => {
+            const newUnit = e.target.value;
+            if(newUnit === currentUnits.dist) return;
+            const isToM = newUnit === 'm';
+            
+            distInputs.forEach(id => {
+                const el = document.getElementById(id);
+                if(el && el.value !== '') {
+                    let val = parseFloat(el.value);
+                    el.value = isToM ? Math.round(val * FT_TO_M) : Math.round(val * M_TO_FT);
+                }
+            });
+            
+            document.querySelectorAll('.unit-dist-lbl').forEach(el => el.textContent = isToM ? 'M' : 'FT');
+            
+            currentUnits.dist = newUnit;
+            triggerAllCalculations();
+        }));
+
+        document.querySelectorAll('input[name="global-temp"]').forEach(r => r.addEventListener('change', (e) => {
+            const newUnit = e.target.value;
+            if(newUnit === currentUnits.temp) return;
+            const isToF = newUnit === 'f';
+            
+            tempInputs.forEach(id => {
+                const el = document.getElementById(id);
+                if(el && el.value !== '') {
+                    let val = parseFloat(el.value);
+                    el.value = isToF ? Math.round(val * 9/5 + 32) : Math.round((val - 32) * 5/9);
+                }
+            });
+            
+            document.querySelectorAll('.unit-temp-lbl').forEach(el => el.textContent = isToF ? '°F' : '°C');
+            
+            currentUnits.temp = newUnit;
+            triggerAllCalculations();
+        }));
+
+        function triggerAllCalculations() {
+            calculateAll();
+            calculateLanding();
+            calculateWB();
+        }
+
+        // ==========================================
         // TAKEOFF CALCULATOR LOGIC & DYNAMIC LIMITS
         // ==========================================
         const inputAlt = document.getElementById('alt');
@@ -1871,24 +1991,24 @@
             resVr.textContent = '--';
             resV2.textContent = '--';
             resV35.textContent = '--';
-            resTofl.textContent = '-- FT';
+            resTofl.textContent = '-- ' + (currentUnits.dist === 'm' ? 'M' : 'FT');
         }
 
-        function updateDynamicLimits(alt) {
+        function updateDynamicLimits(altFt) {
             // Calculate Dynamic VMO
             let vmo = 245;
-            if (alt <= 10000) {
+            if (altFt <= 10000) {
                 vmo = 245;
-            } else if (alt <= 12000) {
-                vmo = 245 + ((alt - 10000) / 2000) * 20; // Linear from 245 to 265
-            } else if (alt <= 21900) {
+            } else if (altFt <= 12000) {
+                vmo = 245 + ((altFt - 10000) / 2000) * 20; // Linear from 245 to 265
+            } else if (altFt <= 21900) {
                 vmo = 265;
             } else {
-                vmo = 265 - ((alt - 21900) / (41000 - 21900)) * (265 - 173); // Linear reduction up to Mach 0.60
+                vmo = 265 - ((altFt - 21900) / (41000 - 21900)) * (265 - 173); // Linear reduction up to Mach 0.60
             }
 
             // Calculate Dynamic VYSE (Blue Line)
-            let vyse = 130 - (0.55 * (alt / 1000));
+            let vyse = 130 - (0.55 * (altFt / 1000));
             if (vyse < 0) vyse = 0;
 
             dynVmo.textContent = Math.round(vmo) + ' KIAS';
@@ -1899,36 +2019,49 @@
         // GENERAL CALCULATION (TAKEOFF)
         // ==========================================
         function calculateAll() {
-            const alt = parseFloat(inputAlt.value);
-            const oat = parseFloat(inputOat.value);
-            const plannedWeight = parseFloat(inputWeight.value);
+            let alt = parseFloat(inputAlt.value);
+            let oat = parseFloat(inputOat.value);
+            let plannedWeight = parseFloat(inputWeight.value);
             const antiIce = document.querySelector('input[name="antiIce"]:checked').value;
             const flaps = document.querySelector('input[name="flaps"]:checked').value;
             const iceAcc = document.querySelector('input[name="iceAcc"]:checked').value;
 
-            updateDynamicLimits(alt);
+            // Convert to native AFM units for math
+            if(currentUnits.dist === 'm' && !isNaN(alt)) alt *= M_TO_FT;
+            if(currentUnits.temp === 'f' && !isNaN(oat)) oat = (oat - 32) * 5/9;
+            if(currentUnits.weight === 'kg' && !isNaN(plannedWeight)) plannedWeight *= KG_TO_LB;
+
+            if (!isNaN(alt)) updateDynamicLimits(alt);
 
             if (isNaN(alt) || isNaN(oat)) {
                 showError("Please enter valid values for Altitude and OAT.");
                 return;
             }
             if (alt < 0 || alt > 41000) {
-                showError("Pressure altitude must be between 0 and 41,000 FT.");
+                let limitDisp = currentUnits.dist === 'm' ? Math.round(41000 * FT_TO_M).toLocaleString('en-US') : '41,000';
+                let unitDisp = currentUnits.dist === 'm' ? 'M' : 'FT';
+                showError(`Pressure altitude must be between 0 and ${limitDisp} ${unitDisp}.`);
                 return;
             }
             if (oat < -40) {
-                showError("OAT below the minimum chart limits (-40°C).");
+                let limitDisp = currentUnits.temp === 'f' ? '-40' : '-40';
+                let unitDisp = currentUnits.temp === 'f' ? '°F' : '°C';
+                showError(`OAT below the minimum chart limits (${limitDisp}${unitDisp}).`);
                 return;
             }
             if (antiIce === 'on' && oat > 10) {
-                showError("OAT exceeds the MAXIMUM limit for Anti-Ice ON (10°C).");
+                let limitDisp = currentUnits.temp === 'f' ? '50' : '10';
+                let unitDisp = currentUnits.temp === 'f' ? '°F' : '°C';
+                showError(`OAT exceeds the MAXIMUM limit for Anti-Ice ON (${limitDisp}${unitDisp}).`);
                 return;
             }
             
             const isaTemp = 15 - (2 * (alt / 1000));
             const maxOAT = isaTemp + 37;
             if (oat > maxOAT) {
-                showError(`OAT exceeds the ISA+37°C limit for this altitude.<br>Maximum allowed OAT: ${maxOAT.toFixed(1)}°C`);
+                let maxOATdisp = currentUnits.temp === 'f' ? (maxOAT * 9/5 + 32) : maxOAT;
+                let unitDisp = currentUnits.temp === 'f' ? '°F' : '°C';
+                showError(`OAT exceeds the ISA+37°C limit for this altitude.<br>Maximum allowed OAT: ${maxOATdisp.toFixed(1)}${unitDisp}`);
                 return;
             }
 
@@ -1973,8 +2106,12 @@
             }
 
             let weightError = false;
+            let displayPlannedW = currentUnits.weight === 'kg' ? Math.round(plannedWeight * LB_TO_KG) : Math.round(plannedWeight);
+            let displayMtowW = currentUnits.weight === 'kg' ? Math.round(mtow * LB_TO_KG) : Math.round(mtow);
+            let lblW = currentUnits.weight === 'kg' ? 'KG' : 'LBS';
+
             if (isNaN(plannedWeight)) weightError = "Enter Planned Weight.";
-            else if (plannedWeight > mtow) weightError = `Planned Weight (${plannedWeight} LBS) exceeds the Climb Limit MTOW (${Math.round(mtow)} LBS). Reduce weight.`;
+            else if (plannedWeight > mtow) weightError = `Planned Weight (${displayPlannedW} ${lblW}) exceeds the Climb Limit MTOW (${displayMtowW} ${lblW}). Reduce weight.`;
 
             resetSpeedsUI();
             
@@ -2041,7 +2178,9 @@
                     resVr.textContent = Math.round(vr);
                     resV2.textContent = Math.round(v2);
                     resV35.textContent = Math.round(v35);
-                    resTofl.textContent = Math.round(tofl) + ' FT';
+
+                    let displayTofl = currentUnits.dist === 'm' ? tofl * FT_TO_M : tofl;
+                    resTofl.textContent = Math.round(displayTofl).toLocaleString('en-US') + (currentUnits.dist === 'm' ? ' M' : ' FT');
                 }
             }
 
@@ -2063,22 +2202,27 @@
             }
 
             resTorque.textContent = (alt > 10000 ? "N/A" : torque.toFixed(1) + '%');
-            resMtow.textContent = Math.round(mtow).toLocaleString('en-US') + ' LBS';
+            resMtow.textContent = displayMtowW.toLocaleString('en-US') + ` ${lblW}`;
         }
 
         // ==========================================
         // GENERAL CALCULATION (LANDING)
         // ==========================================
         function calculateLanding() {
-            const alt = parseFloat(landAlt.value) || 0;
-            const oat = parseFloat(landOat.value) || 0;
-            const peso = parseFloat(landWeight.value) || 12000;
+            let alt = parseFloat(landAlt.value) || 0;
+            let oat = parseFloat(landOat.value) || 0;
+            let peso = parseFloat(landWeight.value) || 12000;
             const vento = parseFloat(landWind.value) || 0;
             const gradiente = parseFloat(landGrad.value) || 0;
 
             const antiIce = document.querySelector('input[name="land-antiIce"]:checked').value;
             const iceAcc = document.querySelector('input[name="land-iceAcc"]:checked').value;
             const antiSkid = document.querySelector('input[name="land-antiSkid"]:checked').value;
+
+            // Convert to native AFM units
+            if(currentUnits.dist === 'm') alt *= M_TO_FT;
+            if(currentUnits.temp === 'f') oat = (oat - 32) * 5/9;
+            if(currentUnits.weight === 'kg') peso *= KG_TO_LB;
 
             // Basic Validations
             if (alt < 0 || alt > 14000 || oat < -40 || oat > 60) {
@@ -2135,18 +2279,25 @@
             }
             dist = Math.max(1000, dist);
 
+            // Formatting outputs to selected units
+            let dispMlw = currentUnits.weight === 'kg' ? mlw * LB_TO_KG : mlw;
+            let dispDist = currentUnits.dist === 'm' ? dist * FT_TO_M : dist;
+            let lblW = currentUnits.weight === 'kg' ? 'KG' : 'LBS';
+            let lblD = currentUnits.dist === 'm' ? 'M' : 'FT';
+
             // DOM Update
-            resLandMlw.textContent = Math.round(mlw).toLocaleString('en-US') + ' LBS';
+            resLandMlw.textContent = Math.round(dispMlw).toLocaleString('en-US') + ` ${lblW}`;
             resLandVref.textContent = Math.round(vref) + ' KTS';
             resLandAppClimb.textContent = appClimb.toFixed(2) + ' %';
             resLandBalked.textContent = Math.round(balkedRoc) + ' FT/MIN';
-            resLandDist.textContent = Math.round(dist).toLocaleString('en-US') + ' FT';
+            resLandDist.textContent = Math.round(dispDist).toLocaleString('en-US') + ` ${lblD}`;
             
             // Alert if weight exceeds MLW
             if (peso > mlw) {
                 resLandMlw.style.color = "var(--error)";
                 landError.style.display = 'block';
-                landError.innerHTML = `WARNING: Planned Weight (${peso} LBS) exceeds the Maximum Authorized for climb conditions (${Math.round(mlw)} LBS).`;
+                let rawDispPeso = currentUnits.weight === 'kg' ? peso * LB_TO_KG : peso;
+                landError.innerHTML = `WARNING: Planned Weight (${Math.round(rawDispPeso)} ${lblW}) exceeds the Maximum Authorized for climb conditions (${Math.round(dispMlw)} ${lblW}).`;
             } else {
                 resLandMlw.style.color = "var(--text-muted)";
             }
@@ -2220,7 +2371,7 @@
             return 321.0;
         }
 
-        function drawCGGraph(zfwW, zfwCG, towW, towCG) {
+        function drawCGGraph(zfwW_lbs, zfwCG, towW_lbs, towCG) {
             const svg = document.getElementById('cg-graph');
             const width = 600, height = 450;
             const padL = 70, padR = 30, padT = 30, padB = 50;
@@ -2240,7 +2391,8 @@
                 const isMajor = w % 1000 === 0;
                 content += `<line x1="${padL}" y1="${mapY(w)}" x2="${width-padR}" y2="${mapY(w)}" stroke="var(--border)" stroke-width="${isMajor ? 1.5 : 0.5}" />`;
                 if(isMajor || w === 14900) {
-                    content += `<text x="${padL - 10}" y="${mapY(w) + 4}" fill="var(--text-muted)" font-size="11" font-weight="${isMajor ? 'bold': 'normal'}" text-anchor="end">${w}</text>`;
+                    const displayW = currentUnits.weight === 'kg' ? Math.round(w * LB_TO_KG) : w;
+                    content += `<text x="${padL - 10}" y="${mapY(w) + 4}" fill="var(--text-muted)" font-size="11" font-weight="${isMajor ? 'bold': 'normal'}" text-anchor="end">${displayW}</text>`;
                 }
             }
             for(let cg = 307; cg <= 321; cg += 1) {
@@ -2248,7 +2400,7 @@
                 content += `<text x="${mapX(cg)}" y="${height - padB + 20}" fill="var(--text-muted)" font-size="11" text-anchor="middle">${cg}</text>`;
             }
 
-            // Envelope Polygon Points
+            // Envelope Polygon Points (LBS internal logic)
             const envPoints = [
                 [307.0, 9000], [307.0, 13450], [307.6, 13680], [310.9, 14900], // Fwd
                 [320.0, 14900], [318.5, 9000] // Aft (Slanted based on AFM)
@@ -2257,8 +2409,8 @@
             content += `<polygon points="${envPoints}" fill="rgba(37, 99, 235, 0.08)" stroke="var(--primary)" stroke-width="2.5" stroke-linejoin="round" />`;
 
             // Operational Limit Lines
-            const addLimitLine = (weight, label) => {
-                const y = mapY(weight);
+            const addLimitLine = (weightLbs, label) => {
+                const y = mapY(weightLbs);
                 content += `<line x1="${padL}" y1="${y}" x2="${width-padR}" y2="${y}" stroke="var(--primary)" stroke-width="1.5" stroke-dasharray="6,4" />`;
                 content += `<text x="${width-padR + 5}" y="${y + 4}" fill="var(--primary)" font-size="10" font-weight="800" text-anchor="start">${label}</text>`;
             };
@@ -2267,9 +2419,9 @@
             addLimitLine(14900, "MAX TAKEOFF");
 
             // Plot Points if valid
-            if (zfwW > 0 && towW > 0) {
-                const zx = mapX(zfwCG), zy = mapY(zfwW);
-                const tx = mapX(towCG), ty = mapY(towW);
+            if (zfwW_lbs > 0 && towW_lbs > 0) {
+                const zx = mapX(zfwCG), zy = mapY(zfwW_lbs);
+                const tx = mapX(towCG), ty = mapY(towW_lbs);
 
                 // Connector line
                 content += `<line x1="${zx}" y1="${zy}" x2="${tx}" y2="${ty}" stroke="var(--text-main)" stroke-width="2" stroke-dasharray="4,4" />`;
@@ -2284,37 +2436,50 @@
             }
 
             // Axis Titles
-            content += `<text x="${padL - 50}" y="${padT + plotH/2}" fill="var(--text-main)" font-size="12" font-weight="bold" text-anchor="middle" transform="rotate(-90 ${padL - 50},${padT + plotH/2})">WEIGHT ~ POUNDS</text>`;
+            const lblTitleW = currentUnits.weight === 'kg' ? 'KILOGRAMS' : 'POUNDS';
+            content += `<text x="${padL - 50}" y="${padT + plotH/2}" fill="var(--text-main)" font-size="12" font-weight="bold" text-anchor="middle" transform="rotate(-90 ${padL - 50},${padT + plotH/2})">WEIGHT ~ ${lblTitleW}</text>`;
             content += `<text x="${padL + plotW/2}" y="${height - 10}" fill="var(--text-main)" font-size="12" font-weight="bold" text-anchor="middle">CENTER OF GRAVITY ~ INCHES AFT OF DATUM</text>`;
 
             svg.innerHTML = content;
         }
 
         function calculateWB() {
-            // Inputs
-            const bewW = parseFloat(document.getElementById('wb-bew-w').value) || 0;
+            // Inputs (Can be in KG or LBS based on UI)
+            let bewW = parseFloat(document.getElementById('wb-bew-w').value) || 0;
             const bewA = parseFloat(document.getElementById('wb-bew-a').value) || 0;
             
-            const crewW = parseFloat(document.getElementById('wb-crew-w').value) || 0;
-            const fwdBagW = parseFloat(document.getElementById('wb-fwd-bag-w').value) || 0;
-            const row1W = parseFloat(document.getElementById('wb-row1-w').value) || 0;
-            const row2W = parseFloat(document.getElementById('wb-row2-w').value) || 0;
-            const row3W = parseFloat(document.getElementById('wb-row3-w').value) || 0;
-            const bagW  = parseFloat(document.getElementById('wb-bag-w').value) || 0;
+            let crewW = parseFloat(document.getElementById('wb-crew-w').value) || 0;
+            let fwdBagW = parseFloat(document.getElementById('wb-fwd-bag-w').value) || 0;
+            let row1W = parseFloat(document.getElementById('wb-row1-w').value) || 0;
+            let row2W = parseFloat(document.getElementById('wb-row2-w').value) || 0;
+            let row3W = parseFloat(document.getElementById('wb-row3-w').value) || 0;
+            let bagW  = parseFloat(document.getElementById('wb-bag-w').value) || 0;
             
-            // Fuel Calculation based on Gallons and Temperature (Density Variation)
+            // Fuel Calculation
             const fuelGal = parseFloat(document.getElementById('wb-fuel-gal').value) || 0;
-            const fuelTemp = parseFloat(document.getElementById('wb-fuel-temp').value) || 15;
+            let fuelTemp = parseFloat(document.getElementById('wb-fuel-temp').value) || 15;
+            
+            // Convert to internal native units (LBS & C) for W&B Math
+            if(currentUnits.temp === 'f') fuelTemp = (fuelTemp - 32) * 5/9;
             
             // Density calculation: Jet A is 6.835 lb/gal at 15°C. Volume expands ~0.0009 per °C.
-            const fuelDensity = 6.835 / (1 + 0.0009 * (fuelTemp - 15));
-            document.getElementById('wb-fuel-density').textContent = fuelDensity.toFixed(2) + ' LB/GAL';
+            const fuelDensityLbsGal = 6.835 / (1 + 0.0009 * (fuelTemp - 15));
+            const dispDensity = currentUnits.weight === 'kg' ? (fuelDensityLbsGal * LB_TO_KG) : fuelDensityLbsGal;
+            const lblDen = currentUnits.weight === 'kg' ? 'KG' : 'LB';
+            document.getElementById('wb-fuel-density').textContent = dispDensity.toFixed(2) + ` ${lblDen}/GAL`;
 
-            const fuelW = fuelGal * fuelDensity;
+            const fuelW_lbs = fuelGal * fuelDensityLbsGal;
             const fuelA = getFuelArm(fuelGal);
 
-            document.getElementById('wb-fuel-w-val').textContent = Math.round(fuelW);
-            document.getElementById('wb-fuel-a-val').textContent = fuelA.toFixed(1);
+            if (currentUnits.weight === 'kg') {
+                bewW *= KG_TO_LB;
+                crewW *= KG_TO_LB;
+                fwdBagW *= KG_TO_LB;
+                row1W *= KG_TO_LB;
+                row2W *= KG_TO_LB;
+                row3W *= KG_TO_LB;
+                bagW *= KG_TO_LB;
+            }
 
             // Arms (from Manual)
             const crewA = 143.0;
@@ -2324,7 +2489,7 @@
             const row3A = 305.0;
             const bagA  = 386.0;
 
-            // Moments (/100)
+            // Moments in LBS-IN (/100)
             const bewM  = (bewW * bewA) / 100;
             const crewM = (crewW * crewA) / 100;
             const fwdBagM = (fwdBagW * fwdBagA) / 100;
@@ -2332,46 +2497,50 @@
             const row2M = (row2W * row2A) / 100;
             const row3M = (row3W * row3A) / 100;
             const bagM  = (bagW * bagA) / 100;
-            const fuelM = (fuelW * fuelA) / 100;
+            const fuelM = (fuelW_lbs * fuelA) / 100;
 
-            // Display Individual Moments
-            document.getElementById('wb-bew-m').textContent = bewM.toFixed(1);
-            document.getElementById('wb-crew-m').textContent = crewM.toFixed(1);
-            if(document.getElementById('wb-fwd-bag-m')) document.getElementById('wb-fwd-bag-m').textContent = fwdBagM.toFixed(1);
-            document.getElementById('wb-row1-m').textContent = row1M.toFixed(1);
-            document.getElementById('wb-row2-m').textContent = row2M.toFixed(1);
-            document.getElementById('wb-row3-m').textContent = row3M.toFixed(1);
-            document.getElementById('wb-bag-m').textContent = bagM.toFixed(1);
-            document.getElementById('wb-fuel-m').textContent = fuelM.toFixed(1);
-
-            // Zero Fuel Weight (ZFW)
+            // Zero Fuel Weight (ZFW) in LBS
             const zfwW = bewW + crewW + fwdBagW + row1W + row2W + row3W + bagW;
             const zfwM = bewM + crewM + fwdBagM + row1M + row2M + row3M + bagM;
             const zfwCG = zfwW > 0 ? (zfwM * 100) / zfwW : 0;
 
-            document.getElementById('wb-zfw-w').textContent = Math.round(zfwW);
-            document.getElementById('wb-zfw-m').textContent = zfwM.toFixed(1);
-            document.getElementById('wb-zfw-cg').textContent = zfwCG.toFixed(1);
-
-            // Takeoff / Ramp Weight
-            const towW = zfwW + fuelW;
+            // Takeoff / Ramp Weight in LBS
+            const towW = zfwW + fuelW_lbs;
             const towM = zfwM + fuelM;
             const towCG = towW > 0 ? (towM * 100) / towW : 0;
 
-            document.getElementById('wb-tow-w').textContent = Math.round(towW);
-            document.getElementById('wb-tow-m').textContent = towM.toFixed(1);
+            // Factor used to revert LBS back to User unit for HTML Display
+            const dF = currentUnits.weight === 'kg' ? LB_TO_KG : 1;
+
+            document.getElementById('wb-fuel-w-val').textContent = Math.round(fuelW_lbs * dF);
+            document.getElementById('wb-fuel-a-val').textContent = fuelA.toFixed(1);
+
+            document.getElementById('wb-bew-m').textContent = (bewM * dF).toFixed(1);
+            document.getElementById('wb-crew-m').textContent = (crewM * dF).toFixed(1);
+            if(document.getElementById('wb-fwd-bag-m')) document.getElementById('wb-fwd-bag-m').textContent = (fwdBagM * dF).toFixed(1);
+            document.getElementById('wb-row1-m').textContent = (row1M * dF).toFixed(1);
+            document.getElementById('wb-row2-m').textContent = (row2M * dF).toFixed(1);
+            document.getElementById('wb-row3-m').textContent = (row3M * dF).toFixed(1);
+            document.getElementById('wb-bag-m').textContent = (bagM * dF).toFixed(1);
+            document.getElementById('wb-fuel-m').textContent = (fuelM * dF).toFixed(1);
+
+            document.getElementById('wb-zfw-w').textContent = Math.round(zfwW * dF);
+            document.getElementById('wb-zfw-m').textContent = (zfwM * dF).toFixed(1);
+            document.getElementById('wb-zfw-cg').textContent = zfwCG.toFixed(1);
+
+            document.getElementById('wb-tow-w').textContent = Math.round(towW * dF);
+            document.getElementById('wb-tow-m').textContent = (towM * dF).toFixed(1);
             document.getElementById('wb-tow-cg').textContent = towCG.toFixed(1);
 
-            // --- CG and Weight Limits Validation ---
-            function getFwdLimit(weight) {
-                if (weight <= 13450) return 307.00;
-                if (weight <= 13680) return 307.00 + ((weight - 13450) / (13680 - 13450)) * (307.60 - 307.00);
-                return 307.60 + ((Math.min(weight, 14900) - 13680) / (14900 - 13680)) * (310.90 - 307.60);
+            // --- CG and Weight Limits Validation (Native in LBS) ---
+            function getFwdLimit(weightLbs) {
+                if (weightLbs <= 13450) return 307.00;
+                if (weightLbs <= 13680) return 307.00 + ((weightLbs - 13450) / (13680 - 13450)) * (307.60 - 307.00);
+                return 307.60 + ((Math.min(weightLbs, 14900) - 13680) / (14900 - 13680)) * (310.90 - 307.60);
             }
 
-            function getAftLimit(weight) {
-                // Derived directly from the slanting line on the AFM chart (318.5 @ 9000 to 320.0 @ 14900)
-                const w = Math.max(9000, Math.min(weight, 14900));
+            function getAftLimit(weightLbs) {
+                const w = Math.max(9000, Math.min(weightLbs, 14900));
                 return 318.5 + ((w - 9000) / (14900 - 9000)) * (320.0 - 318.5);
             }
 
@@ -2379,9 +2548,10 @@
             const MAX_TOW = 14900;
             
             let warnings = [];
+            const lblW = currentUnits.weight === 'kg' ? 'KG' : 'LBS';
 
             const zfwCgEl = document.getElementById('wb-zfw-cg');
-            if (zfwW > MAX_ZFW) warnings.push(`ZFW (${Math.round(zfwW)} lbs) exceeds maximum of ${MAX_ZFW} lbs.`);
+            if (zfwW > MAX_ZFW) warnings.push(`ZFW (${Math.round(zfwW * dF)} ${lblW}) exceeds maximum of ${Math.round(MAX_ZFW * dF)} ${lblW}.`);
             if (zfwW > 0) {
                 const zfwFwd = getFwdLimit(zfwW);
                 const zfwAft = getAftLimit(zfwW);
@@ -2394,7 +2564,7 @@
             }
 
             const towCgEl = document.getElementById('wb-tow-cg');
-            if (towW > MAX_TOW) warnings.push(`Takeoff Weight (${Math.round(towW)} lbs) exceeds maximum of ${MAX_TOW} lbs.`);
+            if (towW > MAX_TOW) warnings.push(`Takeoff Weight (${Math.round(towW * dF)} ${lblW}) exceeds maximum of ${Math.round(MAX_TOW * dF)} ${lblW}.`);
             if (towW > 0) {
                 const towFwd = getFwdLimit(towW);
                 const towAft = getAftLimit(towW);
@@ -2427,7 +2597,7 @@
             // Sync with Takeoff Weight Input (Optional but helpful)
             const takeoffWeightInput = document.getElementById('weight');
             if (takeoffWeightInput && Math.round(towW) > 0) {
-                takeoffWeightInput.value = Math.round(towW);
+                takeoffWeightInput.value = Math.round(towW * dF);
                 calculateAll(); // Update limits
             }
             
