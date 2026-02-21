@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Starship Aerocalc | Takeoff Precision</title>
-    <!-- Fonte Terminal -->
+    <title>Starship Aerocalc | Flight Precision</title>
+    <!-- Terminal Font -->
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
-        /* Variáveis do Tema Starship (Claro/Terminal) */
+        /* Starship Theme Variables (Light/Terminal) */
         :root {
             --bg-dark: #f8fafc;
             --bg-card: #ffffff;
@@ -42,7 +42,7 @@
             min-height: 100vh;
         }
 
-        /* Navegação */
+        /* Navigation */
         nav {
             padding: 24px 5%;
             display: flex;
@@ -88,7 +88,7 @@
             color: var(--primary);
         }
 
-        /* Secção Hero */
+        /* Hero Section */
         .hero {
             margin-top: 80px;
             padding: 100px 5% 80px;
@@ -163,7 +163,7 @@
             transform: translateY(-2px);
         }
 
-        /* Estrutura Principal */
+        /* Main Structure */
         .main-container {
             display: flex;
             flex-direction: column;
@@ -172,7 +172,7 @@
             flex: 1;
         }
 
-        /* Funcionalidades */
+        /* Features */
         .features {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -215,7 +215,7 @@
             line-height: 1.5;
         }
 
-        /* Secções da Aplicação */
+        /* App Sections */
         .app-section {
             width: 100%;
             display: flex;
@@ -252,10 +252,10 @@
         }
 
         .card-wide {
-            max-width: 1000px; /* Alargado para as tabelas de limites */
+            max-width: 1000px; 
         }
 
-        /* Brilho no topo dos cartões */
+        /* Card Top Glow */
         .card::before {
             content: '';
             position: absolute;
@@ -270,7 +270,7 @@
             padding: 32px;
         }
 
-        /* Entradas da Calculadora */
+        /* Calculator Inputs */
         .form-row {
             display: flex;
             gap: 16px;
@@ -348,6 +348,7 @@
             font-weight: 600;
             background-color: var(--bg-input);
             color: var(--text-muted);
+            text-align: center;
         }
 
         .radio-label input {
@@ -360,7 +361,7 @@
             border-color: var(--primary);
         }
 
-        /* Resultados da Calculadora */
+        /* Results */
         .results-wrapper {
             display: flex;
             flex-direction: column;
@@ -503,7 +504,7 @@
             text-align: center;
         }
 
-        /* Tabelas e Limitações Estilizadas */
+        /* Tables and Limitations Styling */
         .limitations-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
@@ -568,7 +569,7 @@
             margin-top: 2px;
         }
 
-        /* Mostrador Dinâmico */
+        /* Dynamic Display */
         .dynamic-speed-box {
             display: flex;
             align-items: center;
@@ -614,7 +615,69 @@
             border: 1px solid rgba(37, 99, 235, 0.3);
         }
 
-        /* Estilos KOEL (Equipment List) */
+        /* Weight and Balance Styles */
+        .wb-input {
+            width: 100%;
+            max-width: 100px;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-main);
+            background-color: var(--bg-input);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .wb-input:focus {
+            border-color: var(--primary);
+        }
+
+        .wb-table-val {
+            font-weight: 600;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .wb-total-row td {
+            background: var(--bg-input);
+            font-weight: 800;
+            border-top: 2px solid var(--border);
+        }
+
+        /* CG Graph Styles */
+        .cg-graph-container {
+            margin-top: 32px;
+            padding: 24px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            overflow-x: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .cg-graph-container h4 {
+            font-size: 16px;
+            color: var(--text-main);
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        #cg-graph {
+            width: 100%;
+            max-width: 600px;
+            height: auto;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        /* KOEL Styles */
         .koel-tabs {
             display: flex;
             gap: 8px;
@@ -658,7 +721,7 @@
             padding-right: 8px;
         }
 
-        /* Estilização da barra de rolagem */
+        /* Custom Scrollbar */
         .koel-list-container::-webkit-scrollbar {
             width: 6px;
         }
@@ -725,7 +788,7 @@
             font-weight: 500;
         }
 
-        /* Rodapé */
+        /* Footer */
         footer {
             background-color: white;
             border-top: 1px solid var(--border);
@@ -760,7 +823,7 @@
             color: var(--primary);
         }
 
-        /* Responsividade */
+        /* Responsiveness */
         @media (max-width: 600px) {
             .form-row {
                 flex-direction: column;
@@ -786,6 +849,10 @@
             .limitations-grid {
                 grid-template-columns: 1fr;
             }
+            .limits-table th, .limits-table td {
+                padding: 10px 12px;
+                font-size: 12px;
+            }
         }
         
         html {
@@ -795,54 +862,56 @@
 </head>
 <body>
 
-    <!-- Navegação -->
+    <!-- Navigation -->
     <nav>
         <div class="logo">🚀 Starship <span>Aerocalc</span></div>
         <div class="nav-links">
-            <a href="#calculator" class="nav-link">Performance</a>
+            <a href="#takeoff" class="nav-link">Takeoff</a>
+            <a href="#landing" class="nav-link">Landing</a>
             <a href="#wind" class="nav-link">Wind</a>
+            <a href="#wb" class="nav-link">Weight & Balance</a>
             <a href="#limitations" class="nav-link">Limitations</a>
-            <a href="#koel" class="nav-link">Equipment (KOEL)</a>
+            <a href="#koel" class="nav-link">Equipment</a>
         </div>
     </nav>
 
-    <!-- Secção de Apresentação -->
+    <!-- Hero Section -->
     <section class="hero">
-        <h1>Absolute Takeoff Precision</h1>
-        <p>The ultimate tool for performance calculations, V-Speeds, MTOW, and power. Starship Aerocalc brings cutting-edge technology to your flight plan in seconds.</p>
+        <h1>Absolute Flight Precision</h1>
+        <p>The ultimate tool for performance calculations, V-Speeds, MTOW, and landing. Starship Aerocalc brings cutting-edge technology to your flight plan in seconds.</p>
         <div class="hero-btns">
-            <a href="#calculator" class="btn-primary">Access Calculator</a>
+            <a href="#takeoff" class="btn-primary">Open Calculator</a>
             <a href="#limitations" class="btn-secondary">View Limitations</a>
         </div>
     </section>
 
-    <!-- Recipiente Principal -->
+    <!-- Main Container -->
     <main class="main-container">
         
-        <!-- Vantagens -->
+        <!-- Features -->
         <div class="features">
             <div class="feature-card">
                 <div class="feature-icon">⚡️</div>
                 <h3>Real-Time Results</h3>
-                <p>Our engine instantly processes complex performance tables as you input data.</p>
+                <p>Our engine instantly processes complex performance tables as you enter data.</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">🎯</div>
                 <h3>Extreme Precision</h3>
-                <p>Bi-linear and tri-linear interpolation based on the original Aircraft Flight Manual (AFM).</p>
+                <p>Bi-linear interpolation and calculations based on the original Aircraft Flight Manual (AFM) charts.</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">✅</div>
                 <h3>Dispatch Ready</h3>
-                <p>Check exactly which equipment is mandatory with the integrated KOEL checker.</p>
+                <p>Check exactly what equipment is required with the built-in KOEL verifier.</p>
             </div>
         </div>
 
-        <!-- Calculadora (Âncora) -->
-        <div id="calculator" class="app-section">
+        <!-- Takeoff Calculator -->
+        <div id="takeoff" class="app-section">
             <div class="section-header">
-                <h2>Performance Calculator</h2>
-                <p>Enter planned flight conditions</p>
+                <h2>Takeoff Calculator</h2>
+                <p>Enter planned departure conditions</p>
             </div>
             <div class="card">
                 <div class="content">
@@ -911,13 +980,13 @@
                             </label>
                             <label class="radio-label">
                                 <input type="radio" name="iceAcc" value="ice">
-                                Icing
+                                Ice
                             </label>
                         </div>
                     </div>
 
                     <div class="results-wrapper">
-                        <!-- Resultado Potência -->
+                        <!-- Torque Result -->
                         <div class="result-container" id="box-torque">
                             <div class="result-info">
                                 <div class="result-label">Power (Torque)</div>
@@ -926,7 +995,7 @@
                             <div class="result-value" id="res-torque">--.-%</div>
                         </div>
 
-                        <!-- Resultado MTOW -->
+                        <!-- MTOW Result -->
                         <div class="result-container" id="box-mtow">
                             <div class="result-info">
                                 <div class="result-label">MTOW (Climb Limit) <span class="limit-badge" id="badge-mtow">MAX</span></div>
@@ -935,10 +1004,10 @@
                             <div class="result-value" id="res-mtow">----- LBS</div>
                         </div>
 
-                        <!-- Velocidades V e TOFL -->
+                        <!-- V-Speeds and TOFL -->
                         <div class="result-container v-speeds-box" id="box-vspeeds">
                             <div class="result-info" style="width: 100%">
-                                <div class="result-label">V-Speeds & Distance (TOFL)</div>
+                                <div class="result-label">V-Speeds and Distance (TOFL)</div>
                                 
                                 <div class="speeds-grid" id="res-speeds-grid">
                                     <div class="speed-item"><span>V1</span><strong id="res-v1">--</strong></div>
@@ -952,11 +1021,11 @@
                             </div>
                         </div>
 
-                        <!-- Resultado Stall Speed -->
+                        <!-- Stall Speed Result -->
                         <div class="result-container" id="box-stall">
                             <div class="result-info">
                                 <div class="result-label">Stall Speed (Vs)</div>
-                                <div class="result-desc">Power Idle</div>
+                                <div class="result-desc">Idle Power</div>
                             </div>
                             <div class="result-value" id="res-stall">-- KIAS</div>
                         </div>
@@ -967,11 +1036,161 @@
             </div>
         </div>
 
-        <!-- Nova Secção: Wind Components -->
+        <!-- Landing Calculator Section -->
+        <div id="landing" class="app-section">
+            <div class="section-header">
+                <h2>Landing Performance</h2>
+                <p>Distance, Weight Limits and Approach Gradients</p>
+            </div>
+            <div class="card">
+                <div class="content">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="land-alt">Pressure Altitude (Destination)</label>
+                            <div class="input-wrapper">
+                                <input type="number" id="land-alt" value="1000" min="0" max="14000" step="1">
+                                <span class="unit">FT</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="land-oat">OAT Temperature</label>
+                            <div class="input-wrapper">
+                                <input type="number" id="land-oat" value="15" min="-40" max="60" step="1">
+                                <span class="unit">°C</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="land-weight">Planned Weight (Landing)</label>
+                            <div class="input-wrapper">
+                                <input type="number" id="land-weight" value="12500" min="10000" max="14900" step="10">
+                                <span class="unit">LBS</span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="land-wind">Wind (+ Head / - Tail)</label>
+                            <div class="input-wrapper">
+                                <input type="number" id="land-wind" value="10" min="-20" max="50" step="1">
+                                <span class="unit">KTS</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label>Runway Gradient</label>
+                            <div class="input-wrapper">
+                                <input type="number" id="land-grad" value="0" min="-5" max="5" step="0.1">
+                                <span class="unit">% (+ Up)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row" style="margin-top: 20px;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label>Engine Anti-Ice</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="land-antiIce" value="off" checked>
+                                    OFF
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="land-antiIce" value="on">
+                                    ON
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label>Ice Accumulation</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="land-iceAcc" value="clean" checked>
+                                    Clean
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="land-iceAcc" value="ice">
+                                    Ice
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 0; margin-top: 20px;">
+                        <label>Anti-Skid (Braking)</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="land-antiSkid" value="on" checked>
+                                ON
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="land-antiSkid" value="off">
+                                OFF
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="results-wrapper">
+                        <!-- Structural Landing Limit -->
+                        <div class="result-container active" id="box-land-mlw">
+                            <div class="result-info">
+                                <div class="result-label">Max Landing (MLW) <span class="limit-badge" id="badge-land-mlw">LIMITED</span></div>
+                                <div class="result-desc">Climb / Ice Limit</div>
+                            </div>
+                            <div class="result-value" id="res-land-mlw">----- LBS</div>
+                        </div>
+
+                        <!-- VREF -->
+                        <div class="result-container active">
+                            <div class="result-info">
+                                <div class="result-label">Reference Speed (VREF)</div>
+                                <div class="result-desc">50 FT AGL / Flaps Extended</div>
+                            </div>
+                            <div class="result-value" id="res-land-vref">--- KTS</div>
+                        </div>
+
+                        <!-- Landing Distance -->
+                        <div class="result-container active" style="border-left-color: var(--primary); background: rgba(37, 99, 235, 0.05); border-color: rgba(37, 99, 235, 0.3);">
+                            <div class="result-info">
+                                <div class="result-label">Landing Distance</div>
+                                <div class="result-desc">3º Path / Dry Runway</div>
+                            </div>
+                            <div class="result-value" id="res-land-dist" style="color: var(--primary);">--- FT</div>
+                        </div>
+
+                        <!-- Approach Climb -->
+                        <div class="result-container active">
+                            <div class="result-info">
+                                <div class="result-label">Approach Climb Gradient</div>
+                                <div class="result-desc">1 Engine Inoperative / Flaps Retracted</div>
+                            </div>
+                            <div class="result-value" id="res-land-appclimb">-.-- %</div>
+                        </div>
+
+                        <!-- Balked Landing -->
+                        <div class="result-container active">
+                            <div class="result-info">
+                                <div class="result-label">Balked Landing</div>
+                                <div class="result-desc">All Engines / Flaps Extended / Gear Down</div>
+                            </div>
+                            <div class="result-value" id="res-land-balked">---- FT/MIN</div>
+                        </div>
+                        
+                        <div class="error-msg" id="land-error"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section: Wind Components -->
         <div id="wind" class="app-section">
             <div class="section-header">
                 <h2>Wind Components</h2>
-                <p>Calculate crosswind and headwind components</p>
+                <p>Calculate crosswind and headwind</p>
             </div>
             <div class="card">
                 <div class="content">
@@ -985,10 +1204,10 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="windAngle">Wind Angle</label>
+                            <label for="windAngle">Angle Relative to Runway</label>
                             <div class="input-wrapper">
                                 <input type="number" id="windAngle" value="20" min="0" max="180">
-                                <span class="unit">DEG</span>
+                                <span class="unit">DEGREES</span>
                             </div>
                         </div>
                     </div>
@@ -996,16 +1215,16 @@
                     <div class="results-wrapper" style="margin-top: 24px;">
                         <div class="result-container active" id="box-headwind">
                             <div class="result-info">
-                                <div class="result-label" id="lbl-headwind">Headwind Component</div>
-                                <div class="result-desc">Component along flight path</div>
+                                <div class="result-label" id="lbl-headwind">Headwind</div>
+                                <div class="result-desc">Component along the path</div>
                             </div>
                             <div class="result-value" id="res-headwind">9.4 KTS</div>
                         </div>
 
                         <div class="result-container active" id="box-crosswind">
                             <div class="result-info">
-                                <div class="result-label">Crosswind Component</div>
-                                <div class="result-desc">Perpendicular to flight path</div>
+                                <div class="result-label">Crosswind</div>
+                                <div class="result-desc">Perpendicular to path</div>
                             </div>
                             <div class="result-value" id="res-crosswind">3.4 KTS</div>
                         </div>
@@ -1014,15 +1233,134 @@
             </div>
         </div>
 
-        <!-- Nova Secção: Limitações da Aeronave -->
+        <!-- Section: Weight & Balance -->
+        <div id="wb" class="app-section">
+            <div class="section-header">
+                <h2>Weight and Balance</h2>
+                <p>CG Calculation for 6-Passenger Seating Configuration</p>
+            </div>
+            <div class="card card-wide">
+                <div class="content">
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
+                        Enter the load weights. The Arms (Fuselage Stations) are pre-filled based on the AFM Six Passenger Seating centroids. Moment is calculated as (Weight &times; Arm) / 100.
+                    </p>
+                    
+                    <div class="form-row" style="background: var(--bg-input); padding: 16px; border-radius: 12px; margin-bottom: 24px; align-items: center;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="wb-fuel-gal" style="color: var(--primary);">Usable Fuel (Gallons)</label>
+                            <div class="input-wrapper">
+                                <input type="number" id="wb-fuel-gal" value="373" min="0" max="565" step="1" style="border-color: rgba(37, 99, 235, 0.3);">
+                                <span class="unit">GAL</span>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="wb-fuel-temp" style="color: var(--primary);">Fuel Temp (OAT)</label>
+                            <div class="input-wrapper">
+                                <input type="number" id="wb-fuel-temp" value="15" min="-40" max="60" step="1" style="border-color: rgba(37, 99, 235, 0.3);">
+                                <span class="unit">°C</span>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: center; text-align: right;">
+                            <span style="font-size: 11px; color: var(--text-muted); font-weight: 700; margin-bottom: 4px;">JET A SPECIFIC WEIGHT</span>
+                            <span id="wb-fuel-density" style="font-size: 18px; font-weight: 800; color: var(--primary);">6.83 LB/GAL</span>
+                        </div>
+                    </div>
+
+                    <div class="limits-table-wrapper" style="overflow-x: auto;">
+                        <table class="limits-table" id="wb-table">
+                            <thead>
+                                <tr>
+                                    <th>Station / Item</th>
+                                    <th>Weight (LBS)</th>
+                                    <th>Arm (F.S.)</th>
+                                    <th>Moment / 100</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Basic Empty Weight</strong></td>
+                                    <td><input type="number" class="wb-input" id="wb-bew-w" value="10150" step="10"></td>
+                                    <td><input type="number" class="wb-input" id="wb-bew-a" value="314.0" step="0.1"></td>
+                                    <td class="wb-table-val" id="wb-bew-m">31871.0</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Crew</strong></td>
+                                    <td><input type="number" class="wb-input wb-weight" id="wb-crew-w" value="170" step="1"></td>
+                                    <td class="wb-table-val">143.0</td>
+                                    <td class="wb-table-val" id="wb-crew-m">243.1</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Forward Baggage</strong></td>
+                                    <td><input type="number" class="wb-input wb-weight" id="wb-fwd-bag-w" value="0" step="1" max="160"></td>
+                                    <td class="wb-table-val">182.0</td>
+                                    <td class="wb-table-val" id="wb-fwd-bag-m">0.0</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Cabin - Row 1</strong></td>
+                                    <td><input type="number" class="wb-input wb-weight" id="wb-row1-w" value="0" step="1"></td>
+                                    <td class="wb-table-val">226.0</td>
+                                    <td class="wb-table-val" id="wb-row1-m">0.0</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Cabin - Row 2</strong></td>
+                                    <td><input type="number" class="wb-input wb-weight" id="wb-row2-w" value="0" step="1"></td>
+                                    <td class="wb-table-val">267.0</td>
+                                    <td class="wb-table-val" id="wb-row2-m">0.0</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Cabin - Row 3</strong></td>
+                                    <td><input type="number" class="wb-input wb-weight" id="wb-row3-w" value="0" step="1"></td>
+                                    <td class="wb-table-val">305.0</td>
+                                    <td class="wb-table-val" id="wb-row3-m">0.0</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Aft Baggage</strong></td>
+                                    <td><input type="number" class="wb-input wb-weight" id="wb-bag-w" value="0" step="1"></td>
+                                    <td class="wb-table-val">386.0</td>
+                                    <td class="wb-table-val" id="wb-bag-m">0.0</td>
+                                </tr>
+                                <tr class="wb-total-row">
+                                    <td style="color: var(--primary);"><strong>ZERO FUEL WEIGHT</strong></td>
+                                    <td id="wb-zfw-w">10320</td>
+                                    <td id="wb-zfw-cg">241.8</td>
+                                    <td id="wb-zfw-m">24958.4</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Usable Fuel</strong></td>
+                                    <td class="wb-table-val" id="wb-fuel-w-val" style="color: var(--primary);">2549</td>
+                                    <td class="wb-table-val" id="wb-fuel-a-val">304.4</td>
+                                    <td class="wb-table-val" id="wb-fuel-m">7759.2</td>
+                                </tr>
+                                <tr class="wb-total-row" style="border-top-width: 3px;">
+                                    <td style="color: var(--accent);"><strong>RAMP / TAKEOFF WEIGHT</strong></td>
+                                    <td id="wb-tow-w">12820</td>
+                                    <td id="wb-tow-cg">242.7</td>
+                                    <td id="wb-tow-m">31108.4</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div id="wb-status-box" style="display: none;"></div>
+
+                    <!-- CG Graph visual envelope -->
+                    <div class="cg-graph-container">
+                        <h4>Weight and Balance Diagram</h4>
+                        <svg id="cg-graph" viewBox="0 0 600 450"></svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section: Aircraft Limitations -->
         <div id="limitations" class="app-section">
             <div class="section-header">
                 <h2>Aircraft Limitations</h2>
-                <p>According to ASI markings and AFM operating restrictions</p>
+                <p>Based on ASI and AFM operational restrictions</p>
             </div>
             
             <div class="limitations-grid card-wide">
-                <!-- Cartão: Limites Dinâmicos -->
+                <!-- Card: Dynamic Limits -->
                 <div class="card" style="width: 100%; max-width: none;">
                     <div class="content">
                         <h3 style="margin-bottom: 24px; color: var(--text-main);">Dynamic Flight Limits</h3>
@@ -1032,7 +1370,7 @@
                         
                         <div class="dynamic-speed-box">
                             <div class="dynamic-speed-title">
-                                <strong>Max Operating Speed (V<sub>MO</sub>)</strong>
+                                <strong>Maximum Speed (V<sub>MO</sub>)</strong>
                                 <span>Red pointer on ASI (Varies with altitude)</span>
                             </div>
                             <div class="dynamic-speed-value val-red" id="dyn-vmo">--- KIAS</div>
@@ -1040,7 +1378,7 @@
 
                         <div class="dynamic-speed-box">
                             <div class="dynamic-speed-title">
-                                <strong>Best OEI Rate of Climb (V<sub>YSE</sub>)</strong>
+                                <strong>Best Single-Engine Rate of Climb (V<sub>YSE</sub>)</strong>
                                 <span>Blue Line (Reduces 0.55 KIAS per 1000 ft)</span>
                             </div>
                             <div class="dynamic-speed-value val-blue" id="dyn-vyse">--- KIAS</div>
@@ -1048,11 +1386,11 @@
                     </div>
                 </div>
 
-                <!-- Cartão: Limitações de Velocidade (Estático) -->
+                <!-- Card: Static Speed Limits -->
                 <div class="card" style="width: 100%; max-width: none;">
                     <div class="content">
-                        <h3 style="color: var(--text-main);">Airspeed Limits (KIAS)</h3>
-                        <p style="font-size: 12px; color: var(--text-muted);">Reference for max weight of 14,900 lbs</p>
+                        <h3 style="color: var(--text-main);">Speed Limits (KIAS)</h3>
+                        <p style="font-size: 12px; color: var(--text-muted);">Reference for a maximum weight of 14,900 lbs</p>
                         
                         <div class="limits-table-wrapper">
                             <table class="limits-table">
@@ -1068,7 +1406,7 @@
                                         <td class="highlight">181</td>
                                     </tr>
                                     <tr>
-                                        <td>Maximum Flap Extension (V<sub>FE</sub>)<small>Fully extended position</small></td>
+                                        <td>Maximum Flap Extended (V<sub>FE</sub>)<small>Fully extended position</small></td>
                                         <td class="highlight">180</td>
                                     </tr>
                                     <tr>
@@ -1080,7 +1418,7 @@
                                         <td class="highlight">200</td>
                                     </tr>
                                     <tr>
-                                        <td>Air Minimum Control (V<sub>MCA</sub>)<small>Flaps Extended / Retracted</small></td>
+                                        <td>Minimum Control in Air (V<sub>MCA</sub>)<small>Flaps Extended / Retracted</small></td>
                                         <td class="red-limit">89 / 94</td>
                                     </tr>
                                     <tr>
@@ -1098,12 +1436,12 @@
                 </div>
             </div>
 
-            <!-- Cartão Larga: Limites do Motor -->
+            <!-- Wide Card: Engine Limits -->
             <div class="card card-wide" style="margin-top: 24px;">
                 <div class="content">
                     <h3 style="color: var(--text-main); margin-bottom: 8px;">Engine Operating Limits (PT6A-67A)</h3>
                     <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">
-                        Each column presents individual limits. Normal oil pressures are 90 to 135 psig at N1 speeds above 72%.
+                        Each column presents individual limits. Normal oil pressure is 90 to 135 psig at N1 speeds above 72%.
                     </p>
                     
                     <div class="limits-table-wrapper">
@@ -1125,7 +1463,7 @@
                                     <td><strong>Starting</strong></td>
                                     <td>---</td>
                                     <td>---</td>
-                                    <td class="red-limit">1000 <small>(5s limit)</small></td>
+                                    <td class="red-limit">1000 <small>(5s Limit)</small></td>
                                     <td>---</td>
                                     <td>---</td>
                                     <td>200 (max)</td>
@@ -1145,14 +1483,14 @@
                                     <td><strong>Takeoff</strong></td>
                                     <td>1200</td>
                                     <td class="highlight">100</td>
-                                    <td class="red-limit">850 <small>(5m limit)</small></td>
+                                    <td class="red-limit">850 <small>(5m Limit)</small></td>
                                     <td>104</td>
                                     <td>1700</td>
                                     <td>90 to 135</td>
                                     <td>10 to 110</td>
                                 </tr>
                                 <tr>
-                                    <td><strong>Max Continuous</strong></td>
+                                    <td><strong>Maximum Continuous</strong></td>
                                     <td>1193</td>
                                     <td class="highlight">100</td>
                                     <td>840</td>
@@ -1162,7 +1500,7 @@
                                     <td>10 to 105</td>
                                 </tr>
                                 <tr>
-                                    <td><strong>Max Cruise</strong></td>
+                                    <td><strong>Maximum Cruise</strong></td>
                                     <td>1100</td>
                                     <td>97</td>
                                     <td>840</td>
@@ -1174,10 +1512,10 @@
                                 <tr>
                                     <td><strong>Transient</strong></td>
                                     <td>---</td>
-                                    <td class="red-limit">138 <small>(20s limit)</small></td>
-                                    <td class="red-limit">870 <small>(20s limit)</small></td>
+                                    <td class="red-limit">138 <small>(20s Limit)</small></td>
+                                    <td class="red-limit">870 <small>(20s Limit)</small></td>
                                     <td>104</td>
-                                    <td>1870 <small>(20s limit)</small></td>
+                                    <td>1870 <small>(20s Limit)</small></td>
                                     <td>40 to 200</td>
                                     <td>-40 to 110</td>
                                 </tr>
@@ -1187,7 +1525,7 @@
                 </div>
             </div>
 
-            <!-- Outras Informações (Combustível e Sistemas) -->
+            <!-- Additional Systems (Fuel and Electrical) -->
             <div class="limitations-grid card-wide" style="margin-top: 24px;">
                 <div class="card" style="width: 100%; max-width: none;">
                     <div class="content">
@@ -1203,7 +1541,7 @@
             </div>
         </div>
 
-        <!-- Secção KOEL (Kinds of Operations Equipment List) -->
+        <!-- Section KOEL (Kinds of Operations Equipment List) -->
         <div id="koel" class="app-section">
             <div class="section-header">
                 <h2>Equipment Requirements</h2>
@@ -1217,18 +1555,18 @@
                         <button class="koel-tab-btn" data-op="1">VFR Night</button>
                         <button class="koel-tab-btn" data-op="2">IFR Day</button>
                         <button class="koel-tab-btn" data-op="3">IFR Night</button>
-                        <button class="koel-tab-btn" data-op="4">Icing</button>
+                        <button class="koel-tab-btn" data-op="4">Ice</button>
                     </div>
 
                     <div class="koel-list-container" id="koel-list-container">
-                        <!-- Itens preenchidos via JavaScript -->
+                        <!-- Items populated via JavaScript -->
                     </div>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- Rodapé & Créditos -->
+    <!-- Footer -->
     <footer>
         <div class="footer-content">
             <p class="dev-credit">Developed by Alan Fernandes</p>
@@ -1243,7 +1581,7 @@
     <!-- Scripts -->
     <script>
         // ==========================================
-        // LÓGICA DA CALCULADORA E LIMITES DINÂMICOS
+        // TAKEOFF CALCULATOR LOGIC & DYNAMIC LIMITS
         // ==========================================
         const inputAlt = document.getElementById('alt');
         const inputOat = document.getElementById('oat');
@@ -1262,7 +1600,7 @@
         const resStall = document.getElementById('res-stall');
         const boxStall = document.getElementById('box-stall');
 
-        // Elementos de Vento
+        // Wind Elements
         const inputWindSpeed = document.getElementById('windSpeed');
         const inputWindAngle = document.getElementById('windAngle');
         const resHeadwind = document.getElementById('res-headwind');
@@ -1270,7 +1608,25 @@
         const lblHeadwind = document.getElementById('lbl-headwind');
         const boxHeadwind = document.getElementById('box-headwind');
 
-        // Referências Dinâmicas
+        // Landing Elements
+        const landAlt = document.getElementById('land-alt');
+        const landOat = document.getElementById('land-oat');
+        const landWeight = document.getElementById('land-weight');
+        const landWind = document.getElementById('land-wind');
+        const landGrad = document.getElementById('land-grad');
+        const landAntiIce = document.querySelectorAll('input[name="land-antiIce"]');
+        const landIceAcc = document.querySelectorAll('input[name="land-iceAcc"]');
+        const landAntiSkid = document.querySelectorAll('input[name="land-antiSkid"]');
+        
+        const resLandMlw = document.getElementById('res-land-mlw');
+        const resLandVref = document.getElementById('res-land-vref');
+        const resLandDist = document.getElementById('res-land-dist');
+        const resLandAppClimb = document.getElementById('res-land-appclimb');
+        const resLandBalked = document.getElementById('res-land-balked');
+        const badgeLandMlw = document.getElementById('badge-land-mlw');
+        const landError = document.getElementById('land-error');
+
+        // Dynamic References
         const dynVmo = document.getElementById('dyn-vmo');
         const dynVyse = document.getElementById('dyn-vyse');
 
@@ -1283,7 +1639,7 @@
         const speedsWarning = document.getElementById('speeds-warning');
         const speedsGrid = document.getElementById('res-speeds-grid');
 
-        // Listeners da Calculadora
+        // Takeoff Calculator Listeners
         inputAlt.addEventListener('input', calculateAll);
         inputOat.addEventListener('input', calculateAll);
         inputWeight.addEventListener('input', calculateAll);
@@ -1291,14 +1647,25 @@
         radiosFlaps.forEach(r => r.addEventListener('change', calculateAll));
         radiosIceAcc.forEach(r => r.addEventListener('change', calculateAll));
 
+        // Landing Calculator Listeners
+        landAlt.addEventListener('input', calculateLanding);
+        landOat.addEventListener('input', calculateLanding);
+        landWeight.addEventListener('input', calculateLanding);
+        landWind.addEventListener('input', calculateLanding);
+        landGrad.addEventListener('input', calculateLanding);
+        landAntiIce.forEach(r => r.addEventListener('change', calculateLanding));
+        landIceAcc.forEach(r => r.addEventListener('change', calculateLanding));
+        landAntiSkid.forEach(r => r.addEventListener('change', calculateLanding));
+
+        // Wind Listeners
         inputWindSpeed.addEventListener('input', calculateWind);
         inputWindAngle.addEventListener('input', calculateWind);
 
-        // --- TABELAS DE DADOS (Velocidades V e TOFL) ---
+        // --- DATA TABLES (V-Speeds and TOFL) ---
         const tAxis = [-30, -10, 0, 10, 20, 30, 40, 52];
         const wAxis = [12000, 13000, 13450, 14000, 14900];
         
-        // --- TABELAS FLAPS ESTENDIDOS ---
+        // --- TABLES FLAPS EXTENDED ---
         const data0_ext = {
             v1: [[91, 91, 91, 91, 91, 91, 91, 91],[91, 91, 91, 91, 91, 91, 91, 94],[93, 93, 93, 93, 93, 93, 93, 97],[94, 94, 94, 94, 95, 95, 96, 100],[97, 98, 99, 99, 100, 100, 100, null]],
             vr: [[91, 91, 91, 91, 91, 91, 91, 91],[94, 94, 94, 94, 94, 94, 94, 95],[96, 96, 96, 96, 96, 96, 96, 98],[97, 98, 98, 98, 98, 98, 99, 100],[101, 101, 101, 101, 101, 102, 102, null]],
@@ -1366,7 +1733,7 @@
             tofl: [[3830, 4224, 4429, 4720, 5068, 5895, null, null],[3990, 4513, 4790, 5282, 6078, null, null, null],[4291, 4856, 5154, 5702, null, null, null, null],[4636, 5242, 5574, null, null, null, null, null],[5252, 6088, null, null, null, null, null, null]]
         };
 
-        // --- TABELAS FLAPS RECOLHIDOS ---
+        // --- TABLES FLAPS RETRACTED ---
         const data0_retract = {
             v1: [[96, 97, 97, 97, 98, 98, 98, 101],[97, 98, 98, 99, 99, 99, 99, 103],[98, 98, 99, 99, 99, 100, 100, 104],[98, 99, 99, 100, 100, 100, 100, 104],[101, 102, 103, 103, 104, 105, 105, null]],
             vr: [[106, 106, 106, 106, 106, 106, 106, 106],[106, 106, 106, 106, 106, 106, 106, 106],[106, 106, 106, 106, 106, 106, 106, 106],[106, 106, 106, 106, 106, 106, 106, 106],[107, 108, 108, 108, 108, 108, 108, null]],
@@ -1489,7 +1856,7 @@
         function disableSpeeds(msg) {
             speedsGrid.style.display = 'none';
             speedsWarning.style.display = 'block';
-            speedsWarning.textContent = msg || 'Airspeed calculation unavailable for these parameters.';
+            speedsWarning.textContent = msg || 'Speed calculations unavailable for these parameters.';
             boxVspeeds.classList.remove('active');
         }
 
@@ -1528,6 +1895,9 @@
             dynVyse.textContent = Math.round(vyse) + ' KIAS';
         }
 
+        // ==========================================
+        // GENERAL CALCULATION (TAKEOFF)
+        // ==========================================
         function calculateAll() {
             const alt = parseFloat(inputAlt.value);
             const oat = parseFloat(inputOat.value);
@@ -1536,7 +1906,6 @@
             const flaps = document.querySelector('input[name="flaps"]:checked').value;
             const iceAcc = document.querySelector('input[name="iceAcc"]:checked').value;
 
-            // Updates dynamic limits first
             updateDynamicLimits(alt);
 
             if (isNaN(alt) || isNaN(oat)) {
@@ -1548,24 +1917,24 @@
                 return;
             }
             if (oat < -40) {
-                showError("Temperature (OAT) is below the chart minimum limit (-40°C).");
+                showError("OAT below the minimum chart limits (-40°C).");
                 return;
             }
             if (antiIce === 'on' && oat > 10) {
-                showError("Temperature (OAT) exceeds the MAXIMUM limit for Engine Anti-Ice ON (10°C).");
+                showError("OAT exceeds the MAXIMUM limit for Anti-Ice ON (10°C).");
                 return;
             }
             
             const isaTemp = 15 - (2 * (alt / 1000));
             const maxOAT = isaTemp + 37;
             if (oat > maxOAT) {
-                showError(`Temperature (OAT) exceeds the ISA+37°C limit for this altitude.<br>Maximum allowed OAT: ${maxOAT.toFixed(1)}°C`);
+                showError(`OAT exceeds the ISA+37°C limit for this altitude.<br>Maximum allowed OAT: ${maxOAT.toFixed(1)}°C`);
                 return;
             }
 
-            // Hide errors, but block V-Speeds calc if alt > 10000 (Tables restricted to 10k)
             hideError();
 
+            // Power (Torque) Calculation
             let torque = 0;
             const FLAT_RATING = 94.5;
             if (antiIce === 'off') {
@@ -1584,7 +1953,7 @@
                 const slope = 1.27;
                 torque = oat <= tKink ? FLAT_RATING : FLAT_RATING - slope * (oat - tKink);
             } else {
-                const tKink = 1.0 + (10000 - Math.min(alt, 10000)) * 0.0035; // Cap to 10k for this generic calculation
+                const tKink = 1.0 + (10000 - Math.min(alt, 10000)) * 0.0035; 
                 const slope = 1.0857;
                 torque = oat <= tKink ? FLAT_RATING : FLAT_RATING - slope * (oat - tKink);
             }
@@ -1592,6 +1961,7 @@
             let mtowOat = oat;
             if (antiIce === 'on') mtowOat += 7; 
 
+            // MTOW Calculation
             let mtow = 0;
             if (flaps === 'retracted') mtow = 17377.7 - (50 * mtowOat) - (0.28777 * alt);
             else mtow = 17658 - (50 * mtowOat) - (0.3758 * alt);
@@ -1603,17 +1973,17 @@
             }
 
             let weightError = false;
-            if (isNaN(plannedWeight)) weightError = "Please enter the Planned Weight.";
-            else if (plannedWeight > mtow) weightError = `Planned Weight (${plannedWeight} LBS) exceeds the climb MTOW limit (${Math.round(mtow)} LBS). Reduce weight.`;
+            if (isNaN(plannedWeight)) weightError = "Enter Planned Weight.";
+            else if (plannedWeight > mtow) weightError = `Planned Weight (${plannedWeight} LBS) exceeds the Climb Limit MTOW (${Math.round(mtow)} LBS). Reduce weight.`;
 
             resetSpeedsUI();
             
             if (alt > 10000) {
-                 disableSpeeds("Airspeed data not certified for takeoffs above 10,000 FT.");
+                disableSpeeds("Speed data not certified for takeoffs above 10,000 FT.");
             } else if (weightError) {
-                 disableSpeeds(weightError);
+                disableSpeeds(weightError);
             } else if (flaps === 'retracted' && alt > 5000 && alt < 8000) {
-                disableSpeeds("Airspeed data with Flaps Retracted are currently unavailable for altitudes between 6,000 and 7,000 FT.");
+                disableSpeeds("Speed data with Flaps Retracted unavailable for altitudes between 6,000 and 7,000 FT.");
             } else {
                 enableSpeeds();
                 const altitudeLevelsExtended = [
@@ -1655,7 +2025,7 @@
                 const v2_upper = getBilinear(plannedWeight, oat, upperData.v2);
                 const tofl_upper = getBilinear(plannedWeight, oat, upperData.tofl);
 
-                if (v1_lower === null || v1_upper === null) disableSpeeds("Conditions outside certified airspeed limits (dashed area on chart).");
+                if (v1_lower === null || v1_upper === null) disableSpeeds("Conditions outside certified limits (dashed area on the chart).");
                 else {
                     const altFrac = upperAlt === lowerAlt ? 0 : (alt - lowerAlt) / (upperAlt - lowerAlt);
                     const v1 = v1_lower + altFrac * (v1_upper - v1_lower);
@@ -1684,7 +2054,6 @@
             }
             
             let vsBank = vs0;
-            
             if (iceAcc === 'ice') {
                 vsBank += (flaps === 'extended') ? 18 : 15;
             }
@@ -1693,16 +2062,104 @@
                 resStall.textContent = Math.round(vsBank) + ' KIAS';
             }
 
-            // Show limited power if calculated
             resTorque.textContent = (alt > 10000 ? "N/A" : torque.toFixed(1) + '%');
             resMtow.textContent = Math.round(mtow).toLocaleString('en-US') + ' LBS';
         }
 
+        // ==========================================
+        // GENERAL CALCULATION (LANDING)
+        // ==========================================
+        function calculateLanding() {
+            const alt = parseFloat(landAlt.value) || 0;
+            const oat = parseFloat(landOat.value) || 0;
+            const peso = parseFloat(landWeight.value) || 12000;
+            const vento = parseFloat(landWind.value) || 0;
+            const gradiente = parseFloat(landGrad.value) || 0;
+
+            const antiIce = document.querySelector('input[name="land-antiIce"]:checked').value;
+            const iceAcc = document.querySelector('input[name="land-iceAcc"]:checked').value;
+            const antiSkid = document.querySelector('input[name="land-antiSkid"]:checked').value;
+
+            // Basic Validations
+            if (alt < 0 || alt > 14000 || oat < -40 || oat > 60) {
+                landError.style.display = 'block';
+                landError.innerHTML = "Please enter acceptable operational limits.";
+                return;
+            } else {
+                landError.style.display = 'none';
+            }
+
+            // 1. MLW (Maximum Landing Weight) - Based on Climb & Ice Restrictions
+            let mlw = 16500 - (alt * 0.2) - (oat * 50);
+            if (antiIce === 'on') mlw -= 800;
+            if (iceAcc === 'ice') mlw -= 1500;
+            
+            badgeLandMlw.style.display = 'none';
+            if (mlw >= 14900) {
+                mlw = 14900;
+                badgeLandMlw.style.display = 'inline-block';
+            }
+
+            // 2. VREF (Linear Approach based on AFM)
+            let vref = 107 + (peso - 11000) * 0.003589;
+            vref = Math.max(107, Math.min(121, vref));
+
+            // 3. Approach Climb Gradient (%)
+            let appClimb = 9.0 - (alt * 0.0003) - (oat * 0.04) - ((peso - 11000) * 0.001);
+            if (antiIce === 'on' && iceAcc === 'clean') appClimb -= 0.8;
+            if (antiIce === 'on' && iceAcc === 'ice') appClimb -= 4.0;
+            appClimb = Math.max(0, appClimb);
+
+            // 4. Balked Landing Rate of Climb (FT/MIN)
+            let balkedRoc = 3200 - (alt * 0.08) - (oat * 10) - ((peso - 11000) * 0.08);
+            if (antiIce === 'on' && iceAcc === 'clean') balkedRoc -= 100;
+            if (antiIce === 'on' && iceAcc === 'ice') balkedRoc -= 500;
+            balkedRoc = Math.max(0, balkedRoc);
+
+            // 5. Landing Distance (FT)
+            let dist = 1800 + (alt * 0.06) + (oat * 10) + ((peso - 11000) * 0.25);
+            
+            // Wind Factors (Headwind -, Tailwind +)
+            if (vento > 0) {
+                dist -= (vento * 18);
+            } else if (vento < 0) {
+                dist -= (vento * 60); // negative wind becomes positive (- - = +)
+            }
+
+            // Runway Gradient Factor (+ up -, - down +)
+            dist -= (gradiente * 50);
+
+            // Anti-Skid Factor
+            if (antiSkid === 'off') {
+                dist *= 1.165; // Increase approx. 16.5% based on AFM examples
+            }
+            dist = Math.max(1000, dist);
+
+            // DOM Update
+            resLandMlw.textContent = Math.round(mlw).toLocaleString('en-US') + ' LBS';
+            resLandVref.textContent = Math.round(vref) + ' KTS';
+            resLandAppClimb.textContent = appClimb.toFixed(2) + ' %';
+            resLandBalked.textContent = Math.round(balkedRoc) + ' FT/MIN';
+            resLandDist.textContent = Math.round(dist).toLocaleString('en-US') + ' FT';
+            
+            // Alert if weight exceeds MLW
+            if (peso > mlw) {
+                resLandMlw.style.color = "var(--error)";
+                landError.style.display = 'block';
+                landError.innerHTML = `WARNING: Planned Weight (${peso} LBS) exceeds the Maximum Authorized for climb conditions (${Math.round(mlw)} LBS).`;
+            } else {
+                resLandMlw.style.color = "var(--text-muted)";
+            }
+        }
+
+        // ==========================================
+        // WIND CALCULATION
+        // ==========================================
         function calculateWind() {
             const speed = parseFloat(inputWindSpeed.value) || 0;
             let angle = parseFloat(inputWindAngle.value) || 0;
 
-            // Normalize angle
+            // Normalize Angle
             angle = Math.abs(angle % 360);
             if (angle > 180) angle = 360 - angle;
 
@@ -1713,26 +2170,288 @@
             resCrosswind.textContent = Math.abs(crosswind).toFixed(1) + ' KTS';
             
             if (headwind >= 0) {
-                lblHeadwind.textContent = "Headwind Component";
+                lblHeadwind.textContent = "Headwind";
                 resHeadwind.textContent = headwind.toFixed(1) + ' KTS';
                 resHeadwind.style.color = "var(--success)";
                 boxHeadwind.style.borderLeftColor = "var(--success)";
             } else {
-                lblHeadwind.textContent = "Tailwind Component";
+                lblHeadwind.textContent = "Tailwind";
                 resHeadwind.textContent = Math.abs(headwind).toFixed(1) + ' KTS';
                 resHeadwind.style.color = "var(--warning)";
                 boxHeadwind.style.borderLeftColor = "var(--warning)";
             }
         }
 
-        // Execute immediately on load
+        // ==========================================
+        // WEIGHT AND BALANCE CALCULATION
+        // ==========================================
+        const fuelArmData = [
+            { gal: 0, arm: 314.6 }, { gal: 10, arm: 314.6 }, { gal: 20, arm: 314.6 }, { gal: 30, arm: 314.6 },
+            { gal: 40, arm: 314.6 }, { gal: 50, arm: 314.6 }, { gal: 60, arm: 306.9 }, { gal: 70, arm: 306.2 },
+            { gal: 80, arm: 305.9 }, { gal: 90, arm: 305.7 }, { gal: 100, arm: 305.5 }, { gal: 110, arm: 305.3 },
+            { gal: 120, arm: 305.1 }, { gal: 130, arm: 304.9 }, { gal: 140, arm: 304.7 }, { gal: 150, arm: 304.5 },
+            { gal: 160, arm: 304.3 }, { gal: 170, arm: 304.1 }, { gal: 180, arm: 303.9 }, { gal: 190, arm: 303.8 },
+            { gal: 200, arm: 303.6 }, { gal: 210, arm: 303.4 }, { gal: 220, arm: 303.2 }, { gal: 230, arm: 303.1 },
+            { gal: 240, arm: 303.0 }, { gal: 250, arm: 302.9 }, { gal: 260, arm: 302.8 }, { gal: 270, arm: 302.8 },
+            { gal: 280, arm: 302.8 }, { gal: 290, arm: 302.7 }, { gal: 300, arm: 302.7 }, { gal: 310, arm: 302.7 },
+            { gal: 320, arm: 302.7 }, { gal: 330, arm: 302.7 }, { gal: 340, arm: 302.7 }, { gal: 350, arm: 302.7 },
+            { gal: 360, arm: 302.7 }, { gal: 365, arm: 302.7 }, { gal: 370, arm: 303.8 }, { gal: 380, arm: 305.8 },
+            { gal: 390, arm: 307.7 }, { gal: 400, arm: 309.3 }, { gal: 410, arm: 310.9 }, { gal: 420, arm: 312.2 },
+            { gal: 430, arm: 313.5 }, { gal: 440, arm: 314.9 }, { gal: 450, arm: 315.9 }, { gal: 460, arm: 317.3 },
+            { gal: 470, arm: 318.5 }, { gal: 480, arm: 319.5 }, { gal: 490, arm: 320.5 }, { gal: 500, arm: 321.8 },
+            { gal: 510, arm: 322.8 }, { gal: 520, arm: 323.0 }, { gal: 530, arm: 322.5 }, { gal: 540, arm: 322.1 },
+            { gal: 550, arm: 321.7 }, { gal: 560, arm: 321.2 }, { gal: 565, arm: 321.0 }
+        ];
+
+        function getFuelArm(gal) {
+            if (gal <= 0) return 314.6;
+            if (gal >= 565) return 321.0;
+            
+            for (let i = 0; i < fuelArmData.length - 1; i++) {
+                if (gal >= fuelArmData[i].gal && gal <= fuelArmData[i+1].gal) {
+                    const g1 = fuelArmData[i].gal;
+                    const g2 = fuelArmData[i+1].gal;
+                    const a1 = fuelArmData[i].arm;
+                    const a2 = fuelArmData[i+1].arm;
+                    if (g1 === g2) return a1;
+                    return a1 + ((gal - g1) / (g2 - g1)) * (a2 - a1);
+                }
+            }
+            return 321.0;
+        }
+
+        function drawCGGraph(zfwW, zfwCG, towW, towCG) {
+            const svg = document.getElementById('cg-graph');
+            const width = 600, height = 450;
+            const padL = 70, padR = 30, padT = 30, padB = 50;
+            const plotW = width - padL - padR;
+            const plotH = height - padT - padB;
+
+            const minW = 9000, maxW = 15000;
+            const minCG = 306, maxCG = 322;
+
+            const mapX = (cg) => padL + ((cg - minCG) / (maxCG - minCG)) * plotW;
+            const mapY = (w) => (height - padB) - ((w - minW) / (maxW - minW)) * plotH;
+
+            let content = '';
+
+            // Grid Lines & Labels
+            for(let w = 9000; w <= 14800; w += 200) {
+                const isMajor = w % 1000 === 0;
+                content += `<line x1="${padL}" y1="${mapY(w)}" x2="${width-padR}" y2="${mapY(w)}" stroke="var(--border)" stroke-width="${isMajor ? 1.5 : 0.5}" />`;
+                if(isMajor || w === 14900) {
+                    content += `<text x="${padL - 10}" y="${mapY(w) + 4}" fill="var(--text-muted)" font-size="11" font-weight="${isMajor ? 'bold': 'normal'}" text-anchor="end">${w}</text>`;
+                }
+            }
+            for(let cg = 307; cg <= 321; cg += 1) {
+                content += `<line x1="${mapX(cg)}" y1="${padT}" x2="${mapX(cg)}" y2="${height-padB}" stroke="var(--border)" stroke-width="0.5" />`;
+                content += `<text x="${mapX(cg)}" y="${height - padB + 20}" fill="var(--text-muted)" font-size="11" text-anchor="middle">${cg}</text>`;
+            }
+
+            // Envelope Polygon Points
+            const envPoints = [
+                [307.0, 9000], [307.0, 13450], [307.6, 13680], [310.9, 14900], // Fwd
+                [320.0, 14900], [318.5, 9000] // Aft (Slanted based on AFM)
+            ].map(p => `${mapX(p[0])},${mapY(p[1])}`).join(' ');
+
+            content += `<polygon points="${envPoints}" fill="rgba(37, 99, 235, 0.08)" stroke="var(--primary)" stroke-width="2.5" stroke-linejoin="round" />`;
+
+            // Operational Limit Lines
+            const addLimitLine = (weight, label) => {
+                const y = mapY(weight);
+                content += `<line x1="${padL}" y1="${y}" x2="${width-padR}" y2="${y}" stroke="var(--primary)" stroke-width="1.5" stroke-dasharray="6,4" />`;
+                content += `<text x="${width-padR + 5}" y="${y + 4}" fill="var(--primary)" font-size="10" font-weight="800" text-anchor="start">${label}</text>`;
+            };
+            addLimitLine(12600, "MAX ZFW");
+            addLimitLine(13680, "MAX LANDING");
+            addLimitLine(14900, "MAX TAKEOFF");
+
+            // Plot Points if valid
+            if (zfwW > 0 && towW > 0) {
+                const zx = mapX(zfwCG), zy = mapY(zfwW);
+                const tx = mapX(towCG), ty = mapY(towW);
+
+                // Connector line
+                content += `<line x1="${zx}" y1="${zy}" x2="${tx}" y2="${ty}" stroke="var(--text-main)" stroke-width="2" stroke-dasharray="4,4" />`;
+                
+                // ZFW Point
+                content += `<circle cx="${zx}" cy="${zy}" r="5" fill="var(--accent)" stroke="white" stroke-width="2" />`;
+                content += `<text x="${zx + 10}" y="${zy + 4}" fill="var(--accent)" font-size="12" font-weight="bold">ZFW</text>`;
+                
+                // TOW Point
+                content += `<circle cx="${tx}" cy="${ty}" r="6" fill="var(--primary)" stroke="white" stroke-width="2" />`;
+                content += `<text x="${tx + 12}" y="${ty + 4}" fill="var(--primary)" font-size="12" font-weight="bold">TOW</text>`;
+            }
+
+            // Axis Titles
+            content += `<text x="${padL - 50}" y="${padT + plotH/2}" fill="var(--text-main)" font-size="12" font-weight="bold" text-anchor="middle" transform="rotate(-90 ${padL - 50},${padT + plotH/2})">WEIGHT ~ POUNDS</text>`;
+            content += `<text x="${padL + plotW/2}" y="${height - 10}" fill="var(--text-main)" font-size="12" font-weight="bold" text-anchor="middle">CENTER OF GRAVITY ~ INCHES AFT OF DATUM</text>`;
+
+            svg.innerHTML = content;
+        }
+
+        function calculateWB() {
+            // Inputs
+            const bewW = parseFloat(document.getElementById('wb-bew-w').value) || 0;
+            const bewA = parseFloat(document.getElementById('wb-bew-a').value) || 0;
+            
+            const crewW = parseFloat(document.getElementById('wb-crew-w').value) || 0;
+            const fwdBagW = parseFloat(document.getElementById('wb-fwd-bag-w').value) || 0;
+            const row1W = parseFloat(document.getElementById('wb-row1-w').value) || 0;
+            const row2W = parseFloat(document.getElementById('wb-row2-w').value) || 0;
+            const row3W = parseFloat(document.getElementById('wb-row3-w').value) || 0;
+            const bagW  = parseFloat(document.getElementById('wb-bag-w').value) || 0;
+            
+            // Fuel Calculation based on Gallons and Temperature (Density Variation)
+            const fuelGal = parseFloat(document.getElementById('wb-fuel-gal').value) || 0;
+            const fuelTemp = parseFloat(document.getElementById('wb-fuel-temp').value) || 15;
+            
+            // Density calculation: Jet A is 6.835 lb/gal at 15°C. Volume expands ~0.0009 per °C.
+            const fuelDensity = 6.835 / (1 + 0.0009 * (fuelTemp - 15));
+            document.getElementById('wb-fuel-density').textContent = fuelDensity.toFixed(2) + ' LB/GAL';
+
+            const fuelW = fuelGal * fuelDensity;
+            const fuelA = getFuelArm(fuelGal);
+
+            document.getElementById('wb-fuel-w-val').textContent = Math.round(fuelW);
+            document.getElementById('wb-fuel-a-val').textContent = fuelA.toFixed(1);
+
+            // Arms (from Manual)
+            const crewA = 143.0;
+            const fwdBagA = 182.0;
+            const row1A = 226.0;
+            const row2A = 267.0;
+            const row3A = 305.0;
+            const bagA  = 386.0;
+
+            // Moments (/100)
+            const bewM  = (bewW * bewA) / 100;
+            const crewM = (crewW * crewA) / 100;
+            const fwdBagM = (fwdBagW * fwdBagA) / 100;
+            const row1M = (row1W * row1A) / 100;
+            const row2M = (row2W * row2A) / 100;
+            const row3M = (row3W * row3A) / 100;
+            const bagM  = (bagW * bagA) / 100;
+            const fuelM = (fuelW * fuelA) / 100;
+
+            // Display Individual Moments
+            document.getElementById('wb-bew-m').textContent = bewM.toFixed(1);
+            document.getElementById('wb-crew-m').textContent = crewM.toFixed(1);
+            if(document.getElementById('wb-fwd-bag-m')) document.getElementById('wb-fwd-bag-m').textContent = fwdBagM.toFixed(1);
+            document.getElementById('wb-row1-m').textContent = row1M.toFixed(1);
+            document.getElementById('wb-row2-m').textContent = row2M.toFixed(1);
+            document.getElementById('wb-row3-m').textContent = row3M.toFixed(1);
+            document.getElementById('wb-bag-m').textContent = bagM.toFixed(1);
+            document.getElementById('wb-fuel-m').textContent = fuelM.toFixed(1);
+
+            // Zero Fuel Weight (ZFW)
+            const zfwW = bewW + crewW + fwdBagW + row1W + row2W + row3W + bagW;
+            const zfwM = bewM + crewM + fwdBagM + row1M + row2M + row3M + bagM;
+            const zfwCG = zfwW > 0 ? (zfwM * 100) / zfwW : 0;
+
+            document.getElementById('wb-zfw-w').textContent = Math.round(zfwW);
+            document.getElementById('wb-zfw-m').textContent = zfwM.toFixed(1);
+            document.getElementById('wb-zfw-cg').textContent = zfwCG.toFixed(1);
+
+            // Takeoff / Ramp Weight
+            const towW = zfwW + fuelW;
+            const towM = zfwM + fuelM;
+            const towCG = towW > 0 ? (towM * 100) / towW : 0;
+
+            document.getElementById('wb-tow-w').textContent = Math.round(towW);
+            document.getElementById('wb-tow-m').textContent = towM.toFixed(1);
+            document.getElementById('wb-tow-cg').textContent = towCG.toFixed(1);
+
+            // --- CG and Weight Limits Validation ---
+            function getFwdLimit(weight) {
+                if (weight <= 13450) return 307.00;
+                if (weight <= 13680) return 307.00 + ((weight - 13450) / (13680 - 13450)) * (307.60 - 307.00);
+                return 307.60 + ((Math.min(weight, 14900) - 13680) / (14900 - 13680)) * (310.90 - 307.60);
+            }
+
+            function getAftLimit(weight) {
+                // Derived directly from the slanting line on the AFM chart (318.5 @ 9000 to 320.0 @ 14900)
+                const w = Math.max(9000, Math.min(weight, 14900));
+                return 318.5 + ((w - 9000) / (14900 - 9000)) * (320.0 - 318.5);
+            }
+
+            const MAX_ZFW = 12600;
+            const MAX_TOW = 14900;
+            
+            let warnings = [];
+
+            const zfwCgEl = document.getElementById('wb-zfw-cg');
+            if (zfwW > MAX_ZFW) warnings.push(`ZFW (${Math.round(zfwW)} lbs) exceeds maximum of ${MAX_ZFW} lbs.`);
+            if (zfwW > 0) {
+                const zfwFwd = getFwdLimit(zfwW);
+                const zfwAft = getAftLimit(zfwW);
+                if (zfwCG < zfwFwd || zfwCG > zfwAft) {
+                    warnings.push(`ZFW CG (${zfwCG.toFixed(1)}) is out of limits [${zfwFwd.toFixed(1)} - ${zfwAft.toFixed(1)}].`);
+                    zfwCgEl.style.color = "var(--error)";
+                } else {
+                    zfwCgEl.style.color = "var(--text-main)";
+                }
+            }
+
+            const towCgEl = document.getElementById('wb-tow-cg');
+            if (towW > MAX_TOW) warnings.push(`Takeoff Weight (${Math.round(towW)} lbs) exceeds maximum of ${MAX_TOW} lbs.`);
+            if (towW > 0) {
+                const towFwd = getFwdLimit(towW);
+                const towAft = getAftLimit(towW);
+                if (towCG < towFwd || towCG > towAft) {
+                    warnings.push(`Takeoff CG (${towCG.toFixed(1)}) is out of limits [${towFwd.toFixed(1)} - ${towAft.toFixed(1)}].`);
+                    towCgEl.style.color = "var(--error)";
+                } else {
+                    towCgEl.style.color = "var(--text-main)";
+                }
+            }
+
+            const statusBox = document.getElementById('wb-status-box');
+            if (warnings.length > 0) {
+                statusBox.style.display = 'block';
+                statusBox.className = 'error-msg'; 
+                statusBox.style.marginTop = '24px';
+                statusBox.style.textAlign = 'left';
+                statusBox.innerHTML = "<strong>⚠️ Limits Violation:</strong><br>" + warnings.join("<br>");
+            } else {
+                statusBox.style.display = 'block';
+                statusBox.className = 'warning-msg'; 
+                statusBox.style.background = 'rgba(5, 150, 105, 0.1)';
+                statusBox.style.borderColor = 'rgba(5, 150, 105, 0.3)';
+                statusBox.style.color = 'var(--success)';
+                statusBox.style.marginTop = '24px';
+                statusBox.style.textAlign = 'center';
+                statusBox.innerHTML = "<strong>✓ Weight and CG are within limits.</strong>";
+            }
+
+            // Sync with Takeoff Weight Input (Optional but helpful)
+            const takeoffWeightInput = document.getElementById('weight');
+            if (takeoffWeightInput && Math.round(towW) > 0) {
+                takeoffWeightInput.value = Math.round(towW);
+                calculateAll(); // Update limits
+            }
+            
+            // Draw the CG Graph dynamically based on new results
+            drawCGGraph(zfwW, zfwCG, towW, towCG);
+        }
+
+        // Add Listeners to WB Table
+        document.querySelectorAll('.wb-input').forEach(input => {
+            input.addEventListener('input', calculateWB);
+        });
+        document.getElementById('wb-fuel-gal').addEventListener('input', calculateWB);
+        document.getElementById('wb-fuel-temp').addEventListener('input', calculateWB);
+
+        // Initial Calls
         calculateAll();
+        calculateLanding();
         calculateWind();
+        calculateWB();
 
         // ==========================================
-        // KOEL LOGIC (Equipment List)
+        // KOEL LOGIC (Equipment)
         // ==========================================
-        // Req array index: [VFR Day, VFR Night, IFR Day, IFR Night, Icing]
+        // Req Indices: [VFR Day, VFR Night, IFR Day, IFR Night, Ice]
         const koelData = [
             {
                 category: "Electrical Power",
@@ -1740,31 +2459,31 @@
                     { name: "Battery", req: [1, 1, 1, 1, 1] },
                     { name: "Battery Monitor System", req: [1, 1, 1, 1, 1] },
                     { name: "DC Generator", req: [2, 2, 2, 2, 2] },
-                    { name: "DC Loadmeter", req: [2, 2, 2, 2, 2] },
+                    { name: "Loadmeter", req: [2, 2, 2, 2, 2] },
                     { name: "DC Voltmeter and Selectors", req: [1, 1, 1, 1, 1] },
                     { name: "Battery Ammeter and Selectors", req: [1, 1, 1, 1, 1] },
-                    { name: "Nose Sealed Battery Packs", req: [2, 2, 2, 2, 2] }
+                    { name: "Sealed Lead Acid Batteries", req: [2, 2, 2, 2, 2] }
                 ]
             },
             {
                 category: "Engine Indications",
                 items: [
                     { name: "EICAS", req: [1, 1, 1, 1, 1] },
-                    { name: "Multi-Function Display (MFD) (EICAS Rev)", req: [1, 1, 1, 1, 1] },
+                    { name: "Multifunction Display (MFD)", req: [1, 1, 1, 1, 1] },
                     { name: "Radio Tuning Unit (RTU)", req: [1, 1, 1, 1, 1] }
                 ]
             },
             {
                 category: "Engine Oil",
                 items: [
-                    { name: "Low Oil Pressure Annunciator", req: [2, 2, 2, 2, 2] }
+                    { name: "Low Oil Pressure Warning", req: [2, 2, 2, 2, 2] }
                 ]
             },
             {
-                category: "Environmental and Pressurization",
+                category: "Environmental & Pressurization",
                 items: [
-                    { name: "Bleed Air Fail Annunciators", req: [3, 3, 3, 3, 3] },
-                    { name: "Cabin High Altitude Annunciator", req: [1, 1, 1, 1, 1] },
+                    { name: "Bleed Air Fail Warnings", req: [3, 3, 3, 3, 3] },
+                    { name: "High Cabin Altitude Warning", req: [1, 1, 1, 1, 1] },
                     { name: "Cabin Rate of Climb Indicator", req: [1, 1, 1, 1, 1] },
                     { name: "Bleed Air Shutoff Valve", req: [2, 2, 2, 2, 2] },
                     { name: "Outflow/Safety Valve", req: [2, 2, 2, 2, 2] },
@@ -1776,7 +2495,7 @@
             {
                 category: "Fire Protection",
                 items: [
-                    { name: "Engine Fire Detector System", req: [2, 2, 2, 2, 2] },
+                    { name: "Engine Fire Detection", req: [2, 2, 2, 2, 2] },
                     { name: "Engine Fire Extinguisher", req: [2, 2, 2, 2, 2] },
                     { name: "Portable Fire Extinguisher", req: [2, 2, 2, 2, 2] }
                 ]
@@ -1785,17 +2504,17 @@
                 category: "Flight Controls",
                 items: [
                     { name: "Flap/Forward Wing System", req: [1, 1, 1, 1, 1] },
-                    { name: "Trim Position Indicator (All axes)", req: [3, 3, 3, 3, 3] },
+                    { name: "Trim Position Indicator", req: [3, 3, 3, 3, 3] },
                     { name: "Stall Warning System", req: [1, 1, 1, 1, 1] }
                 ]
             },
             {
                 category: "Fuel",
                 items: [
-                    { name: "Standby Electrical Fuel Pump", req: [2, 2, 2, 2, 2] },
-                    { name: "Low Fuel Pressure Annunciator", req: [2, 2, 2, 2, 2] },
-                    { name: "Quantity Indicator System", req: [2, 2, 2, 2, 2] },
-                    { name: "Firewall Fuel Shutoff System", req: [2, 2, 2, 2, 2] },
+                    { name: "Electric Standby Pump", req: [2, 2, 2, 2, 2] },
+                    { name: "Low Fuel Pressure Warning", req: [2, 2, 2, 2, 2] },
+                    { name: "Fuel Quantity Indicator", req: [2, 2, 2, 2, 2] },
+                    { name: "Firewall Shutoff Valve", req: [2, 2, 2, 2, 2] },
                     { name: "Crossfeed System", req: [1, 1, 1, 1, 1] }
                 ]
             },
@@ -1806,16 +2525,16 @@
                     { name: "Engine Anti-Ice", req: [2, 2, 2, 2, 2] },
                     { name: "Heated Fuel Vent", req: [0, 0, 0, 0, 2] },
                     { name: "Heated Windshield", req: [2, 2, 2, 2, 2] },
-                    { name: "Pitot and Stall Warning Heat", req: [2, 2, 2, 2, 2] },
+                    { name: "Pitot/Stall Heat", req: [2, 2, 2, 2, 2] },
                     { name: "Ice Detector", req: [0, 0, 0, 0, 2] },
-                    { name: "Pneumatic Boot System", req: [0, 0, 0, 0, 1] }
+                    { name: "Pneumatic Boots", req: [0, 0, 0, 0, 1] }
                 ]
             },
             {
                 category: "Landing Gear",
                 items: [
-                    { name: "Gear Position Indicator Light", req: [3, 3, 3, 3, 3] },
-                    { name: "Landing Gear Warning Horn", req: [1, 1, 1, 1, 1] },
+                    { name: "Gear Position Lights", req: [3, 3, 3, 3, 3] },
+                    { name: "Landing Gear Aural Warning", req: [1, 1, 1, 1, 1] },
                     { name: "Alternate Extension Hand Pump", req: [1, 1, 1, 1, 1] }
                 ]
             }
@@ -1825,7 +2544,7 @@
         const koelTabs = document.querySelectorAll('.koel-tab-btn');
 
         function renderKOEL(operationIndex) {
-            koelContainer.innerHTML = ''; // Clear current table
+            koelContainer.innerHTML = ''; 
             
             koelData.forEach(categoryData => {
                 const categoryDiv = document.createElement('div');
@@ -1859,7 +2578,6 @@
             });
         }
 
-        // KOEL tabs listeners setup
         koelTabs.forEach(tab => {
             tab.addEventListener('click', (e) => {
                 koelTabs.forEach(t => t.classList.remove('active'));
@@ -1868,7 +2586,6 @@
             });
         });
 
-        // Initialize with the first tab (VFR Day)
         renderKOEL(0);
 
     </script>
