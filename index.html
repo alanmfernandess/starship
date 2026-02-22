@@ -1860,6 +1860,143 @@
                             </div>
                         </div>
 
+                        <div class="accordion-item warning">
+                            <button class="accordion-header">Battery Charge Rate</button>
+                            <div class="accordion-content">
+                                <div class="checklist-body">
+                                    <div class="checklist-row"><span class="checklist-item">1. Battery Switch</span> <span class="checklist-action text-red">OFF</span></div>
+                                    <div class="checklist-row"><span class="checklist-item">2. BATT CHG RATE Annunciator</span> <span class="checklist-action">EXTINGUISHED</span></div>
+                                    
+                                    <div class="checklist-note" style="background: transparent; margin-top: 16px;">If BATT CHG RATE annunciator does not extinguish:</div>
+                                    <div class="checklist-row"><span class="checklist-item">3. Land at the nearest suitable airport.</span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item warning">
+                            <button class="accordion-header">Pitch Trim Fail</button>
+                            <div class="accordion-content">
+                                <div class="checklist-body">
+                                    <div class="checklist-note">If autopilot is not engaged:</div>
+                                    <div class="checklist-row"><span class="checklist-item">1. Pitch Trim Power Switch</span> <span class="checklist-action">OFF/RESET</span></div>
+                                    <div class="checklist-row"><span class="checklist-item">2. Pitch Trim Power Switch</span> <span class="checklist-action">NORM TO RESET SYSTEM</span></div>
+                                    
+                                    <div class="checklist-note" style="background: transparent;">If annunciator illuminates again:</div>
+                                    <div class="checklist-row"><span class="checklist-item">3. Pitch Trim Power Switch</span> <span class="checklist-action">STBY</span></div>
+                                    <div class="checklist-row"><span class="checklist-item">4. Pitch Trim Standby Switches</span> <span class="checklist-action">RETRIM</span></div>
+
+                                    <div class="checklist-note" style="margin-top: 16px;">If autopilot is engaged:</div>
+                                    <div class="checklist-row"><span class="checklist-item">5. Autopilot</span> <span class="checklist-action">DISENGAGE</span></div>
+                                    
+                                    <div class="checklist-note" style="background: transparent;">If still illuminated, trim failure detected by manual system. See steps 1-4.</div>
+                                    <div class="checklist-note" style="background: transparent;">If extinguishes, trim failure detected by autopilot:</div>
+                                    <div class="checklist-row"><span class="checklist-item">6. Autopilot</span> <span class="checklist-action">RE-ENGAGE</span></div>
+                                    
+                                    <div class="checklist-note" style="background: transparent;">If illuminates again:</div>
+                                    <div class="checklist-row"><span class="checklist-item">7. Autopilot</span> <span class="checklist-action">DISENGAGE</span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item critical">
+                            <button class="accordion-header">Pitch Axis Runaway</button>
+                            <div class="accordion-content">
+                                <div class="checklist-body">
+                                    <div class="checklist-row"><span class="checklist-item">1. Airplane Attitude (using pitch control)</span> <span class="checklist-action text-red">MAINTAIN</span></div>
+                                    <div class="checklist-row"><span class="checklist-item">2. Control Wheel Interrupt Button</span> <span class="checklist-action text-red">DEPRESS AND HOLD</span></div>
+                                    <div class="checklist-row"><span class="checklist-item">3. Determine Cause of Malfunction:</span></div>
+                                    
+                                    <div class="checklist-note" style="background: transparent;">If L STALL WRN FAIL illuminates after the button has been depressed (8-10s):</div>
+                                    <div class="checklist-row"><span class="checklist-item">4. Release Control Wheel Interrupt Button.</span></div>
+                                    <div class="checklist-row"><span class="checklist-item">5. Land at the nearest suitable airport.</span></div>
+
+                                    <div class="checklist-note" style="background: transparent; margin-top: 16px;">If L STALL WRN FAIL does NOT illuminate (Pitch Trim runaway):</div>
+                                    <div class="checklist-row"><span class="checklist-item">6. Pitch Trim Power Switch</span> <span class="checklist-action text-red">STBY</span></div>
+                                    <div class="checklist-row"><span class="checklist-item">7. Control Wheel Interrupt Button</span> <span class="checklist-action text-red">RELEASE</span></div>
+                                    <div class="checklist-row"><span class="checklist-item">8. Pitch Trim Standby Switches</span> <span class="checklist-action text-red">RETRIM</span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item warning">
+                            <button class="accordion-header">Roll or Rudder Trim Fail</button>
+                            <div class="accordion-content">
+                                <div class="checklist-body">
+                                    <div class="checklist-note">If autopilot is not engaged:</div>
+                                    <div class="checklist-row"><span class="checklist-item">1. Roll or Rudder Trim Power Switch</span> <span class="checklist-action">OFF/RESET</span></div>
+                                    <div class="checklist-row"><span class="checklist-item">2. Roll or Rudder Trim Power Switch</span> <span class="checklist-action">NORM TO RESET SYSTEM</span></div>
+                                    
+                                    <div class="checklist-note" style="background: transparent;">If annunciator illuminates again:</div>
+                                    <div class="checklist-row"><span class="checklist-item">3. Roll or Rudder Trim Power Switch</span> <span class="checklist-action">OFF/RESET</span></div>
+                                    <div class="checklist-row"><span class="checklist-item">4. Airspeed</span> <span class="checklist-action">REDUCE SPEED BELOW 160 KNOTS</span></div>
+
+                                    <div class="checklist-note" style="margin-top: 16px;">If autopilot is engaged:</div>
+                                    <div class="checklist-row"><span class="checklist-item">5. Autopilot</span> <span class="checklist-action">DISENGAGE</span></div>
+                                    
+                                    <div class="checklist-note" style="background: transparent;">If still illuminated, trim failure detected by manual system. See steps 1-4.</div>
+                                    <div class="checklist-note" style="background: transparent;">If extinguishes, trim failure detected by autopilot:</div>
+                                    <div class="checklist-row"><span class="checklist-item">6. Autopilot</span> <span class="checklist-action">RE-ENGAGE</span></div>
+                                    
+                                    <div class="checklist-note" style="background: transparent;">If illuminates again:</div>
+                                    <div class="checklist-row"><span class="checklist-item">7. Autopilot</span> <span class="checklist-action">DISENGAGE</span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item critical">
+                            <button class="accordion-header">Roll or Rudder Trim Runaway</button>
+                            <div class="accordion-content">
+                                <div class="checklist-body">
+                                    <div class="checklist-row"><span class="checklist-item">1. Airplane Attitude (using roll / rudder control)</span> <span class="checklist-action text-red">MAINTAIN</span></div>
+                                    <div class="checklist-row"><span class="checklist-item">2. Control Wheel Interrupt Button</span> <span class="checklist-action text-red">DEPRESS AND HOLD</span></div>
+                                    <div class="checklist-row"><span class="checklist-item">3. Roll or Rudder Trim Power Switch</span> <span class="checklist-action text-red">OFF/RESET</span></div>
+                                    <div class="checklist-row"><span class="checklist-item">4. Airspeed</span> <span class="checklist-action text-red">REDUCE SPEED BELOW 160 KNOTS</span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item warning">
+                            <button class="accordion-header">Flap / Forward Wing Asymmetry</button>
+                            <div class="accordion-content">
+                                <div class="checklist-body">
+                                    <div class="checklist-row"><span class="checklist-item">1. Airplane Attitude (using pitch/roll control)</span> <span class="checklist-action text-red">MAINTAIN</span></div>
+                                    <div class="checklist-row"><span class="checklist-item">2. Control Wheel Interrupt Button</span> <span class="checklist-action text-red">DEPRESS AND HOLD</span></div>
+                                    <div class="checklist-row"><span class="checklist-item">3. Flap Control Circuit Breaker (left panel)</span> <span class="checklist-action text-red">PULL</span></div>
+                                    <div class="checklist-row"><span class="checklist-item">4. Control Wheel Interrupt Button</span> <span class="checklist-action text-red">RELEASE</span></div>
+                                    <div class="checklist-row"><span class="checklist-item">5. Airplane Trim</span> <span class="checklist-action text-red">AS REQUIRED</span></div>
+                                    <div class="checklist-row"><span class="checklist-item">6. Airspeed</span> <span class="checklist-action text-red">180 KNOTS MAXIMUM</span></div>
+                                    <div class="checklist-row"><span class="checklist-item">7. Approach</span> <span class="checklist-action text-red">USE FLAPS-RETRACTED PROCEDURE</span></div>
+                                    
+                                    <div class="checklist-note" style="background: transparent; margin-top: 16px;">Additional Procedures with Airframe Ice:</div>
+                                    <div class="checklist-row"><span class="checklist-item">8. Cycle boots prior to landing.</span></div>
+                                    <div class="checklist-row"><span class="checklist-item">9. Approach Speed</span> <span class="checklist-action">VREF +15 KIAS</span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item warning">
+                            <button class="accordion-header">Flight Director Malfunctions</button>
+                            <div class="accordion-content">
+                                <div class="checklist-body">
+                                    <div class="checklist-row"><span class="checklist-item">1. Control Wheel Disconnect Button</span> <span class="checklist-action text-red">DEPRESS</span></div>
+                                    <div class="checklist-row"><span class="checklist-item">2. Airplane Attitude</span> <span class="checklist-action text-red">RECOVER</span></div>
+                                    <div class="checklist-row"><span class="checklist-item">3. On An Instrument Approach</span> <span class="checklist-action text-red">EXECUTE MISSED APPROACH</span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item critical">
+                            <button class="accordion-header">Engine Failure (Autopilot Coupled)</button>
+                            <div class="accordion-content">
+                                <div class="checklist-body">
+                                    <div class="checklist-row"><span class="checklist-item">1. Power Levers</span> <span class="checklist-action text-red">AS REQUIRED (MAINTAIN SPD/ALT)</span></div>
+                                    <div class="checklist-row"><span class="checklist-item">2. Inoperative Engine</span> <span class="checklist-action text-red">VERIFY</span></div>
+                                    <div class="checklist-row"><span class="checklist-item">3. Propeller Lever (Inoperative Engine)</span> <span class="checklist-action text-red">FEATHER</span></div>
+                                    <div class="checklist-row"><span class="checklist-item">4. Follow the Engine Failure Procedures in this section.</span></div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>
