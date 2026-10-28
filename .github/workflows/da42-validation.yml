@@ -21,7 +21,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Validate seven modules, TAS holdouts, LDG and abnormal landing grids, AFM go-around table
+      - name: Validate eight modules including W&B limits, CG envelope and official AFM example
         run: npm test
 
   mobile-ui-validation:
@@ -38,5 +38,22 @@ jobs:
         run: |
           python -m pip install playwright
           python -m playwright install --with-deps chromium
-      - name: Mobile UI: seven modules, Cruise ISA toggle and both landing charts
+      - name: Mobile UI: seven performance modules and Cruise ISA toggle
         run: python test_browser.py
+
+  weight-and-balance-ui:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: da42
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Chromium
+        run: |
+          python -m pip install playwright
+          python -m playwright install --with-deps chromium
+      - name: Verify Weight and Balance mobile UI on five viewports
+        run: python test_wb_browser.py
