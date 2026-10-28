@@ -268,7 +268,7 @@ function compute(id,v){if(id==='goaround')return goAroundCompute(v);if(id==='cru
  try{
  if(id==='abnormal'){
   const raw=abnormalRaw(v),ground=raw.ground+GRAPH_REGISTRATION.abnormal.ground,total=raw.total+GRAPH_REGISTRATION.abnormal.total;
-  if(!Number.isFinite(ground)||!Number.isFinite(total)||ground<=0||total<ground)return {error:'CÁLCULO FORA DO DOMÍNIO DIGITALIZADO'};
+  if(!Number.isFinite(ground)||!Number.isFinite(total)||ground<100||total<ground||total>1400)return {error:'DISTÂNCIA FORA DA ESCALA DA CARTA'};
   return {main:total,secondary:ground,primaryLabel:'LANDING DISTANCE'};
  }
  if(id==='landing'){
@@ -290,8 +290,8 @@ function icon(name){const paths={menu:'<path d="M4 7h16M4 12h12M4 17h8"/>',slide
  */
 function bannerFor(id,v,r){
  if(r.error)return r.error;
- if(id==='goaround')return v.mass===1900?'MASSA 1900 KG · PROCEDIMENTO ANORMAL · ISA / MSL':'ISA / MSL · LDG · GEAR EXTENDED · BOTH MAX · 84 KIAS';
- if(id==='abnormal')return v.mass>1805?'FLAPS UP / APP · MASSA > 1805 KG · PROCEDIMENTO ANORMAL':'FLAPS UP / APP · BOTH IDLE · 86 KIAS';
+ if(id==='goaround')return v.mass===1900?'MASSA 1900 KG · PROCEDIMENTO ANORMAL · NÃO USAR EM VOO':'ISA / MSL · LDG · BOTH MAX · 84 KIAS · NÃO USAR EM VOO';
+ if(id==='abnormal')return v.mass>1805?'FLAPS UP / APP · MASSA > 1805 KG · PROCEDIMENTO ANORMAL':'FLAPS UP / APP · BOTH IDLE · 86 KIAS · NÃO USAR EM VOO';
  if(id==='landing'&&v.mass>1805)return 'MASSA > 1805 KG · PROCEDIMENTO ANORMAL · NÃO UTILIZAR EM VOO';
  return 'DIGITALIZAÇÃO EXPERIMENTAL · NÃO UTILIZAR EM VOO';
 }
