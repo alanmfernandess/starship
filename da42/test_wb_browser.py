@@ -46,13 +46,14 @@ with sync_playwright() as p:
         assert page.locator('.case').count()==6
         assert 'LANDING' not in page.locator('.sheet').inner_text()
         assert 'FUEL FULL' in page.locator('.sheet').inner_text()
+        assert 'study cases' not in page.locator('.sheet').inner_text()
         page.locator('.close').click()
         page.locator('#nav-settings').click()
         assert page.locator('input[data-wb="emptyMass"]').count()==1
         assert page.locator('input[data-wb="emptyMoment"]').count()==1
         assert page.locator('input[data-wb="emptyMass"]').input_value()=='1,450.0'
         page.locator('input[data-wb="emptyMass"]').fill('1470')
-        assert 'CUSTOM PROFILE' in page.locator('#notice').inner_text()
+        assert page.locator('#notice').inner_text()=='NOT FOR FLIGHT'
         page.locator('#reset-example').click()
         assert page.locator('#cg').inner_text()=='2.447'
         count+=7
@@ -69,7 +70,11 @@ with sync_playwright() as p:
         assert page.locator('input[data-wb="copilot"]').get_attribute('readonly') is not None
         assert page.locator('input[data-wb="pax2"]').get_attribute('readonly') is not None
         assert page.evaluate("JSON.stringify([WBApp.profile.mainL,WBApp.profile.mainR,WBApp.profile.auxL,WBApp.profile.auxR,WBApp.profile.deice,WBApp.profile.emptyMass,WBApp.profile.emptyMoment])")==pre_fuel
-        assert 'SIMULAÇÃO' in page.locator('#notice').inner_text()
+        assert page.locator('#notice').inner_text()=='NOT FOR FLIGHT'
+        assert page.locator('#optimize-status').count()==0
+        assert 'AUTO' not in page.locator('.fields').inner_text()
+        assert 'CAMPOS BLOQUEADOS' not in page.locator('.phone').inner_text()
+        assert 'FUEL MANUAL' not in page.locator('.phone').inner_text()
         page.locator('#edit-load').click()
         assert page.locator('input[data-wb="nose"]').get_attribute('readonly') is not None
         assert page.locator('input[data-wb="cabin"]').get_attribute('readonly') is not None
