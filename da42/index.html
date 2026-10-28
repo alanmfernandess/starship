@@ -117,26 +117,26 @@ function rawCompute(id,v){const n=NOMOGRAMS[id];let y=leftPanel(id,v.pa,v.oat);
 /**
  * TAS chart raster digitization: 1752x1212 px, x=158 px at 120 kt,
  * x=1670 px at 180 kt. Coordinates read from ISA STD solid curves
- * at 50/60/70/80/92% load, 0-14000 ft. Adjacent ISA curves
+ * at 50/60/70/80/92% load, 0-18000 ft. Adjacent ISA curves
  * -10/+10/+20/+30 deg C approximated by measured pixel spacing.
  * Experimental engineering estimate; not flight-validated.
  */
 const CRUISE_CHART={
- alt:[0,2000,5000,8000,10000,12000,14000],
+ alt:[0,2000,5000,8000,10000,12000,14000,16000,18000],
  pxStd:{
-  50:[369,402,452,516,553,594,638],
-  60:[617,656,713,781,823,871,920],
-  70:[866,898,947,1010,1053,1107,1174],
-  80:[1031,1072,1138,1225,1262,1310,1384],
-  92:[1256,1280,1340,1427,1480,1512,1540]
+  50:[369,402,452,516,553,594,638,680,722],
+  60:[617,656,713,781,823,871,920,970,1019],
+  70:[866,898,947,1010,1053,1107,1174,1212,1267],
+  80:[1031,1072,1138,1225,1262,1310,1384,1430,1489],
+  92:[1256,1280,1340,1427,1480,1512,1540,1519,1494]
  },
- pxPer10C:[21,22,24,26,28,29,31],
+ pxPer10C:[21,22,24,26,28,29,31,33,34],
  xAt120:158,xAt180:1670
 };
 function cruiseLimits(v){
  if(!Number.isFinite(v.pa)||!Number.isFinite(v.oat)||!Number.isFinite(v.load))return 'COMPLETE OS VALORES';
  if(v.engines!==2)return 'CARTA APLICÁVEL A DOIS MOTORES';
- if(v.pa<0||v.pa>14000)return 'ALTITUDE FORA DA REGIÃO DIGITALIZADA';
+ if(v.pa<0||v.pa>18000)return 'ALTITUDE FORA DA REGIÃO DIGITALIZADA';
  if(v.load<50||v.load>92)return 'CARGA FORA DO GRÁFICO';
  const d=v.oat-(15-.0019812*v.pa);
  if(d < -10-1e-6 || d >30+1e-6)return 'TEMPERATURA FORA DAS CURVAS ISA';
@@ -170,7 +170,7 @@ function cruisePlot(v,r){
    if(m===0){u=0;w=0;}else{u=Math.sign(m)*Math.min(Math.abs(u),2*Math.abs(m));w=Math.sign(m)*Math.min(Math.abs(w),2*Math.abs(m));}
    out+=' C '+(a.x+dx/3).toFixed(1)+' '+(y(a[k])+dx*u/3).toFixed(1)+', '+(b.x-dx/3).toFixed(1)+' '+(y(b[k])-dx*w/3).toFixed(1)+', '+b.x.toFixed(1)+' '+y(b[k]).toFixed(1);}
   return out;}
- return '<svg class="plot" viewBox="0 0 290 138" preserveAspectRatio="none" role="img" aria-label="TAS por altitude; azul: temperatura selecionada; âmbar: ISA mais trinta graus"><path class="grid" d="M0 28H290M0 75H290M0 121H290"/><path class="gold" d="'+curve('gold')+'"/><path class="blue" d="'+curve('blue')+'"/><circle class="dot" cx="'+(6+v.pa/14000*278).toFixed(1)+'" cy="'+y(r.main).toFixed(1)+'" r="4.5"/></svg>';
+ return '<svg class="plot" viewBox="0 0 290 138" preserveAspectRatio="none" role="img" aria-label="TAS por altitude; azul: temperatura selecionada; âmbar: ISA mais trinta graus"><path class="grid" d="M0 28H290M0 75H290M0 121H290"/><path class="gold" d="'+curve('gold')+'"/><path class="blue" d="'+curve('blue')+'"/><circle class="dot" cx="'+(6+v.pa/18000*278).toFixed(1)+'" cy="'+y(r.main).toFixed(1)+'" r="4.5"/></svg>';
 }
 
 const EXAMPLES={takeoff:{pa:0,oat:15,mass:1800,wind:10},climb:{pa:0,oat:15,mass:1800,power:92},oei:{pa:0,oat:15,mass:1800,power:92}};
@@ -247,7 +247,7 @@ function render(){const m=MODELS[current],v=inputs[current],r=compute(current,v)
 function refresh(){const v=inputs[current],m=MODELS[current],r=compute(current,v);el('#main-result').textContent=r.error?'—':fmt(current==='takeoff'?r.main:Math.round(r.main));el('#main-result').classList.toggle('negative',!r.error&&r.main<0);el('#result-name').textContent=r.primaryLabel||m.panel;el('#secondary-result').textContent=r.error?'—':current==='takeoff'?fmt(r.secondary)+' m':current==='cruise'?fmt(Math.abs(r.secondary)<.5?0:r.secondary)+' °C':verticalFmt(r.secondary)+' m/s';el('#secondary-result').classList.toggle('negative',!r.error&&current!=='cruise'&&r.secondary<0);el('#plot-area').innerHTML=createPlot(current,v,r);el('#banner').textContent=r.error||'DIGITALIZAÇÃO EXPERIMENTAL · NÃO UTILIZAR EM VOO';el('#banner').classList.toggle('error',!!r.error)}
 function showSheet(type){const main=el('.phone'),title={modules:'PERFORMANCE',settings:'PREFERÊNCIAS',chart:'SENSIBILIDADE',history:'HISTÓRICO'}[type]||'';const v=inputs[current];const r=compute(current,v);let content='';
  if(type==='modules')content=Object.entries(MODELS).map(([k,m],i)=>`<button class="option ${current===k?'selected':''}" data-module="${k}"><span><strong>0${i+1} · ${k==='oei'?'ONE ENGINE CLIMB / DESCENT':k==='cruise'?'CRUISING · TRUE AIRSPEED':m.label+' PERFORMANCE'}</strong><span class="sub">${k==='takeoff'?'Takeoff distance / ground roll':k==='climb'?'Two engines · 92%':k==='cruise'?'50–92% engine load · 2 engines':'One engine inoperative · 92%'}</span></span>${current===k?icon('check'):icon('next')}</button>`).join('');
- if(type==='settings')content=`<div class="mini">AERO UI · MASTER DESIGN 1.0</div><small>Parâmetros: gráficos do DA42 NG enviados pelo usuário. Condições: flaps UP; pista pavimentada na decolagem; ambos MAX/2.300 RPM no Takeoff, ambos 92%/90 KIAS no Climb, e motor restante a 92%/85 KIAS no OEI, com motor inoperante embandeirado e assegurado. Cruzeiro: 2 motores, carga 50–92% e ISA −10/+30 °C, até 14.000 ft na versão experimental.</small><div class="disclaimer">MODELO DE ENGENHARIA PRELIMINAR<br>Curvas parcialmente digitalizadas e interpoladas da carta AFM 7.01.15-E Rev.1. Somente os exemplos impressos foram conferidos; demais pontos ainda exigem validação independente. Não utilizar para planejamento, despacho ou execução de voo.</div><button class="small-action" id="reset">RESTAURAR VALORES DE EXEMPLO</button>`;
+ if(type==='settings')content=`<div class="mini">AERO UI · MASTER DESIGN 1.0</div><small>Parâmetros: gráficos do DA42 NG enviados pelo usuário. Condições: flaps UP; pista pavimentada na decolagem; ambos MAX/2.300 RPM no Takeoff, ambos 92%/90 KIAS no Climb, e motor restante a 92%/85 KIAS no OEI, com motor inoperante embandeirado e assegurado. Cruzeiro: 2 motores, carga 50–92% e ISA −10/+30 °C, até 18.000 ft na versão experimental.</small><div class="disclaimer">MODELO DE ENGENHARIA PRELIMINAR<br>Curvas parcialmente digitalizadas e interpoladas da carta AFM 7.01.15-E Rev.1. Somente os exemplos impressos foram conferidos; demais pontos ainda exigem validação independente. Não utilizar para planejamento, despacho ou execução de voo.</div><button class="small-action" id="reset">RESTAURAR VALORES DE EXEMPLO</button>`;
  if(type==='history')content=history.length?history.map(h=>`<button class="option" data-restore="${h.id}"><span><strong>${escapeHTML(h.name)} · ${escapeHTML(h.result)}</strong><span class="sub">${escapeHTML(h.when)} · ${escapeHTML(h.in)}</span></span>${icon('next')}</button>`).join(''):'<p class="history-empty">Nenhum cálculo salvo.</p>';
  if(type==='chart')content=`<div style="background:#202d39;border-radius:17px;padding:15px"><div class="mini">${escapeHTML(MODELS[current].panel)}</div><div style="font-size:31px;margin:12px 0 6px">${r.error?'—':fmt(r.main)} <span style="color:#9cb1bf;font-size:16px">${MODELS[current].unit}</span></div>${createPlot(current,v,r)}</div><small>Curvas derivadas da digitalização gráfica preliminar. Sem autorização para uso operacional.</small><button class="small-action" id="save">SALVAR CÁLCULO NO HISTÓRICO</button>`;
  const d=document.createElement('div');d.className='sheet-backdrop';d.innerHTML=`<div class="sheet" role="dialog" aria-modal="true" aria-label="${title}"><div class="sheet-header"><h2>${title}</h2><button class="close" aria-label="Fechar">×</button></div>${content}</div>`;main.appendChild(d);d.addEventListener('click',e=>{if(e.target===d)d.remove()});d.querySelector('.close').onclick=()=>d.remove();d.querySelectorAll('[data-module]').forEach(b=>b.onclick=()=>{current=b.dataset.module;d.remove();render()});if(d.querySelector('#reset'))d.querySelector('#reset').onclick=()=>{inputs[current]={...MODELS[current].defaults};d.remove();render()};if(d.querySelector('#save'))d.querySelector('#save').onclick=()=>{const val=compute(current,v);if(val.error)return;history.unshift({id:Date.now(),name:MODELS[current].label,result:`${fmt(val.main)} ${MODELS[current].unit}`,when:new Date().toLocaleString('pt-BR'),in:`${fmt(v.pa)} ft · ${fmt(v.oat)} °C · ${current==='cruise'?fmt(v.load)+'%':fmt(v.mass)+' kg'}`,module:current,values:{...v}});history=history.slice(0,20);persist();d.remove()};d.querySelectorAll('[data-restore]').forEach(b=>b.onclick=()=>{const h=history.find(z=>String(z.id)===b.dataset.restore);if(!h)return;current=h.module;inputs[current]={...h.values};d.remove();render()});}
