@@ -87,7 +87,14 @@ with sync_playwright() as p:
         assert page.evaluate("WBApp.optimizedMode") is True
         assert page.evaluate("WBApp.profile.mainL")==35
         assert page.locator('input[data-wb="pilot"]').get_attribute('readonly') is not None
-        count+=24
+        page.locator('#nav-settings').click()
+        assert page.locator('#restore-manual').count()==1
+        page.locator('#restore-manual').click()
+        assert page.evaluate("WBApp.optimizedMode") is False
+        assert page.evaluate("WBApp.profile.pilot")==80
+        assert page.evaluate("WBApp.profile.mainL")==35
+        assert page.locator('input[data-wb="pilot"]').get_attribute('readonly') is None
+        count+=29
         assert len(errors)==0,errors
         context.close()
     browser.close()
