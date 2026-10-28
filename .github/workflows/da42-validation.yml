@@ -21,7 +21,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Validate eight modules including W&B limits, CG envelope and official AFM example
+      - name: Validate eight modules, W&B CG envelope and stochastic loading optimizer
         run: npm test
 
   mobile-ui-validation:
@@ -55,5 +55,5 @@ jobs:
         run: |
           python -m pip install playwright
           python -m playwright install --with-deps chromium
-      - name: Verify Weight and Balance mobile UI on five viewports
+      - name: Verify W&B optimizer, fuel input independence and manual restore on five mobile viewports
         run: python test_wb_browser.py
