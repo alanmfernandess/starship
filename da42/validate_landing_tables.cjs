@@ -66,4 +66,4 @@ for(const kind of ['landing','abnormal'])for(const mass of [1700,1750,1900,1950,
 assert.ok(interpolated>400&&rejected>0);
 for(const bad of [{pa:-1},{pa:10001},{oat:-1},{oat:51},{mass:1699},{mass:2000},{wind:-11},{wind:21},{slope:-1},{slope:5.1},{surface:'invalid'},{oat:NaN},{mass:NaN}])
  assert.ok(E.compute('landing',{...base,...bad}).error,JSON.stringify(bad));
-console.log('PASS landing §5.3.11: '+known+' published values, '+missing+' slashed cells, '+interpolated+' interpolated cases, '+rejected+' no-data rejects, wind/runway/ISA exact checks.');
+console.log('PASS landing §5.3.11: '+known+' published distance pairs, '+missing+' slashed cells, '+interpolated+' interpolated cases, '+rejected+' no-data rejects, wind/runway/ISA exact checks.');
