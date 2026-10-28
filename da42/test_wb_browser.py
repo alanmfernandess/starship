@@ -56,6 +56,38 @@ with sync_playwright() as p:
         page.locator('#reset-example').click()
         assert page.locator('#cg').inner_text()=='2.447'
         count+=7
+        # Stochastic optimizer must only generate hypothetical occupants/baggage.
+        assert page.locator('#optimize').inner_text()=='OTIMIZAR'
+        pre_fuel=page.evaluate("JSON.stringify([WBApp.profile.mainL,WBApp.profile.mainR,WBApp.profile.auxL,WBApp.profile.auxR,WBApp.profile.deice,WBApp.profile.emptyMass,WBApp.profile.emptyMoment])")
+        page.locator('#optimize').click()
+        assert page.evaluate("WBApp.optimizedMode") is True
+        assert page.evaluate("WBApp.model.statuses.cgOK && WBApp.model.statuses.massOK && WBApp.model.statuses.scenariosOK") is True
+        assert page.locator('#cg-status').inner_text().find('WITHIN LIMITS')!=-1
+        assert page.locator('#mass-check').inner_text().find('MASS WITHIN LIMITS')!=-1
+        assert page.locator('input[data-wb="pilot"]').get_attribute('readonly') is not None
+        assert page.locator('input[data-wb="pax1"]').get_attribute('readonly') is not None
+        assert page.locator('input[data-wb="copilot"]').get_attribute('readonly') is not None
+        assert page.locator('input[data-wb="pax2"]').get_attribute('readonly') is not None
+        assert page.evaluate("JSON.stringify([WBApp.profile.mainL,WBApp.profile.mainR,WBApp.profile.auxL,WBApp.profile.auxR,WBApp.profile.deice,WBApp.profile.emptyMass,WBApp.profile.emptyMoment])")==pre_fuel
+        assert 'SIMULAÇÃO' in page.locator('#notice').inner_text()
+        page.locator('#edit-load').click()
+        assert page.locator('input[data-wb="nose"]').get_attribute('readonly') is not None
+        assert page.locator('input[data-wb="cabin"]').get_attribute('readonly') is not None
+        assert page.locator('input[data-wb="extension"]').get_attribute('readonly') is not None
+        assert page.locator('input[data-wb="mainL"]').get_attribute('readonly') is None
+        assert page.locator('input[data-wb="auxL"]').get_attribute('readonly') is None
+        page.locator('input[data-wb="mainL"]').fill('35')
+        assert page.evaluate("WBApp.profile.mainL")==35
+        assert page.evaluate("WBApp.profile.mainR")==79.5
+        page.locator('.close').click()
+        page.locator('#optimize').click()
+        assert page.evaluate("WBApp.model.statuses.cgOK && WBApp.model.statuses.massOK && WBApp.model.statuses.scenariosOK") is True
+        assert page.evaluate("WBApp.profile.mainL")==35
+        page.reload()
+        assert page.evaluate("WBApp.optimizedMode") is True
+        assert page.evaluate("WBApp.profile.mainL")==35
+        assert page.locator('input[data-wb="pilot"]').get_attribute('readonly') is not None
+        count+=24
         assert len(errors)==0,errors
         context.close()
     browser.close()
