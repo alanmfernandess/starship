@@ -155,3 +155,7 @@ O motor independente `takeoff-tables.js` contém dados completos para **1.700, 1
 Resultado inclui Ground Roll e distância sobre 50 ft, com gráfico proporcional. Referência de teste: massa 1.900 kg, SL, OAT 10°C, vento zero, pista pavimentada: Normal 450/710 m, Short 430/640 m. Em ISA (SL) Normal 458/734 m e Short 445/657 m; valores da coluna ISA usados diretamente. Ponto da interface original (1.800 kg, SL, 15°C, vento de proa 10kt): 406,25m corrida e 638,393m total, agora derivados da tabela e correção de vento.
 
 **Nota de validade:** fatores de superfície e declive são típicos, e condições de pista molhada, irregular ou macia podem causar distâncias muito superiores. A distância disponível deve ser comparada com a distância sobre 50 ft; este software não está aprovado para cálculo operacional. Testes adicionais em `validate_takeoff_tables.cjs` e `test_browser.py`.
+
+### v0.11.1 — Ajustes de Runway
+
+Removido o rótulo redundante `RUNWAY SURFACE` da janela Runway no Takeoff. O antigo campo numérico de `UPHILL SLOPE (%)` foi substituído por slider de 0% a 5%, passos de 0,5%, mostrando o valor atual e os dois extremos. Cálculo e gráfico atualizados durante o ajuste, mantendo o painel aberto. Os limites são do controle experimental atual, não um limite de declive homologado no AFM. Regressão mobile adicionada em `test_browser.py`.
