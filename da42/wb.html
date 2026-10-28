@@ -34,10 +34,8 @@ button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus
 .optimize-row{display:flex;gap:9px;margin:-7px 0 clamp(12px,2dvh,22px);align-items:stretch}
 .optimize-button{flex:1;min-height:46px;border:1px solid #40738f;border-radius:13px;color:#8dd2ff;background:#203a4c;font-weight:600;letter-spacing:.4px;font-size:13px}
 .optimize-button:active{background:#2b5069}
-.optimize-status{flex:1;min-width:0;align-self:center;color:var(--label);font-size:9px;line-height:1.45;text-align:right}
-.optimize-status.bad{color:var(--amber)}
+.optimize-feedback{flex:1;min-width:0;align-self:center;color:var(--amber);font-size:11px;text-align:right}
 .field input[readonly],.sheet-row input[readonly]{color:#aac2d1;cursor:default}
-.field .auto-tag{font-size:9px;color:#56b9ee;letter-spacing:.3px}
 
 .result{background:var(--tile);border-radius:19px;padding:18px 15px 16px;min-height:310px}
 .result-head{display:flex;align-items:center;justify-content:space-between;color:#afc2ce;font-size:13px;letter-spacing:.25px}.result-head .icon{color:var(--blue);width:19px;height:19px}
@@ -100,12 +98,9 @@ const profilesInputs=[
  ['auxL','AUX LEFT','kg'],['auxR','AUX RIGHT','kg'],
  ['emptyMass','EMPTY MASS','kg'],['emptyMoment','EMPTY MOMENT','kg·m']
 ];
-function currentProfileName(){
- return Object.keys(E.EXAMPLE).every(k=>profile[k]===E.EXAMPLE[k])?'AFM EXAMPLE':'CUSTOM PROFILE';
-}
 function card(key,label){
  const v=profile[key];
- return '<div class="field"><label for="val-'+key+'">'+label+(optimizedMode&&OPT.ADJUSTABLE.includes(key)?' <span class="auto-tag">AUTO</span>':'')+'</label><div class="entry"><input data-wb="'+key+'" id="val-'+key+'" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" value="'+esc(format(v,0))+'" aria-label="'+label+' kg"'+(optimizedMode&&OPT.ADJUSTABLE.includes(key)?' readonly aria-readonly="true"':'')+'><span class="unit">kg</span></div></div>';
+ return '<div class="field"><label for="val-'+key+'">'+label+'</label><div class="entry"><input data-wb="'+key+'" id="val-'+key+'" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" value="'+esc(format(v,0))+'" aria-label="'+label+' kg"'+(optimizedMode&&OPT.ADJUSTABLE.includes(key)?' readonly aria-readonly="true"':'')+'><span class="unit">kg</span></div></div>';
 }
 function coords(m,c){const width=270,axisL=2.33,axisR=2.51;return [31+(c-axisL)/(axisR-axisL)*width,181-(m-1500)/450*160]}
 function envelope(){
@@ -127,20 +122,20 @@ function statusText(){
 function content(){
  const cg=model.ok?format(model.takeoff.cg,3):'—';
  const sc=model.ok?model.statuses:{};
- const fuelText=model.ok?format(model.fuel.usableTotal,1)+' kg · DE-ICE '+format(profile.deice,1)+' kg':'INVALID INPUT';
+ const fuelText=model.ok?format(model.fuel.usableTotal,1)+' kg':'—';
  const metrics=model.ok?'<div class="metrics"><div class="metric"><label>ZERO FUEL MASS</label><b>'+format(model.zeroFuel.mass,1)+' kg</b></div><div class="metric"><label>TAKEOFF MASS</label><b>'+format(model.takeoff.mass,1)+' kg</b></div></div>':'<div class="metrics"><div class="metric"><label>CHECK INPUTS</label><b>—</b></div></div>';
  const massState=model.ok?(sc.massOK?'MASS WITHIN LIMITS':'MASS LIMIT EXCEEDED'):'CHECK INPUTS';
  return '<div class="phone"><header class="topbar"><button class="icon-btn" id="menu" aria-label="Abrir módulos">'+icon('menu')+'</button><h1>DA42 NG</h1><button class="icon-btn" id="settings" aria-label="Configurações da aeronave">'+icon('settings')+'</button></header>'+
  '<main class="scroller" id="scroller"><div class="module-heading"><span>WEIGHT &amp; BALANCE</span><span class="accent">CG ENVELOPE</span></div>'+
  '<div class="fields">'+card('pilot','PILOT')+card('copilot','COPILOT')+card('pax1','PASSENGER 1')+card('pax2','PASSENGER 2')+'</div>'+
  '<button class="open-load" id="edit-load"><span><span class="main">BAGGAGE &amp; FUEL</span><span class="sub" id="fuel-summary">'+fuelText+'</span></span>'+icon('next')+'</button>'+
- '<div class="optimize-row"><button id="optimize" class="optimize-button" type="button">OTIMIZAR</button><span id="optimize-status" class="optimize-status'+(optimizeMessage?' bad':'')+'">'+(optimizeMessage?esc(optimizeMessage):optimizedMode?'SIMULAÇÃO AUTO · CAMPOS BLOQUEADOS':'CENÁRIO SIMULADO · FUEL MANUAL')+'</span></div>'+
+ '<div class="optimize-row"><button id="optimize" class="optimize-button" type="button">OTIMIZAR</button>'+(optimizeMessage?'<span id="optimize-status" class="optimize-feedback" role="alert">'+esc(optimizeMessage)+'</span>':'')+'</div>'+
  '<section class="result" aria-live="polite"><div class="result-head"><span>TAKEOFF CG</span>'+icon('chart')+'</div>'+
  '<div class="primary"><strong class="number" id="cg">'+cg+'</strong><span class="primary-unit">m</span></div><div id="cg-status">'+statusText()+'</div>'+
  '<div id="envelope">'+envelope()+'</div><div class="legend"><span><i class="dot" style="background:#e7b46d"></i>ZERO FUEL</span><span><i class="dot" style="background:#56b9ee"></i>TAKEOFF</span></div>'+
  '<div id="mass-check" class="standalone-status '+(sc.massOK?'':'bad')+'">'+(model.ok?massState:'—')+'</div><div id="metrics">'+metrics+'</div>'+
  '<div class="line"><span>ZERO FUEL CG</span><strong id="zfcg">'+(model.ok?format(model.zeroFuel.cg,3)+' m':'—')+'</strong></div>'+
- '</section><div class="notice" id="notice">AFM EXAMPLE / CUSTOM · NOT FOR FLIGHT</div></main>'+
+ '</section><div class="notice" id="notice">NOT FOR FLIGHT</div></main>'+
  '<nav class="bottom"><button class="nav-btn active" id="nav-input" aria-label="Ocupantes">'+icon('calculator')+'</button>'+
  '<button class="nav-btn" id="nav-chart" aria-label="Envelope CG">'+icon('chart')+'</button>'+
  '<button class="nav-btn" id="nav-scenarios" aria-label="Cenários de combustível e degelo">'+icon('history')+'</button>'+
@@ -164,12 +159,12 @@ function recalc(){
  const set=(s,v)=>{const e=el(s);if(e)e.innerHTML=v};
  const cg=model.ok?format(model.takeoff.cg,3):'—';
  set('#cg',cg);set('#cg-status',statusText());set('#envelope',envelope());
- set('#fuel-summary',model.ok?format(model.fuel.usableTotal,1)+' kg · DE-ICE '+format(profile.deice,1)+' kg':'INVALID INPUT');
+ set('#fuel-summary',model.ok?format(model.fuel.usableTotal,1)+' kg':'—');
  set('#mass-check','<span class="'+(model.ok?(model.statuses.massOK?'good':'error'):'error')+'">'+(model.ok?(model.statuses.massOK?'MASS WITHIN LIMITS':'MASS LIMIT EXCEEDED'):'CHECK INPUTS')+'</span>');
  set('#metrics',model.ok?'<div class="metrics"><div class="metric"><label>ZERO FUEL MASS</label><b>'+format(model.zeroFuel.mass,1)+' kg</b></div><div class="metric"><label>TAKEOFF MASS</label><b>'+format(model.takeoff.mass,1)+' kg</b></div></div>':'');
  set('#zfcg',model.ok?format(model.zeroFuel.cg,3)+' m':'—');
- const notice=el('#notice');if(notice){notice.textContent=model.ok?(optimizedMode?'SIMULAÇÃO · PESOS GERADOS NÃO SÃO REAIS · NOT FOR FLIGHT':currentProfileName()+' · NOT FOR FLIGHT'):model.errors.join(' · ');notice.classList.toggle('bad',optimizedMode||!model.ok||!model.statuses.massOK||!model.statuses.cgOK)}
- const optStatus=el('#optimize-status');if(optStatus){optStatus.textContent=optimizeMessage|| (optimizedMode?'SIMULAÇÃO AUTO · CAMPOS BLOQUEADOS':'CENÁRIO SIMULADO · FUEL MANUAL');optStatus.classList.toggle('bad',!!optimizeMessage)}
+ const notice=el('#notice');if(notice){notice.textContent=model.ok?'NOT FOR FLIGHT':model.errors.join(' · ');notice.classList.toggle('bad',!model.ok||!model.statuses.massOK||!model.statuses.cgOK)}
+ const optStatus=el('#optimize-status');if(optStatus)optStatus.textContent=optimizeMessage;
  store();
 }
 function bindInputs(root=document){
@@ -200,12 +195,11 @@ function sheet(type){
     const field=profilesInputs.find(([id])=>id===k);
     body+='<div class="sheet-row"><label for="sheet-'+k+'">'+field[1]+'</label><input data-wb="'+k+'" id="sheet-'+k+'" inputmode="decimal" autocomplete="off" type="text" value="'+(profile[k]===null?'':esc(format(profile[k],k==='emptyMoment'?1:1)))+'" placeholder="—" aria-label="'+field[1]+'"'+(optimizedMode&&OPT.ADJUSTABLE.includes(k)?' readonly aria-readonly="true"':'')+'><span class="unit">'+field[2]+'</span></div>';
    }
-   if(title==='FUEL · USEABLE MASS')body+='<div class="s-note">Main: 79.5 kg per side · Aux: 42.0 kg per side · Density 0.84 kg/L</div>';
   }
-  if(type==='settings')body+='<div class="s-note">Empty mass includes unusable fuel and installed equipment. Use the aircraft current Mass &amp; Balance Report for actual flight.</div>'+(optimizedMode&&previousManual?'<button class="action" id="restore-manual">RESTAURAR CARGA MANUAL</button>':'')+'<button class="action" id="reset-example">RESTORE AFM EXAMPLE</button>';
+  if(type==='settings')body+=(optimizedMode&&previousManual?'<button class="action" id="restore-manual">CARGA MANUAL</button>':'')+'<button class="action" id="reset-example">AFM EXAMPLE</button>';
  }
  if(type==='scenarios'){
-  const title='<div class="s-note">CG checks at usable fuel empty/full and de-ice empty/loaded. These are study cases, not a substitute for the aircraft report.</div>';
+  const title='';
   body=title+(model.ok?model.scenarios.map(c=>'<div class="case"><div class="name">'+c.name+'</div><div class="value"><b>'+format(c.mass,1)+' kg</b><span class="'+(c.cgOK?'good':'error')+'">'+format(c.cg,3)+' m · '+(c.cgOK?'CG OK':'CG OUT')+'</span></div></div>').join(''):'<p class="error">'+model.errors.join(', ')+'</p>');
   if(model.ok)body+='<div class="section-title">LOADED CONDITION</div><div class="case"><div class="value"><span>ZERO FUEL</span><b>'+format(model.zeroFuel.mass,1)+' kg</b></div></div><div class="case"><div class="value"><span>TAKEOFF</span><b>'+format(model.takeoff.mass,1)+' kg</b></div></div>';
  }
@@ -230,7 +224,7 @@ function render(){
  el('#edit-load').onclick=()=>sheet('load');
  el('#optimize').onclick=()=>{
   const found=OPT.optimize(profile,E);
-  if(!found.ok){optimizeMessage=found.reason||'SEM CONFIGURAÇÃO VÁLIDA';recalc();return}
+  if(!found.ok){optimizeMessage=found.reason&&(/COMBUSTÍVEL|PERFIL|DADOS/.test(found.reason))?'DADOS INVÁLIDOS':'SEM SOLUÇÃO';render();return}
   if(!optimizedMode){
    previousManual=Object.fromEntries(OPT.ADJUSTABLE.map(k=>[k,profile[k]]));
    try{localStorage.setItem(MANUAL_KEY,JSON.stringify(previousManual))}catch(e){}
