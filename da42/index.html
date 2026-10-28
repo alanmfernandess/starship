@@ -143,6 +143,8 @@ function cruiseCompute(v){
  const spacing=interp(CRUISE_CHART.alt.map((a,i)=>[a,CRUISE_CHART.pxPer10C[i]]),v.pa);
  const pixel=solid+delta/10*spacing;
  const tas=120+(pixel-CRUISE_CHART.xAt120)*60/(CRUISE_CHART.xAt180-CRUISE_CHART.xAt120);
+ // The source chart is bounded by its TAS axis; do not extrapolate the raster result.
+ if(!Number.isFinite(tas)||tas<120||tas>180)return {error:'TAS FORA DO DOMÍNIO DA CARTA'};
  return {main:tas,secondary:delta,primaryLabel:'TRUE AIRSPEED'};
 }
 // Cyan=current ISA deviation; amber=ISA+30 deg C. Both calculated from the chart.
