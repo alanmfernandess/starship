@@ -100,9 +100,38 @@ with sync_playwright() as p:
         all_checks+=25
         page.locator('#menu').click()
         page.locator('button[data-module="oei"]').click()
-        assert page.locator('#main-result').inner_text()=='212'
+        assert page.locator('#main-result').inner_text()=='211'
         assert page.locator('#secondary-result').inner_text()=='1.07 m/s'
-        all_checks+=2
+        assert page.locator('.field').count()==4
+        assert page.locator('#oei-isa-toggle').inner_text()=='ISA'
+        assert 'VYSE 85 KIAS' in page.locator('#banner').inner_text()
+        page.locator('input[data-key="mass"]').fill('1999')
+        assert page.locator('#main-result').inner_text()=='138'
+        page.locator('#oei-isa-toggle').click()
+        assert page.locator('#oei-isa-toggle').inner_text()=='OAT'
+        assert page.locator('input[data-key="oat"]').get_attribute('readonly') is not None
+        assert page.locator('#main-result').inner_text()=='140'
+        page.locator('input[data-key="pa"]').fill('18000')
+        assert page.locator('#main-result').inner_text()=='-169'
+        assert page.locator('#result-name').inner_text()=='RATE OF DESCENT'
+        assert page.locator('#secondary-result').inner_text().startswith('-')
+        assert 'NEGATIVO' in page.locator('#banner').inner_text()
+        page.locator('input[data-key="pa"]').fill('4000')
+        page.locator('#oei-isa-toggle').click()
+        page.locator('input[data-key="oat"]').fill('50')
+        assert page.locator('#main-result').inner_text()=='0'
+        assert '< 50' in page.locator('#banner').inner_text()
+        page.locator('input[data-key="pa"]').fill('6000')
+        assert page.locator('#main-result').inner_text()=='—'
+        page.locator('input[data-key="oat"]').fill('40')
+        assert page.locator('#main-result').inner_text()=='0'
+        page.locator('input[data-key="mass"]').fill('2000')
+        assert page.locator('#main-result').inner_text()=='—'
+        page.locator('input[data-key="mass"]').fill('1900')
+        page.locator('input[data-key="pa"]').fill('0')
+        page.locator('input[data-key="oat"]').fill('10')
+        assert page.locator('#main-result').inner_text()=='180'
+        all_checks+=27
         page.locator('#menu').click()
         page.locator('button[data-module="cruise"]').click()
         assert page.locator('#main-result').inner_text()=='164'
