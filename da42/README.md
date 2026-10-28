@@ -5,8 +5,9 @@ Aplicação mobile-first estática (PWA) para análise experimental de:
 1. Takeoff Performance — corrida e distância sobre 50 ft
 2. Climb Performance — dois motores
 3. One Engine Inoperative — climb/descent
+4. Cruising — True Airspeed (TAS) / two engines
 
-**Atenção: NÃO UTILIZAR PARA OPERAÇÃO AERONÁUTICA.** A reprodução dos pontos de exemplo não representa validação de uma ferramenta de planejamento de voo. O modelo de interpolação usa amostras gráficas limitadas extraídas de um raster das cartas, com ajuste de registro aos três exemplos impressos. A digitalização e verificação independentes de todas as curvas permanecem pendentes.
+**Atenção: NÃO UTILIZAR PARA OPERAÇÃO AERONÁUTICA.** A reprodução dos pontos de exemplo não representa validação de uma ferramenta de planejamento de voo. O modelo de interpolação usa amostras gráficas limitadas extraídas de um raster das cartas, com ajuste de registro aos três exemplos impressos nos módulos anteriores. A digitalização e verificação independentes de todas as curvas permanecem pendentes.
 
 ## Fonte primária
 
@@ -30,7 +31,7 @@ O núcleo da interface (`index.html`, função `compute`) calcula a sequência d
 - conversão das ordenadas das cartas para distância ou razão de subida;
 - registro de escala pelos exemplos publicados nas próprias cartas.
 
-Parte dos pontos foi lida manualmente e outra obtida por detecção de segmentos em raster; não houve transcrição completa/independente das curvas. Os três pontos de referência **não são testes independentes**, pois participaram do registro do modelo. Novas condições devem ser cotejadas contra o AFM gráfico.
+Parte dos pontos foi lida manualmente e outra obtida por detecção de segmentos em raster; não houve transcrição completa/independente das curvas. Os quatro pontos de referência **não são testes independentes**, pois participaram do registro do modelo. Novas condições devem ser cotejadas contra o AFM gráfico.
 
 ### Testes
 
@@ -39,6 +40,10 @@ Parte dos pontos foi lida manualmente e outra obtida por detecção de segmentos
 `python test_browser.py` — testes de renderização Chromium em modo mobile/touch, com navegação, geometria e ausência de erros de script. Requer Python, Playwright e Chromium instalado; em sistemas diferentes, ajustar o caminho do executável.
 
 Os testes foram executados em dimensões 320×690, 390×667, 390×844, 430×932 e 706×1200. Isso é **emulação Chromium**, e não ensaio em dispositivos móveis físicos, Safari/iOS ou Android real. Não há laudo de equivalência pixel-perfect.
+
+### TAS — quarto módulo
+
+A carta Cruising / True Airspeed fornecida pelo usuário foi parcialmente digitalizada por amostras das curvas ISA STD nos grupos 50, 60, 70, 80 e 92% de carga. Interpolação entre altitude (0–14.000 ft), carga e desvios ISA (-10 a +30°C). Referência de leitura: 164 KTAS a 10.000 ft/ISA STD/80% (2 motores). A variação com temperatura foi aproximada por espaçamento entre curvas; erros fora do exemplo permanecem desconhecidos. Massa não aparece como entrada nesta carta. Dois motores é condição fixa.
 
 ## Publicação
 
@@ -51,6 +56,7 @@ URL temporária (confirmar deploy): `https://alanmfernandess.github.io/starship/
 - Takeoff: flaps UP, ambos MAX @ 2300 RPM, VR 80 KIAS, 85 KIAS, pista pavimentada.
 - Climb: flaps UP, ambos 92%, trem recolhido, 90 KIAS.
 - OEI: flaps UP, motor remanescente 92%, motor inoperante embandeirado/assegurado, 85 KIAS.
+- TAS: ambos os motores, carga 50–92%, altitude de pressão e desvio ISA conforme carta.
 
 ## Requisitos pendentes antes de validação técnica
 
