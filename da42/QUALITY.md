@@ -93,3 +93,10 @@
 - Uses a fixed y scale (Climb 1400 ft/min, OEI ±320 ft/min) so distinct rates cannot appear identical through per-result rescaling.
 - Computational interpolation/tables unaffected. Uses `data-roc`, `data-direction`, `data-baseline-y`, `data-end-y` SVG properties for directional regression without interpreting screenshots.
 - Adds numerical assertions to `npm test` and browser checks in five viewports. This is a chart of **instantaneous vertical rate**, not time-to-climb or a flightpath prediction. Not for operational use.
+
+## v0.13.4 — Aero UI curve styling
+
+- Climb and OEI primary result charts switched from linear SVG paths to monotonic cubic Bézier curves (`C`) consistent with Cruise stroke styling.
+- Constrained control point ordinates between original and final values: positive ROC ascends, negative ROC descends, zero ROC remains horizontal.
+- Chart represents a stylized one-minute altitude difference rather than an integrated physical trajectory; no synthetic second performance data series.
+- Regression: `validate_vertical_plots.cjs` tests cubic control values and signed direction across the reference grid; mobile Chromium smoke checks the path command on five viewports. No AFM interpolation or performance result changes.
