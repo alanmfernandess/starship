@@ -65,13 +65,13 @@ with sync_playwright() as p:
         all_checks+=31
         page.locator('#menu').click()
         expected_modules=[
-            'TAKEOFF PERFORMANCE',
-            'CLIMB PERFORMANCE',
+            'TAKEOFF',
+            'CLIMB',
             'ONE ENGINE CLIMB / DESCENT',
-            'CRUISING · TRUE AIRSPEED',
-            'LANDING · FLAPS LDG',
-            'ABNORMAL LANDING · UP / APP',
-            'GO-AROUND · CLIMB GRADIENT',
+            'CRUISE',
+            'LANDING',
+            'ABNORMAL LANDING',
+            'GO-AROUND',
             'TIME · FUEL · DISTANCE TO CLIMB'
         ]
         assert page.locator('.sheet button[data-module] strong').all_inner_texts()==expected_modules
