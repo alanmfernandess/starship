@@ -159,3 +159,15 @@ Resultado inclui Ground Roll e distância sobre 50 ft, com gráfico proporcional
 ### v0.11.1 — Ajustes de Runway
 
 Removido o rótulo redundante `RUNWAY SURFACE` da janela Runway no Takeoff. O antigo campo numérico de `UPHILL SLOPE (%)` foi substituído por slider de 0% a 5%, passos de 0,5%, mostrando o valor atual e os dois extremos. Cálculo e gráfico atualizados durante o ajuste, mantendo o painel aberto. Os limites são do controle experimental atual, não um limite de declive homologado no AFM. Regressão mobile adicionada em `test_browser.py`.
+
+### v0.12.0 — Climb AFM 5.3.7 e referência de 1999 kg
+
+A referência de massa de **1.999 kg** foi confirmada pelo usuário para as tabelas de performance da aeronave; a implementação tabular de **Takeoff e Climb** aceita até 1.999 kg dentro das células publicadas. A modificação MÄM 42-678, limites de massa/centro de gravidade e suplementos do AFM devem ser verificados para o uso operacional. O **Weight & Balance** não foi automaticamente estendido além de 1.900 kg, porque o envelope de CG recebido até agora termina em 1.900 kg.
+
+O motor `climb-tables.js` digitaliza diretamente seis matrizes publicadas na seção 5.3.7 do AFM: **Flaps UP/APP × 1700/1900/1999 kg**, altitude de pressão 0–18.000 ft, OAT −20,−10,0,10,20,30,40,50 °C e coluna ISA específica. Cada célula riscada é `null` e não é extrapolada. Interpolação apenas entre dados publicados adjacentes, sem inventar valores além dos limites.
+
+**Condições:** ambos motores 92%, trem recolhido; UP: VY 90 KIAS até 1900 kg e 92 KIAS acima de 1900 kg, APP: VY 85 KIAS. Notas de velocidade vertical do AFM com 100% de potência são distintas e **não** usadas na tabela de 92%. Conversão ft/min × 0,00508 para m/s. Interface Aero UI com botão flaps UP/APP e seletor OAT/ISA preservando os quatro cartões.
+
+**Referências exatas em MSL/ISA:** UP 1999 kg = 982 ft/min, APP 1999 kg = 953 ft/min; UP 1900 kg = 1065 ft/min, APP 1900 kg = 1034 ft/min. A 1800kg MSL OAT 15°C, UP 1147,5 ft/min, APP 1120 ft/min. Testes `validate_climb_tables.cjs` conferem dados e domínio; `validate_takeoff_tables.cjs` agora cobre os 1999kg.
+
+**Não aprovado para planejamento de voo.** O perfil individual e os limites de CG e MZFM/MLM devem ser compatíveis com o suplemento e o relatório de peso e balanceamento aplicáveis.
