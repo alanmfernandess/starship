@@ -103,13 +103,27 @@ with sync_playwright() as p:
         assert page.locator('#main-result').inner_text()=='211'
         assert page.locator('#secondary-result').inner_text()=='1.07 m/s'
         assert page.locator('.field').count()==4
+        assert page.locator('.power-note').count()==0
+        assert 'ONE ENGINE (REMAINING)' not in page.locator('.fields').inner_text()
         assert page.locator('#oei-isa-toggle').inner_text()=='ISA'
+        def verify_cards_aligned():
+            pa=page.locator('#val-pa').bounding_box()
+            oat=page.locator('#val-oat').bounding_box()
+            pa_label=page.locator('label[for="val-pa"]').bounding_box()
+            oat_label=page.locator('label[for="val-oat"]').bounding_box()
+            oat_card=page.locator('#val-oat').locator('xpath=../..').bounding_box()
+            isa_button=page.locator('#oei-isa-toggle').bounding_box()
+            assert abs(pa['y']-oat['y'])<=2, (w,h,'numeric input misalignment',pa,oat)
+            assert abs(pa_label['y']-oat_label['y'])<=2, (w,h,'label misalignment',pa_label,oat_label)
+            assert isa_button['x']>=oat_card['x'] and isa_button['x']+isa_button['width']<=oat_card['x']+oat_card['width'],(w,h,'ISA toggle outside OAT card')
+        verify_cards_aligned()
         assert 'VYSE 85 KIAS' in page.locator('#banner').inner_text()
         page.locator('input[data-key="mass"]').fill('1999')
         assert page.locator('#main-result').inner_text()=='138'
         page.locator('#oei-isa-toggle').click()
         assert page.locator('#oei-isa-toggle').inner_text()=='OAT'
         assert page.locator('input[data-key="oat"]').get_attribute('readonly') is not None
+        verify_cards_aligned()
         assert page.locator('#main-result').inner_text()=='140'
         page.locator('input[data-key="pa"]').fill('18000')
         assert page.locator('#main-result').inner_text()=='-169'
@@ -131,7 +145,7 @@ with sync_playwright() as p:
         page.locator('input[data-key="pa"]').fill('0')
         page.locator('input[data-key="oat"]').fill('10')
         assert page.locator('#main-result').inner_text()=='180'
-        all_checks+=27
+        all_checks+=34
         page.locator('#menu').click()
         page.locator('button[data-module="cruise"]').click()
         assert page.locator('#main-result').inner_text()=='164'
