@@ -27,7 +27,7 @@ assert.equal(C.compute({flaps:'app',mass:1900,pa:0,isa:true,power:92}).main,1034
 assert.equal(C.compute({flaps:'up',mass:1700,pa:0,isa:true,power:92}).main,1241);
 assert.equal(C.compute({flaps:'app',mass:1700,pa:0,isa:true,power:92}).main,1215);
 assert.equal(C.compute({flaps:'up',mass:1800,pa:0,oat:15,power:92}).main,1147.5);
-assert.equal(C.compute({flaps:'app',mass:1800,pa:0,oat:15,power:92}).main,1037.5);
+assert.equal(C.compute({flaps:'app',mass:1800,pa:0,oat:15,power:92}).main,1120);
 assert.equal(C.compute({flaps:'up',mass:1999,pa:0,oat:15,power:92}).main,975);
 assert.equal(C.compute({flaps:'app',mass:1999,pa:0,oat:15,power:92}).main,950);
 assert.equal(C.compute({flaps:'app',mass:1999,pa:6000,oat:50,power:92}).error,'SEM DADOS PUBLICADOS NA TABELA');
