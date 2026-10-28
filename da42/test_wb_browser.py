@@ -31,24 +31,26 @@ with sync_playwright() as p:
         assert 'MASS WITHIN LIMITS' in page.locator('#mass-check').inner_text()
         count+=2
         page.locator('#edit-load').click()
-        assert page.locator('.sheet-row input').count()==12
+        assert page.locator('.sheet-row input').count()==8
+        assert page.locator('[data-wb^="landing"]').count()==0
         page.locator('input[data-wb="cabin"]').fill('40')
         page.locator('input[data-wb="extension"]').fill('18')
         assert 'CABIN + EXTENSION' in page.locator('#notice').inner_text()
         page.locator('input[data-wb="cabin"]').fill('10')
         assert 'CABIN + EXTENSION' not in page.locator('#notice').inner_text()
-        for k in ['landingMainL','landingMainR','landingAuxL','landingAuxR']:
-            page.locator('input[data-wb="'+k+'"]').fill('0')
-        assert 'LANDING NORMAL' in page.locator('#notice').inner_text()
+        assert 'LANDING FUEL' not in page.locator('.sheet').inner_text()
+        assert 'LANDING' not in page.locator('#notice').inner_text()
         page.locator('.close').click()
         count+=5
         page.locator('#nav-scenarios').click()
-        assert page.locator('.case').count()>=7
+        assert page.locator('.case').count()==6
+        assert 'LANDING' not in page.locator('.sheet').inner_text()
         assert 'FUEL FULL' in page.locator('.sheet').inner_text()
         page.locator('.close').click()
         page.locator('#nav-settings').click()
         assert page.locator('input[data-wb="emptyMass"]').count()==1
         assert page.locator('input[data-wb="emptyMoment"]').count()==1
+        assert page.locator('input[data-wb="emptyMass"]').input_value()=='1,450.0'
         page.locator('input[data-wb="emptyMass"]').fill('1470')
         assert 'CUSTOM PROFILE' in page.locator('#notice').inner_text()
         page.locator('#reset-example').click()
