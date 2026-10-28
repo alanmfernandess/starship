@@ -109,3 +109,11 @@
 - Warmer OAT correction only: +10% per +10°C versus table's ISA, no credit for colder OAT; for this prototype ΔISA>+30°C unsupported.
 - Aero UI 2×2 cards and a curved chart of altitude against cumulative elapsed climb time; outputs three metrics. Zero wind and engine 92%, UP, gear retracted.
 - New `validate_time_to_climb.cjs`, five-viewports mobile checks; software not approved for flight.
+
+## v0.15 — AFM 5.3.10 Cruise Performance
+
+- New separate Cruise Performance module, 1999 kg, 9 altitudes × 5 ΔISA bands × 4 power/FF/TAS rows = 180 published anchors.
+- Exact tabular interpolation in power, altitude and ΔISA; reject mass outside 1999kg, power beyond local max/min and off-table OAT/altitudes. Fixed UP flaps and retracted gear.
+- Cruise performance note: optional 2% reduction when OÄM 42-278 installed and OÄM 42-193 absent. TAS adjusted only in prototype; FF remains original tabulation pending equipment applicability confirmation.
+- Aero UI four cards with fixed mass, OAT/ΔISA input switch, configuration toggle and smoothed TAS vs pressure altitude curve.
+- Regression: `validate_cruise_performance.cjs`; five viewport browser checks plus prior modules. Not approved for flight.
