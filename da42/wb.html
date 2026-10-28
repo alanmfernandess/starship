@@ -118,7 +118,7 @@ function envelope(){
 function content(){
  const sc=model.ok?model.statuses:{};
  const fuelText=model.ok?format(model.fuel.usableTotal,1)+' kg':'—';
- const metrics=model.ok?'<div class="metrics"><div class="metric"><label>ZFW</label><b>'+format(model.zeroFuel.mass,1)+' kg</b></div><div class="metric"><label>TOW</label><b>'+format(model.takeoff.mass,1)+' kg</b></div></div>':'<div class="metrics"><div class="metric"><label>CHECK INPUTS</label><b>—</b></div></div>';
+ const metrics=model.ok?'<div class="metrics"><div class="metric"><label>ZFW</label><b>'+format(model.zeroFuel.mass,0)+' kg</b></div><div class="metric"><label>TOW</label><b>'+format(model.takeoff.mass,0)+' kg</b></div></div>':'<div class="metrics"><div class="metric"><label>CHECK INPUTS</label><b>—</b></div></div>';
  const massState=model.ok?(sc.massOK?'MASS WITHIN LIMITS':'MASS LIMIT EXCEEDED'):'CHECK INPUTS';
  return '<div class="phone"><header class="topbar"><button class="icon-btn" id="menu" aria-label="Abrir módulos">'+icon('menu')+'</button><h1>DA42 NG</h1><button class="icon-btn" id="settings" aria-label="Configurações da aeronave">'+icon('settings')+'</button></header>'+
  '<main class="scroller" id="scroller"><div class="module-heading"><span>WEIGHT &amp; BALANCE</span><span class="accent">CG ENVELOPE</span></div>'+
@@ -154,7 +154,7 @@ function recalc(){
  set('#envelope',envelope());
  set('#fuel-summary',model.ok?format(model.fuel.usableTotal,1)+' kg':'—');
  set('#mass-check','<span class="'+(model.ok?(model.statuses.massOK?'good':'error'):'error')+'">'+(model.ok?(model.statuses.massOK?'MASS WITHIN LIMITS':'MASS LIMIT EXCEEDED'):'CHECK INPUTS')+'</span>');
- set('#metrics',model.ok?'<div class="metrics"><div class="metric"><label>ZFW</label><b>'+format(model.zeroFuel.mass,1)+' kg</b></div><div class="metric"><label>TOW</label><b>'+format(model.takeoff.mass,1)+' kg</b></div></div>':'');
+ set('#metrics',model.ok?'<div class="metrics"><div class="metric"><label>ZFW</label><b>'+format(model.zeroFuel.mass,0)+' kg</b></div><div class="metric"><label>TOW</label><b>'+format(model.takeoff.mass,0)+' kg</b></div></div>':'');
  const notice=el('#notice');if(notice){notice.textContent=model.ok?'NOT FOR FLIGHT':model.errors.join(' · ');notice.classList.toggle('bad',!model.ok||!model.statuses.massOK||!model.statuses.cgOK)}
  const optStatus=el('#optimize-status');if(optStatus)optStatus.textContent=optimizeMessage;
  store();
@@ -193,7 +193,7 @@ function sheet(type){
  if(type==='scenarios'){
   const title='';
   body=title+(model.ok?model.scenarios.map(c=>'<div class="case"><div class="name">'+c.name+'</div><div class="value"><b>'+format(c.mass,1)+' kg</b><span class="'+(c.cgOK?'good':'error')+'">'+format(c.cg,3)+' m · '+(c.cgOK?'CG OK':'CG OUT')+'</span></div></div>').join(''):'<p class="error">'+model.errors.join(', ')+'</p>');
-  if(model.ok)body+='<div class="section-title">LOADED CONDITION</div><div class="case"><div class="value"><span>ZFW</span><b>'+format(model.zeroFuel.mass,1)+' kg</b></div></div><div class="case"><div class="value"><span>TOW</span><b>'+format(model.takeoff.mass,1)+' kg</b></div></div>';
+  if(model.ok)body+='<div class="section-title">LOADED CONDITION</div><div class="case"><div class="value"><span>ZFW</span><b>'+format(model.zeroFuel.mass,0)+' kg</b></div></div><div class="case"><div class="value"><span>TOW</span><b>'+format(model.takeoff.mass,0)+' kg</b></div></div>';
  }
  if(type==='modules')body='<a class="action" href="./index.html">PERFORMANCE MODULES 01–07</a><a class="action" href="./wb.html">08 · WEIGHT &amp; BALANCE</a>';
  const d=document.createElement('div');d.className='sheet-backdrop';d.innerHTML='<div class="sheet" role="dialog" aria-modal="true" aria-label="'+titles[type]+'"><div class="sheet-head"><h2>'+titles[type]+'</h2><button class="close" aria-label="Fechar">×</button></div>'+body+'</div>';
