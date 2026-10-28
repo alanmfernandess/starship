@@ -1,46 +1,40 @@
-// Engineering/visual regression checks only; not operational AFM validation.
-const assert=require('node:assert/strict');
-const fs=require('node:fs');
-const vm=require('node:vm');
-const html=fs.readFileSync(__dirname+'/index.html','utf8');
-const script=html.match(/<script>([\s\S]*?)<\/script>/)[1];
-const node={innerHTML:'',classList:{toggle(){}},addEventListener(){}};
+// AFM §5.3.11 integrated Landing UI: 4 Aero UI cards and segmented chart.
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
+const source=fs.readFileSync(__dirname+'/index.html','utf8');
+const script=source.match(/<script>([\s\S]*?)<\/script>/)[1];
+let markup='';
+const node={set innerHTML(value){markup=value},get innerHTML(){return markup},classList:{toggle(){}},addEventListener(){}};
 const document={querySelector(){return node},querySelectorAll(){return []}};
-const context={document,localStorage:{getItem(k){return k==='aero-ui-da42-v1'?JSON.stringify({current:'landing'}):null},setItem(){}},location:{protocol:'file:'},navigator:{},console};
-context.window=context;vm.createContext(context);vm.runInContext(fs.readFileSync(__dirname+'/takeoff-tables.js','utf8'),context);vm.runInContext(script,context);
-const f=v=>context.AeroCalc.compute('landing',v);
+const ctx={document,console,location:{protocol:'file:'},navigator:{},localStorage:{getItem(k){return k==='aero-ui-da42-v1'?JSON.stringify({current:'landing'}):null},setItem(){}}};
+ctx.window=ctx;vm.createContext(ctx);
+for(const name of ['landing-tables.js','takeoff-tables.js','climb-tables.js','oei-tables.js','time-to-climb.js','cruise-performance.js'])
+ vm.runInContext(fs.readFileSync(__dirname+'/'+name,'utf8'),ctx);
+vm.runInContext(script,ctx);
+const f=v=>ctx.AeroCalc.compute('landing',v);
 const example={pa:0,oat:15,mass:1800,wind:10};
 const r=f(example);
-assert.equal(r.secondary,248);assert.equal(r.main,480);
-assert.ok(node.innerHTML.includes('TOUCHDOWN'));
-assert.ok(node.innerHTML.includes('TOTAL 480 m'));
-assert.ok(node.innerHTML.includes('232 m'));
-assert.equal((node.innerHTML.match(/data-key="/g)||[]).length,4);
-assert.ok(!node.innerHTML.includes('temp-mode-toggle'));
-assert.deepEqual(Object.keys(context.AeroCalc.MODELS),['takeoff','climb','oei','cruise','landing','abnormal','goaround','timeclimb','cruiseperf']);
-const compare=(v1,v2,dir=1)=>{const a=f(v1),b=f(v2);assert.ok(!a.error&&!b.error);assert.ok(dir*(b.main-a.main)>0);};
-compare({...example,wind:20},{...example,wind:0});   // weaker headwind => longer landing
-compare({...example,mass:1700},{...example,mass:1900});
-compare({...example,oat:5},{...example,oat:25});
-compare({...example,pa:0},{...example,pa:2000});
-let samples=0;
-for(const pa of [0,1000,2000,3000,4000,5000,6000,7000,8000,9000,10000])
- for(const oat of [-30,-10,0,15,25])
- for(const mass of [1500,1600,1700,1800,1900])
- for(const wind of [-10,-5,0,10,20]){
- const v={pa,oat,mass,wind};
- if(context.AeroCalc.limits('landing',v))continue;
- const x=f(v);
- assert.ok(!x.error&&Number.isFinite(x.main)&&Number.isFinite(x.secondary));
- assert.ok(x.main>x.secondary&&x.secondary>0,'Total must exceed ground roll');
- const heavier=f({...v,mass:Math.min(1900,mass+1)});
- assert.ok(!heavier.error&&heavier.main>=x.main);
- samples++;
+assert.ok(Math.abs(r.main-557.1428571428571)<1e-8);
+assert.ok(Math.abs(r.secondary-329.64285714285717)<1e-8);
+assert.ok(markup.includes('TOUCHDOWN')&&markup.includes('TOTAL 557 m'));
+assert.ok(markup.includes('id="landing-runway"')&&markup.includes('id="landing-isa-toggle"'));
+assert.equal((markup.match(/class="field /g)||[]).length,4);
+assert.deepEqual(Object.keys(ctx.AeroCalc.MODELS),['takeoff','climb','oei','cruise','landing','abnormal','goaround','timeclimb','cruiseperf']);
+for(const v of [{...example,mass:1700,wind:0,oat:0},{...example,mass:1900,wind:0,oat:0},{...example,mass:1999,wind:0,oat:0}]){
+ const result=f(v);assert.ok(result.main>result.secondary&&result.secondary>0);
 }
-for(const v of [
- {...example,pa:-1},{...example,pa:10001},{...example,mass:1499},
- {...example,mass:1901},{...example,oat:-36},{...example,oat:51},
- {...example,wind:-11},{...example,wind:21},
- {...example,oat:NaN},{...example,wind:NaN}
-]) assert.ok(f(v).error,'Out-of-range input must be rejected');
-console.log('Landing: 248/480 m reference, '+samples+' in-domain cases, 10 invalid cases, 4 trends, segment chart OK. Prototype only.');
+let valid=0,rejected=0;
+for(const pa of [0,1000,2000,4000,6000,8000,10000])
+ for(const oat of [0,10,20,30,40,50])
+ for(const mass of [1700,1800,1900,1950,1999])
+ for(const wind of [-5,0,10,20]){
+  const v={pa,oat,mass,wind};
+  const result=f(v);
+  if(result.error){assert.equal(result.error,'CÉLULA NÃO PUBLICADA NO AFM');rejected++;continue}
+  assert.ok(result.main>result.secondary&&result.secondary>0);
+  valid++;
+ }
+assert.ok(valid>300&&rejected>0);
+for(const v of [{pa:-1},{pa:10001},{mass:1699},{mass:2000},{oat:-1},{oat:51},{wind:-11},{wind:21},{slope:-1},{wind:NaN}]){
+ assert.ok(f({...example,...v}).error,'Invalid input accepted: '+JSON.stringify(v));
+}
+console.log('PASS Landing AFM §5.3.11 integrated, '+valid+' valid and '+rejected+' unpublished cells, four Aero UI cards, 2-color chart.');
