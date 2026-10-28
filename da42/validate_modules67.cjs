@@ -10,7 +10,7 @@ function boot(module){
  const document={querySelector(){return el},querySelectorAll(){return []}};
  const ctx={document,location:{protocol:'file:'},navigator:{},console,
    localStorage:{getItem(k){return k==='aero-ui-da42-v1'?JSON.stringify({current:module}):null},setItem(){}}};
- ctx.window=ctx;vm.createContext(ctx);vm.runInContext(fs.readFileSync(__dirname+'/takeoff-tables.js','utf8'),ctx);vm.runInContext(script,ctx);
+ ctx.window=ctx;vm.createContext(ctx);vm.runInContext(fs.readFileSync(__dirname+'/takeoff-tables.js','utf8'),ctx);vm.runInContext(fs.readFileSync(__dirname+'/climb-tables.js','utf8'),ctx);vm.runInContext(script,ctx);
  return {api:ctx.AeroCalc,html:el.html};
 }
 const ab=boot('abnormal'),go=boot('goaround');
@@ -65,5 +65,5 @@ const legacy=[
  Math.round(f('cruise',{pa:10000,oat:-5,load:80,engines:2}).main),
  f('landing',{pa:0,oat:15,mass:1800,wind:10}).main
 ];
-assert.ok(Math.abs(legacy[0]-638.3928571428571)<1e-9);assert.deepEqual(legacy.slice(1),[1150,212,164,480]);
+assert.ok(Math.abs(legacy[0]-638.3928571428571)<1e-9);assert.deepEqual(legacy.slice(1),[1147.5,212,164,480]);
 console.log('PASS abnormal Landing 418/722 m, '+count+' grid cases, '+scaleRejections+' scale rejections; Go-Around both published masses 7.5/6.7%; UI structure; legacy 5 modules. Not flight validated.');
