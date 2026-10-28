@@ -57,15 +57,47 @@ with sync_playwright() as p:
         page.locator('button[data-surface="paved"]').click()
         assert page.locator('#main-result').inner_text()=='638'
         page.locator('input[data-key="mass"]').fill('1999')
+        assert page.locator('#main-result').inner_text()!='—'
+        page.locator('input[data-key="mass"]').fill('2000')
         assert page.locator('#main-result').inner_text()=='—'
         page.locator('input[data-key="mass"]').fill('1800')
         assert page.locator('#main-result').inner_text()=='638'
         all_checks+=31
         page.locator('#menu').click()
         page.locator('button[data-module="climb"]').click()
-        assert page.locator('#main-result').inner_text()=='1,150'
+        assert page.locator('#main-result').inner_text()=='1,148'
         assert page.locator('#secondary-result').inner_text()=='5.8 m/s'
-        all_checks+=2
+        assert page.locator('#climb-flaps').inner_text()=='FLAPS UP'
+        assert page.locator('#climb-isa-toggle').inner_text()=='ISA'
+        page.locator('#climb-flaps').click()
+        assert page.locator('#climb-flaps').inner_text()=='FLAPS APP'
+        assert page.locator('#main-result').inner_text()=='1,120'
+        page.locator('#climb-flaps').click()
+        page.locator('input[data-key="mass"]').fill('1999')
+        assert page.locator('#main-result').inner_text()=='975'
+        assert 'VY 92 KIAS' in page.locator('#banner').inner_text()
+        page.locator('#climb-flaps').click()
+        assert page.locator('#main-result').inner_text()=='950'
+        assert 'VY 85 KIAS' in page.locator('#banner').inner_text()
+        page.locator('#climb-isa-toggle').click()
+        assert page.locator('#main-result').inner_text()=='953'
+        assert page.locator('input[data-key="oat"]').get_attribute('readonly') is not None
+        page.locator('#climb-flaps').click()
+        assert page.locator('#main-result').inner_text()=='982'
+        page.locator('input[data-key="pa"]').fill('2000')
+        assert page.locator('#main-result').inner_text()=='956'
+        page.locator('input[data-key="pa"]').fill('18000')
+        assert page.locator('#main-result').inner_text()=='512'
+        page.locator('#climb-isa-toggle').click()
+        page.locator('input[data-key="oat"]').fill('50')
+        assert page.locator('#main-result').inner_text()=='—'
+        page.locator('input[data-key="pa"]').fill('0')
+        page.locator('input[data-key="oat"]').fill('10')
+        page.locator('input[data-key="mass"]').fill('2000')
+        assert page.locator('#main-result').inner_text()=='—'
+        page.locator('input[data-key="mass"]').fill('1900')
+        assert page.locator('#main-result').inner_text()=='1,070'
+        all_checks+=25
         page.locator('#menu').click()
         page.locator('button[data-module="oei"]').click()
         assert page.locator('#main-result').inner_text()=='212'
