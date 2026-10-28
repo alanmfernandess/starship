@@ -105,6 +105,22 @@ with sync_playwright() as p:
         assert page.locator('.field').count()==4
         assert page.locator('.power-note').count()==0
         assert 'ONE ENGINE (REMAINING)' not in page.locator('.fields').inner_text()
+        # Fixed engine-power value must use the same Aero UI typography as inputs.
+        typography=page.evaluate("""() => {
+            const fields=['#val-pa','.field.readonly .power-value'];
+            return fields.map(selector=>{
+                const cs=getComputedStyle(document.querySelector(selector));
+                return {
+                    fontSize:cs.fontSize,
+                    fontWeight:cs.fontWeight,
+                    lineHeight:cs.lineHeight,
+                    letterSpacing:cs.letterSpacing,
+                    fontFamily:cs.fontFamily,
+                    fontVariantNumeric:cs.fontVariantNumeric
+                };
+            });
+        }""")
+        assert typography[0]==typography[1],(w,h,'engine power font mismatch',typography)
         assert page.locator('#oei-isa-toggle').inner_text()=='ISA'
         def verify_cards_aligned():
             pa=page.locator('#val-pa').bounding_box()
@@ -151,6 +167,12 @@ with sync_playwright() as p:
         assert page.locator('#main-result').inner_text()=='164'
         assert page.locator('#secondary-result').inner_text()=='0 °C'
         assert page.locator('.field.readonly .power-value').inner_text()=='2'
+        cruise_fonts=page.evaluate("""() => {
+            const input=getComputedStyle(document.querySelector('#val-load'));
+            const fixed=getComputedStyle(document.querySelector('.field.readonly .power-value'));
+            return [input.fontSize,input.fontWeight,input.lineHeight,input.letterSpacing,fixed.fontSize,fixed.fontWeight,fixed.lineHeight,fixed.letterSpacing];
+        }""")
+        assert cruise_fonts[:4]==cruise_fonts[4:],(w,h,'fixed-field typography drift',cruise_fonts)
         assert page.locator('input[data-key="load"]').count()==1
         assert page.locator('html').evaluate('(el)=>el.scrollWidth')<=w
         page.locator('input[data-key="load"]').fill('92')
