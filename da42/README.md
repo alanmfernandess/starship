@@ -123,3 +123,13 @@ O perfil inicial é **AFM EXAMPLE**, com Empty Mass 1450 kg / Empty Moment 3488 
 **Validação:** \`node validate_wb.cjs\` cobre exemplos, limites de envelope, massa, bagagens, combustível e centenas de combinações. \`python test_wb_browser.py\` verifica a interface em cinco resoluções com Chromium instalado; configurado na CI. Não é certificação e não substitui o Mass and Balance Report específico da aeronave, o AFM vigente e seus suplementos. **NÃO UTILIZAR PARA PLANEJAMENTO OU EXECUÇÃO DE VOO.**
 
 **Revisão v0.9.1:** removidos os quatro campos de combustível de pouso e a estimativa de Landing CG. Permanecem apenas a condição de carregamento, Zero Fuel/Takeoff e os quatro cenários extremos requeridos pelo AFM. Perfis salvos em versão anterior descartam automaticamente as antigas propriedades de Landing Fuel.
+
+### v0.10 — Otimizar (W&B)
+
+O botão **OTIMIZAR** gera um **cenário hipotético randômico**, variando somente Pilot, Copilot, Passenger 1, Passenger 2 e bagagens Nose/Cabin/Extension. Cada sugestão é avaliada pelo motor matemático: ZFM <=1765 kg, MTOM <=1900 kg, mínimo de voo >=1510 kg, CG de Zero Fuel e Takeoff dentro do envelope, todos os limites de bagagens, e as quatro combinações extremas fuel/de-ice. Caso nenhuma configuração cumpra os critérios com as condições fixas informadas, a ferramenta informa a impossibilidade e **não altera os dados**.
+
+**Otimizar nunca altera:** combustível Main L/R, Aux L/R, de-icing, empty mass, empty moment. Combustível permanece exclusivamente manual, inclusive após otimizar. Ocupantes/bagagens passam a ser campos somente leitura no modo AUTO; botão OTIMIZAR pode gerar outra sugestão. Para retornar ao carregamento manual anterior, em Perfil selecione **RESTAURAR CARGA MANUAL** (sem alterar combustível). Os valores anteriores são preservados localmente, enquanto o modo AUTO persistir.
+
+**IMPORTANTE:** os pesos de ocupantes são inventados para explorar a geometria do envelope. Não representam pessoas reais, não corrigem fisicamente uma aeronave nem podem ser usados como manifesto de carga; a UI identifica o resultado como **SIMULAÇÃO**. O algoritmo não deve ser utilizado para aprovar um carregamento real fora do CG.
+
+Validação: `node validate_optimizer.cjs` com gerador reproduzível, imutabilidade dos inputs fixos, variação de cenários, limites e insatisfatibilidade; `test_wb_browser.py` verifica botões, campos bloqueados, manutenção da edição do fuel e persistência.
