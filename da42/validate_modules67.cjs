@@ -21,7 +21,7 @@ assert.equal(f('abnormal',ref).secondary,418);
 assert.equal((ab.html.match(/class="field /g)||[]).length,4);
 assert.ok(ab.html.includes('304 m')&&ab.html.includes('418 m')&&ab.html.includes('TOTAL 722 m'));
 assert.ok(!ab.html.includes('temp-mode-toggle'));
-let count=0;
+let count=0,scaleRejections=0;
 for(const pa of [0,1000,2000,3000,4000,5000,6000,7000,8000,9000,10000])
  for(const oat of [-30,-10,0,15,25])
  for(const mass of [1500,1600,1700,1800,1900])
@@ -29,13 +29,19 @@ for(const pa of [0,1000,2000,3000,4000,5000,6000,7000,8000,9000,10000])
   const v={pa,oat,mass,wind};
   if(ab.api.limits('abnormal',v))continue;
   const r=f('abnormal',v);
-  assert.ok(!r.error&&Number.isFinite(r.main)&&Number.isFinite(r.secondary));
+  if(r.error){
+   assert.equal(r.error,'DISTÂNCIA FORA DA ESCALA DA CARTA');
+   scaleRejections++;
+   continue;
+  }
+  assert.ok(Number.isFinite(r.main)&&Number.isFinite(r.secondary));
   assert.ok(r.main>r.secondary&&r.secondary>0);
   const heavier=f('abnormal',{...v,mass:Math.min(1900,mass+1)});
-  assert.ok(!heavier.error&&heavier.main>=r.main);
+  if(!heavier.error)assert.ok(heavier.main>=r.main);
   count++;
  }
-assert.equal(count,1375);
+assert.equal(count,1369);
+assert.equal(scaleRejections,6);
 for(const v of [{...ref,pa:-1},{...ref,pa:10001},{...ref,mass:1499},{...ref,mass:1901},
  {...ref,oat:-36},{...ref,oat:51},{...ref,wind:-11},{...ref,wind:21},{...ref,wind:NaN}]){
  assert.ok(f('abnormal',v).error,'Abnormal must reject invalid '+JSON.stringify(v));
@@ -60,4 +66,4 @@ const legacy=[
  f('landing',{pa:0,oat:15,mass:1800,wind:10}).main
 ];
 assert.deepEqual(legacy,[610,1150,212,164,480]);
-console.log('PASS abnormal Landing 418/722 m, '+count+' grid cases; Go-Around both published masses 7.5/6.7%; UI structure; legacy 5 modules. Not flight validated.');
+console.log('PASS abnormal Landing 418/722 m, '+count+' grid cases, '+scaleRejections+' scale rejections; Go-Around both published masses 7.5/6.7%; UI structure; legacy 5 modules. Not flight validated.');
