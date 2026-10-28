@@ -9,7 +9,7 @@ const ctx={document,console,location:{protocol:'file:'},navigator:{},localStorag
 ctx.window=ctx;vm.createContext(ctx);
 for(const name of ['landing-tables.js','takeoff-tables.js','climb-tables.js','oei-tables.js','time-to-climb.js','cruise-performance.js'])
  vm.runInContext(fs.readFileSync(__dirname+'/'+name,'utf8'),ctx);
-vm.runInContext(script,ctx);
+vm.runInContext(fs.readFileSync(__dirname+'/goaround-tables.js','utf8'),ctx);vm.runInContext(script,ctx);
 const f=v=>ctx.AeroCalc.compute('landing',v);
 const example={pa:0,oat:15,mass:1800,wind:10};
 const r=f(example);
