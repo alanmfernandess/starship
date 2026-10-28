@@ -9,7 +9,7 @@ const sandbox={document,localStorage:{getItem(){return null},setItem(){}},naviga
 sandbox.window=sandbox;
 vm.createContext(sandbox);
 for(const name of ['takeoff','climb','oei'])vm.runInContext(fs.readFileSync(__dirname+'/'+name+'-tables.js','utf8'),sandbox);
-vm.runInContext(script,sandbox);
+vm.runInContext(fs.readFileSync(__dirname+'/goaround-tables.js','utf8'),sandbox);vm.runInContext(script,sandbox);
 const numberAttr=(svg,name)=>{const m=svg.match(new RegExp('data-'+name+'="([^"]+)"'));return m?Number(m[1]):null;};
 const directionAttr=svg=>svg.match(/data-direction="([^"]+)"/)?.[1]||null;
 function check(id,v){
