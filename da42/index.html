@@ -333,7 +333,26 @@ function goAroundPlot(v,r){
  +'</svg>';
 }
 
-function createPlot(id,v,res){if(id==='goaround')return goAroundPlot(v,res);if(id==='landing'||id==='abnormal')return landingPlot(v,res);if(id==='cruise')return cruisePlot(v,res);if(res.error)return `<svg class="plot" viewBox="0 0 290 138" aria-label="Gráfico indisponível" role="img"></svg>`;
+function takeoffPlot(v,r){
+ if(r.error)return '<svg class="plot" viewBox="0 0 290 138" role="img" aria-label="Distância indisponível"></svg>';
+ const total=r.main,ground=r.secondary,air=total-ground;
+ if(!Number.isFinite(total)||total<=0||ground<=0||air<0)return '';
+ const start=8,end=282,split=start+(end-start)*ground/total,groundX=(start+split)/2,airX=(split+end)/2;
+ const tx=(x,y,t,color='#b6cad8',size=11)=>'<text x="'+x+'" y="'+y+'" text-anchor="middle" font-size="'+size+'" fill="'+color+'">'+t+'</text>';
+ return '<svg class="plot" viewBox="0 0 290 138" role="img" aria-label="Corrida '+fmt(ground)+' metros, total sobre 50 pés '+fmt(total)+' metros">'
+ +'<text x="8" y="17" font-size="10" fill="#91a8b8">START</text>'
+ +'<text x="282" y="17" text-anchor="end" font-size="10" fill="#91a8b8">50 FT</text>'
+ +'<path d="M8 29V80M'+split.toFixed(2)+' 29V80M282 29V80" stroke="#7896a8" stroke-width="1" stroke-dasharray="3 4"/>'
+ +'<rect x="8" y="47" width="'+(split-start).toFixed(2)+'" height="17" rx="3" fill="#e7b46d"/>'
+ +'<rect x="'+split.toFixed(2)+'" y="47" width="'+(end-split).toFixed(2)+'" height="17" rx="3" fill="#56b9ee"/>'
+ +'<circle cx="'+split.toFixed(2)+'" cy="55.5" r="5" fill="#f1f5f9" stroke="#202d39" stroke-width="2"/>'
+ +tx(groundX.toFixed(2),89,fmt(ground)+' m','#e7b46d')
+ +tx(airX.toFixed(2),89,fmt(air)+' m','#56b9ee')
+ +'<path d="M8 107V118M282 107V118M8 112H282" fill="none" stroke="#7896a8" stroke-width="1"/>'
+ +tx(145,132,'TOTAL '+fmt(total)+' m','#d3e0ea')
+ +'</svg>';
+}
+function createPlot(id,v,res){if(id==='takeoff')return takeoffPlot(v,res);if(id==='goaround')return goAroundPlot(v,res);if(id==='landing'||id==='abnormal')return landingPlot(v,res);if(id==='cruise')return cruisePlot(v,res);if(res.error)return `<svg class="plot" viewBox="0 0 290 138" aria-label="Gráfico indisponível" role="img"></svg>`;
  // Smoothed spline for the live model's response to temperature, sampled at constant PA/mass.
  const T=[-30,-25,-20,-15,-10,-5,0,5,10,15,20,25,30,35,40,45].filter(t=>t<=15-0.0019812*v.pa+35 && t>=-35);
  const usable=T.map(t=>{const r=compute(id,{...v,oat:t});return {t,val:r.error?null:r.main,second:r.error?null:r.secondary}}).filter(x=>x.val!=null);
