@@ -77,3 +77,12 @@
 - Takeoff performance range expanded through AFM's 1999kg published tables, while Weight & Balance continues to require the appropriate mass/CG supplement for extending its 1900kg envelope.
 - Numerical checks: `validate_climb_tables.cjs` and extended `validate_takeoff_tables.cjs`. Browser checks include flap selection, 1999kg, ISA, hot/missing cells, legacy modules.
 - Software remains experimental and is not a validated operational performance reference.
+
+## v0.13.0 — OEI AFM §5.3.8
+
+- OEI 92%, remaining engine loaded, dead engine feathered/secured, UP, gear retracted, VYSE 85 KIAS, half ball out.
+- 3 grids at 1700/1900/1999 kg; 10 altitudes, eight OAT temperatures and separate ISA; 228 published numerical anchors, 42 unsupported cells.
+- Preserve 71 negative ROC reference cells and 101 values <50 ft/min, including zero. UI warns for the AFM's grey shaded area.
+- Exact table and interpolated-point numerical regression in `validate_oei_tables.cjs`; dedicated negative/zero and no-data browser checks added.
+- Existing Takeoff/Climb/other modules unchanged except test harness loading the OEI engine.
+- 1999kg performance results do not constitute certification of aircraft weight-and-balance limits; require applicable AFM supplements.
