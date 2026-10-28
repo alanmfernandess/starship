@@ -31,6 +31,14 @@ button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus
 .unit{font-size:15px;color:#89a6b9;white-space:nowrap;flex:none}
 .open-load{width:100%;background:var(--tile);border:0;border-radius:16px;padding:15px;min-height:70px;margin-bottom:clamp(12px,2dvh,24px);display:flex;align-items:center;justify-content:space-between;text-align:left;color:var(--txt)}
 .open-load .main{display:block;font-size:13px;font-weight:500;color:#b3c4d0;letter-spacing:.15px}.open-load .sub{display:block;font-size:11px;color:var(--label);margin-top:8px}
+.optimize-row{display:flex;gap:9px;margin:-7px 0 clamp(12px,2dvh,22px);align-items:stretch}
+.optimize-button{flex:1;min-height:46px;border:1px solid #40738f;border-radius:13px;color:#8dd2ff;background:#203a4c;font-weight:600;letter-spacing:.4px;font-size:13px}
+.optimize-button:active{background:#2b5069}
+.optimize-status{flex:1;min-width:0;align-self:center;color:var(--label);font-size:9px;line-height:1.45;text-align:right}
+.optimize-status.bad{color:var(--amber)}
+.field input[readonly],.sheet-row input[readonly]{color:#aac2d1;cursor:default}
+.field .auto-tag{font-size:9px;color:#56b9ee;letter-spacing:.3px}
+
 .result{background:var(--tile);border-radius:19px;padding:18px 15px 16px;min-height:310px}
 .result-head{display:flex;align-items:center;justify-content:space-between;color:#afc2ce;font-size:13px;letter-spacing:.25px}.result-head .icon{color:var(--blue);width:19px;height:19px}
 .primary{display:flex;align-items:baseline;gap:10px;margin-top:13px}
@@ -61,9 +69,9 @@ button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus
 @media(max-width:355px){.field{height:87px;padding:13px 12px 9px}.entry input{font-size:27px}.module-heading{margin-top:20px}}
 @media(max-height:730px){.topbar{height:72px;padding-top:17px}.module-heading{margin-top:15px;margin-bottom:12px}.field{height:87px}.fields{margin-bottom:10px}.result{padding-top:14px}.bottom{height:57px}}
 </style></head>
-<body><div id="app"></div><script src="./wb-engine.js"></script><script>
+<body><div id="app"></div><script src="./wb-engine.js"></script><script src="./wb-optimizer.js"></script><script>
 'use strict';
-const E=window.WBEngine,KEY='da42-wb-profile-v1';
+const E=window.WBEngine,OPT=window.WBOptimizer,AUTO_KEY='da42-wb-optimized-v1',KEY='da42-wb-profile-v1';
 const icons={
  menu:'<path d="M5 7h14M5 12h9M5 17h6"/>',
  settings:'<path d="M4 7h16M4 17h16M9 3v8M15 13v8"/><circle cx="9" cy="7" r="2"/><circle cx="15" cy="17" r="2"/>',
@@ -79,6 +87,9 @@ const el=s=>document.querySelector(s);
 const format=(x,d=0)=>typeof x==='number'&&Number.isFinite(x)?new Intl.NumberFormat('en-US',{minimumFractionDigits:d,maximumFractionDigits:d}).format(x):'—';
 let profile=E.EXAMPLE;
 try{const saved=JSON.parse(localStorage.getItem(KEY));if(saved&&typeof saved==='object'){const clean=Object.fromEntries(E.INPUTS.filter(k=>Object.prototype.hasOwnProperty.call(saved,k)).map(k=>[k,saved[k]]));profile={...E.EXAMPLE,...clean}}}catch(e){}
+let optimizedMode=false;
+try{optimizedMode=localStorage.getItem(AUTO_KEY)==='true'}catch(e){}
+let optimizeMessage='';
 let model=E.calculate(profile);
 function esc(s){return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;')}
 const profilesInputs=[
@@ -92,7 +103,7 @@ function currentProfileName(){
 }
 function card(key,label){
  const v=profile[key];
- return '<div class="field"><label for="val-'+key+'">'+label+'</label><div class="entry"><input data-wb="'+key+'" id="val-'+key+'" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" value="'+esc(format(v,0))+'" aria-label="'+label+' kg"><span class="unit">kg</span></div></div>';
+ return '<div class="field"><label for="val-'+key+'">'+label+(optimizedMode&&OPT.ADJUSTABLE.includes(key)?' <span class="auto-tag">AUTO</span>':'')+'</label><div class="entry"><input data-wb="'+key+'" id="val-'+key+'" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" value="'+esc(format(v,0))+'" aria-label="'+label+' kg"'+(optimizedMode&&OPT.ADJUSTABLE.includes(key)?' readonly aria-readonly="true"':'')+'><span class="unit">kg</span></div></div>';
 }
 function coords(m,c){const width=270,axisL=2.33,axisR=2.51;return [31+(c-axisL)/(axisR-axisL)*width,181-(m-1500)/450*160]}
 function envelope(){
@@ -121,6 +132,7 @@ function content(){
  '<main class="scroller" id="scroller"><div class="module-heading"><span>WEIGHT &amp; BALANCE</span><span class="accent">CG ENVELOPE</span></div>'+
  '<div class="fields">'+card('pilot','PILOT')+card('copilot','COPILOT')+card('pax1','PASSENGER 1')+card('pax2','PASSENGER 2')+'</div>'+
  '<button class="open-load" id="edit-load"><span><span class="main">BAGGAGE &amp; FUEL</span><span class="sub" id="fuel-summary">'+fuelText+'</span></span>'+icon('next')+'</button>'+
+ '<div class="optimize-row"><button id="optimize" class="optimize-button" type="button">OTIMIZAR</button><span id="optimize-status" class="optimize-status'+(optimizeMessage?' bad':'')+'">'+(optimizeMessage?esc(optimizeMessage):optimizedMode?'SIMULAÇÃO AUTO · CAMPOS BLOQUEADOS':'CENÁRIO SIMULADO · FUEL MANUAL')+'</span></div>'+
  '<section class="result" aria-live="polite"><div class="result-head"><span>TAKEOFF CG</span>'+icon('chart')+'</div>'+
  '<div class="primary"><strong class="number" id="cg">'+cg+'</strong><span class="primary-unit">m</span></div><div id="cg-status">'+statusText()+'</div>'+
  '<div id="envelope">'+envelope()+'</div><div class="legend"><span><i class="dot" style="background:#e7b46d"></i>ZERO FUEL</span><span><i class="dot" style="background:#56b9ee"></i>TAKEOFF</span></div>'+
@@ -154,13 +166,15 @@ function recalc(){
  set('#mass-check','<span class="'+(model.ok?(model.statuses.massOK?'good':'error'):'error')+'">'+(model.ok?(model.statuses.massOK?'MASS WITHIN LIMITS':'MASS LIMIT EXCEEDED'):'CHECK INPUTS')+'</span>');
  set('#metrics',model.ok?'<div class="metrics"><div class="metric"><label>ZERO FUEL MASS</label><b>'+format(model.zeroFuel.mass,1)+' kg</b></div><div class="metric"><label>TAKEOFF MASS</label><b>'+format(model.takeoff.mass,1)+' kg</b></div></div>':'');
  set('#zfcg',model.ok?format(model.zeroFuel.cg,3)+' m':'—');
- const notice=el('#notice');if(notice){notice.textContent=model.ok?(currentProfileName()+' · NOT FOR FLIGHT'):model.errors.join(' · ');notice.classList.toggle('bad',!model.ok||!model.statuses.massOK||!model.statuses.cgOK)}
+ const notice=el('#notice');if(notice){notice.textContent=model.ok?(optimizedMode?'SIMULAÇÃO · PESOS GERADOS NÃO SÃO REAIS · NOT FOR FLIGHT':currentProfileName()+' · NOT FOR FLIGHT'):model.errors.join(' · ');notice.classList.toggle('bad',optimizedMode||!model.ok||!model.statuses.massOK||!model.statuses.cgOK)}
+ const optStatus=el('#optimize-status');if(optStatus){optStatus.textContent=optimizeMessage|| (optimizedMode?'SIMULAÇÃO AUTO · CAMPOS BLOQUEADOS':'CENÁRIO SIMULADO · FUEL MANUAL');optStatus.classList.toggle('bad',!!optimizeMessage)}
  store();
 }
 function bindInputs(root=document){
  root.querySelectorAll('[data-wb]').forEach(inp=>{
   inp.addEventListener('input',()=>{
    const k=inp.dataset.wb;
+   if(optimizedMode&&OPT.ADJUSTABLE.includes(k))return;
    profile={...profile,[k]:parseNumber(inp.value)};
    recalc();
   });
@@ -182,7 +196,7 @@ function sheet(type){
    body+='<div class="section-title">'+title+'</div>';
    for(const k of keys){
     const field=profilesInputs.find(([id])=>id===k);
-    body+='<div class="sheet-row"><label for="sheet-'+k+'">'+field[1]+'</label><input data-wb="'+k+'" id="sheet-'+k+'" inputmode="decimal" autocomplete="off" type="text" value="'+(profile[k]===null?'':esc(format(profile[k],k==='emptyMoment'?1:1)))+'" placeholder="—" aria-label="'+field[1]+'"><span class="unit">'+field[2]+'</span></div>';
+    body+='<div class="sheet-row"><label for="sheet-'+k+'">'+field[1]+'</label><input data-wb="'+k+'" id="sheet-'+k+'" inputmode="decimal" autocomplete="off" type="text" value="'+(profile[k]===null?'':esc(format(profile[k],k==='emptyMoment'?1:1)))+'" placeholder="—" aria-label="'+field[1]+'"'+(optimizedMode&&OPT.ADJUSTABLE.includes(k)?' readonly aria-readonly="true"':'')+'><span class="unit">'+field[2]+'</span></div>';
    }
    if(title==='FUEL · USEABLE MASS')body+='<div class="s-note">Main: 79.5 kg per side · Aux: 42.0 kg per side · Density 0.84 kg/L</div>';
   }
@@ -199,20 +213,29 @@ function sheet(type){
  d.addEventListener('click',ev=>{if(ev.target===d)d.remove()});
  d.querySelector('.close').onclick=()=>d.remove();
  bindInputs(d);
- const reset=d.querySelector('#reset-example');if(reset)reset.onclick=()=>{profile={...E.EXAMPLE};model=E.calculate(profile);localStorage.removeItem(KEY);d.remove();render()};
+ const reset=d.querySelector('#reset-example');if(reset)reset.onclick=()=>{profile={...E.EXAMPLE};optimizedMode=false;optimizeMessage='';model=E.calculate(profile);localStorage.removeItem(KEY);localStorage.removeItem(AUTO_KEY);d.remove();render()};
 }
 function render(){
  model=E.calculate(profile);el('#app').innerHTML=content();bindInputs();
  el('#menu').onclick=()=>sheet('modules');
  el('#settings').onclick=()=>sheet('settings');
  el('#edit-load').onclick=()=>sheet('load');
+ el('#optimize').onclick=()=>{
+  const found=OPT.optimize(profile,E);
+  if(!found.ok){optimizeMessage=found.reason||'SEM CONFIGURAÇÃO VÁLIDA';recalc();return}
+  profile={...profile,...found.suggested};
+  optimizedMode=true;
+  optimizeMessage='';
+  try{localStorage.setItem(AUTO_KEY,'true')}catch(e){}
+  render();
+ };
  el('#nav-input').onclick=()=>{el('#scroller').scrollTo({top:0,behavior:'smooth'})};
  el('#nav-chart').onclick=()=>el('.result').scrollIntoView({behavior:'smooth',block:'start'});
  el('#nav-scenarios').onclick=()=>sheet('scenarios');
  el('#nav-settings').onclick=()=>sheet('settings');
  recalc();
 }
-window.WBApp={get profile(){return profile},get model(){return model},render,sheet};
+window.WBApp={get profile(){return profile},get model(){return model},get optimizedMode(){return optimizedMode},render,sheet,optimize:()=>OPT.optimize(profile,E)};
 render();
 if('serviceWorker'in navigator&&location.protocol==='https:')window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 </script></body></html>
