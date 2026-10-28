@@ -17,7 +17,7 @@ assert.ok(node.innerHTML.includes('TOTAL 480 m'));
 assert.ok(node.innerHTML.includes('232 m'));
 assert.equal((node.innerHTML.match(/data-key="/g)||[]).length,4);
 assert.ok(!node.innerHTML.includes('temp-mode-toggle'));
-assert.deepEqual(Object.keys(context.AeroCalc.MODELS),['takeoff','climb','oei','cruise','landing','abnormal','goaround']);
+assert.deepEqual(Object.keys(context.AeroCalc.MODELS),['takeoff','climb','oei','cruise','landing','abnormal','goaround','timeclimb']);
 const compare=(v1,v2,dir=1)=>{const a=f(v1),b=f(v2);assert.ok(!a.error&&!b.error);assert.ok(dir*(b.main-a.main)>0);};
 compare({...example,wind:20},{...example,wind:0});   // weaker headwind => longer landing
 compare({...example,mass:1700},{...example,mass:1900});
