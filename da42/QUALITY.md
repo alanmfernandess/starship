@@ -40,8 +40,14 @@
 - Cálculo direto por somatório de massas e momentos; envelope CG por interpolação exata dos pontos numéricos da seção 2.8, em vez de digitalização de pixels.
 - Limites individuais de bagagens, combinado cabin+extension, MZFM 1765 kg, MTOM 1900 kg, MLW normal 1805 kg e mínimo de voo 1510 kg.
 - Cargas individuais de piloto/copiloto, passageiros traseiros, compartimentos, quatro tanques de combustível utilizável e fluido de degelo.
-- Landing Fuel pendente até entrada explícita de quatro quantidades; casos de CG com combustível vazio/cheio e fluido carregado/retirado.
+- Sem previsão de combustível remanescente no pouso: somente massa de combustível atualmente carregada, e cenários de CG com combustível vazio/cheio e fluido carregado/retirado.
 - Testes: \`validate_wb.cjs\` (motor, limites, regressão oficial, combinação de cargas), \`test_wb_browser.py\` (tela mobile, limites, persistência da entrada, envelope e cenário).
 - Código W&B na pasta \`da42\` do repositório Starship em \`wb.html\` e \`wb-engine.js\`, sem modificar a aplicação Starship principal.
 
 **Escopo:** precisão matemática das fórmulas do exemplo e limites documentados, não aprovação operacional da aeronave. O relatório de peso e balanceamento atualizado e suplementos são imprescindíveis para uso específico. O dispositivo e o software não são certificados. 
+
+## v0.9.1 — Escopo corrigido do W&B
+
+- Eliminados os quatro campos de Landing Fuel, estado de massa previsto para pouso, ponto Landing CG no gráfico e mensagens de combustível de pouso pendente.
+- Preservados os pontos Zero Fuel e Takeoff, além das quatro combinações estáticas combustível vazio/cheio e degelo carregado/vazio.
+- Regressão ajustada para verificar que entradas antigas de pouso não afetam cálculos de massa e CG e que perfis salvos são saneados; não há funcionalidade de autonomia.
