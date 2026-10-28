@@ -67,6 +67,17 @@ with sync_playwright() as p:
         page.locator('button[data-module="climb"]').click()
         assert page.locator('#main-result').inner_text()=='1,148'
         assert page.locator('#secondary-result').inner_text()=='5.8 m/s'
+        def verify_vertical_graph(direction):
+            chart=page.locator('#plot-area svg.vertical-rate-plot')
+            assert chart.count()==1,(w,h,'missing vertical-rate plot')
+            start=float(chart.get_attribute('data-baseline-y'))
+            end=float(chart.get_attribute('data-end-y'))
+            assert chart.get_attribute('data-direction')==direction,(w,h,chart.get_attribute('data-direction'),direction)
+            if direction=='subida':assert end<start,(w,h,'chart must ascend',start,end)
+            elif direction=='descida':assert end>start,(w,h,'chart must descend',start,end)
+            else:assert end==start,(w,h,'zero ROC must be level',start,end)
+            assert '1 MIN' in chart.inner_text()
+        verify_vertical_graph('subida')
         assert page.locator('#climb-flaps').inner_text()=='FLAPS UP'
         assert page.locator('#climb-isa-toggle').inner_text()=='ISA'
         page.locator('#climb-flaps').click()
@@ -102,6 +113,7 @@ with sync_playwright() as p:
         page.locator('button[data-module="oei"]').click()
         assert page.locator('#main-result').inner_text()=='211'
         assert page.locator('#secondary-result').inner_text()=='1.07 m/s'
+        verify_vertical_graph('subida')
         assert page.locator('.field').count()==4
         assert page.locator('.power-note').count()==0
         assert 'ONE ENGINE (REMAINING)' not in page.locator('.fields').inner_text()
@@ -145,11 +157,13 @@ with sync_playwright() as p:
         assert page.locator('#main-result').inner_text()=='-169'
         assert page.locator('#result-name').inner_text()=='RATE OF DESCENT'
         assert page.locator('#secondary-result').inner_text().startswith('-')
+        verify_vertical_graph('descida')
         assert 'NEGATIVO' in page.locator('#banner').inner_text()
         page.locator('input[data-key="pa"]').fill('4000')
         page.locator('#oei-isa-toggle').click()
         page.locator('input[data-key="oat"]').fill('50')
         assert page.locator('#main-result').inner_text()=='0'
+        verify_vertical_graph('altitude constante')
         assert '< 50' in page.locator('#banner').inner_text()
         page.locator('input[data-key="pa"]').fill('6000')
         assert page.locator('#main-result').inner_text()=='—'
@@ -161,7 +175,7 @@ with sync_playwright() as p:
         page.locator('input[data-key="pa"]').fill('0')
         page.locator('input[data-key="oat"]').fill('10')
         assert page.locator('#main-result').inner_text()=='180'
-        all_checks+=34
+        all_checks+=39
         page.locator('#menu').click()
         page.locator('button[data-module="cruise"]').click()
         assert page.locator('#main-result').inner_text()=='164'
