@@ -71,7 +71,7 @@ button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus
 </style></head>
 <body><div id="app"></div><script src="./wb-engine.js"></script><script src="./wb-optimizer.js"></script><script>
 'use strict';
-const E=window.WBEngine,OPT=window.WBOptimizer,AUTO_KEY='da42-wb-optimized-v1',KEY='da42-wb-profile-v1';
+const E=window.WBEngine,OPT=window.WBOptimizer,AUTO_KEY='da42-wb-optimized-v1',MANUAL_KEY='da42-wb-pre-auto-manual-v1',KEY='da42-wb-profile-v1';
 const icons={
  menu:'<path d="M5 7h14M5 12h9M5 17h6"/>',
  settings:'<path d="M4 7h16M4 17h16M9 3v8M15 13v8"/><circle cx="9" cy="7" r="2"/><circle cx="15" cy="17" r="2"/>',
@@ -90,6 +90,8 @@ try{const saved=JSON.parse(localStorage.getItem(KEY));if(saved&&typeof saved==='
 let optimizedMode=false;
 try{optimizedMode=localStorage.getItem(AUTO_KEY)==='true'}catch(e){}
 let optimizeMessage='';
+let previousManual=null;
+try{const saved=JSON.parse(localStorage.getItem(MANUAL_KEY));if(saved&&typeof saved==='object'&&OPT.ADJUSTABLE.every(k=>Object.prototype.hasOwnProperty.call(saved,k)))previousManual=saved}catch(e){}
 let model=E.calculate(profile);
 function esc(s){return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;')}
 const profilesInputs=[
@@ -200,7 +202,7 @@ function sheet(type){
    }
    if(title==='FUEL · USEABLE MASS')body+='<div class="s-note">Main: 79.5 kg per side · Aux: 42.0 kg per side · Density 0.84 kg/L</div>';
   }
-  if(type==='settings')body+='<div class="s-note">Empty mass includes unusable fuel and installed equipment. Use the aircraft current Mass &amp; Balance Report for actual flight.</div><button class="action" id="reset-example">RESTORE AFM EXAMPLE</button>';
+  if(type==='settings')body+='<div class="s-note">Empty mass includes unusable fuel and installed equipment. Use the aircraft current Mass &amp; Balance Report for actual flight.</div>'+(optimizedMode&&previousManual?'<button class="action" id="restore-manual">RESTAURAR CARGA MANUAL</button>':'')+'<button class="action" id="reset-example">RESTORE AFM EXAMPLE</button>';
  }
  if(type==='scenarios'){
   const title='<div class="s-note">CG checks at usable fuel empty/full and de-ice empty/loaded. These are study cases, not a substitute for the aircraft report.</div>';
@@ -213,7 +215,13 @@ function sheet(type){
  d.addEventListener('click',ev=>{if(ev.target===d)d.remove()});
  d.querySelector('.close').onclick=()=>d.remove();
  bindInputs(d);
- const reset=d.querySelector('#reset-example');if(reset)reset.onclick=()=>{profile={...E.EXAMPLE};optimizedMode=false;optimizeMessage='';model=E.calculate(profile);localStorage.removeItem(KEY);localStorage.removeItem(AUTO_KEY);d.remove();render()};
+ const restore=d.querySelector('#restore-manual');if(restore)restore.onclick=()=>{
+  if(previousManual)profile={...profile,...previousManual};
+  optimizedMode=false;optimizeMessage='';
+  try{localStorage.removeItem(AUTO_KEY);localStorage.removeItem(MANUAL_KEY)}catch(e){}
+  previousManual=null;d.remove();render();
+ };
+ const reset=d.querySelector('#reset-example');if(reset)reset.onclick=()=>{profile={...E.EXAMPLE};optimizedMode=false;previousManual=null;optimizeMessage='';model=E.calculate(profile);try{localStorage.removeItem(KEY);localStorage.removeItem(AUTO_KEY);localStorage.removeItem(MANUAL_KEY)}catch(e){}d.remove();render()};
 }
 function render(){
  model=E.calculate(profile);el('#app').innerHTML=content();bindInputs();
@@ -223,6 +231,10 @@ function render(){
  el('#optimize').onclick=()=>{
   const found=OPT.optimize(profile,E);
   if(!found.ok){optimizeMessage=found.reason||'SEM CONFIGURAÇÃO VÁLIDA';recalc();return}
+  if(!optimizedMode){
+   previousManual=Object.fromEntries(OPT.ADJUSTABLE.map(k=>[k,profile[k]]));
+   try{localStorage.setItem(MANUAL_KEY,JSON.stringify(previousManual))}catch(e){}
+  }
   profile={...profile,...found.suggested};
   optimizedMode=true;
   optimizeMessage='';
