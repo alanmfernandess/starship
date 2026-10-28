@@ -77,6 +77,10 @@ with sync_playwright() as p:
             elif direction=='descida':assert end>start,(w,h,'chart must descend',start,end)
             else:assert end==start,(w,h,'zero ROC must be level',start,end)
             assert '1 MIN' in chart.inner_text()
+            curve=chart.locator('path.vertical-curve')
+            assert curve.count()==1,(w,h,'missing Aero UI spline')
+            pathdata=curve.get_attribute('d')
+            assert pathdata.count(' C')==1 and ' L' not in pathdata,(w,h,'curve must be a cubic, not straight segments',pathdata)
         verify_vertical_graph('subida')
         assert page.locator('#climb-flaps').inner_text()=='FLAPS UP'
         assert page.locator('#climb-isa-toggle').inner_text()=='ISA'
