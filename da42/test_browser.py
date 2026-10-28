@@ -73,12 +73,11 @@ with sync_playwright() as p:
             'ABNORMAL LANDING',
             'GO-AROUND',
             'TIME · FUEL · DISTANCE TO CLIMB',
-            'CRUISE PERFORMANCE',
-            'WIND COMPONENTS'
+            'CRUISE PERFORMANCE'
         ]
         assert page.locator('.sheet button[data-module] strong').all_inner_texts()==expected_modules
         assert page.locator('.sheet a.option[href="./wb.html"] strong').inner_text()=='WEIGHT & BALANCE'
-        assert page.locator('.sheet .option').count()==11
+        assert page.locator('.sheet .option').count()==10
         assert page.locator('.sheet .option .sub').count()==0
         assert page.locator('.sheet .option').evaluate_all("(xs)=>xs.every(x=>x.querySelectorAll('strong').length===1)")
         assert page.locator('html').evaluate('(el)=>el.scrollWidth')<=w
@@ -422,51 +421,6 @@ with sync_playwright() as p:
         assert page.locator('html').evaluate('(el)=>el.scrollWidth')<=w
         assert len(errors)==0,errors
         all_checks+=29
-        # AFM §5.3.5 — wind components: headings and wind directions FROM, kt.
-        page.locator('#menu').click()
-        page.locator('button[data-module="windcomp"]').click()
-        assert page.locator('.field').count()==4
-        assert page.locator('input[data-key]').count()==3
-        assert page.locator('.field.readonly .power-value').inner_text()=='25'
-        assert page.locator('#main-result').inner_text()=='16'
-        assert page.locator('#secondary-label').inner_text()=='HEADWIND'
-        assert page.locator('#secondary-result').inner_text()=='25 kt'
-        assert page.locator('#wind-side').inner_text()=='FROM RIGHT'
-        assert page.locator('#plot-area svg.wind-components-plot').count()==1
-        assert page.locator('#plot-area .wind-angle-arc').count()==1
-        assert page.locator('#plot-area svg.wind-components-plot').get_attribute('data-wind-side')=='RIGHT'
-        page.locator('input[data-key="windDir"]').fill('270')
-        assert page.locator('#main-result').inner_text()=='30'
-        assert page.locator('#secondary-label').inner_text()=='NO HEADWIND'
-        assert page.locator('#wind-side').inner_text()=='FROM LEFT'
-        assert 'ACIMA DE 25 KT DEMONSTRADOS' in page.locator('#banner').inner_text()
-        page.locator('input[data-key="heading"]').fill('270')
-        assert page.locator('#main-result').inner_text()=='0'
-        assert page.locator('#secondary-label').inner_text()=='HEADWIND'
-        assert page.locator('#secondary-result').inner_text()=='30 kt'
-        assert page.locator('#wind-side').inner_text()=='ON AXIS'
-        page.locator('input[data-key="windDir"]').fill('90')
-        assert page.locator('#main-result').inner_text()=='0'
-        assert page.locator('#secondary-label').inner_text()=='TAILWIND'
-        assert page.locator('#secondary-result').inner_text()=='30 kt'
-        page.locator('input[data-key="heading"]').fill('360')
-        page.locator('input[data-key="windSpeed"]').fill('25')
-        assert page.locator('#main-result').inner_text()=='25'
-        assert 'ACIMA DE 25' not in page.locator('#banner').inner_text()
-        page.locator('input[data-key="windSpeed"]').fill('26')
-        assert page.locator('#main-result').inner_text()=='26'
-        assert 'ACIMA DE 25' in page.locator('#banner').inner_text()
-        page.locator('input[data-key="windSpeed"]').fill('41')
-        assert page.locator('#main-result').inner_text()=='—'
-        assert 'FORA DA ESCALA' in page.locator('#banner').inner_text()
-        page.locator('input[data-key="windSpeed"]').fill('30')
-        page.locator('input[data-key="heading"]').fill('361')
-        assert page.locator('#main-result').inner_text()=='—'
-        page.locator('input[data-key="heading"]').fill('360')
-        assert page.locator('#main-result').inner_text()=='30'
-        assert page.locator('html').evaluate('(el)=>el.scrollWidth')<=w
-        assert len(errors)==0,errors
-        all_checks+=37
         ctx.close()
     browser.close()
     print(f'{all_checks} mobile Chromium checks passed at 5 viewport sizes.')
