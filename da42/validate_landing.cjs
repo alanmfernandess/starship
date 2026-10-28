@@ -18,7 +18,7 @@ assert.ok(Math.abs(r.secondary-329.64285714285717)<1e-8);
 assert.ok(markup.includes('TOUCHDOWN')&&markup.includes('TOTAL 557 m'));
 assert.ok(markup.includes('id="landing-runway"')&&markup.includes('id="landing-isa-toggle"'));
 assert.equal((markup.match(/class="field /g)||[]).length,4);
-assert.deepEqual(Object.keys(ctx.AeroCalc.MODELS),['takeoff','climb','oei','cruise','landing','abnormal','goaround','timeclimb','cruiseperf','windcomp']);
+assert.deepEqual(Object.keys(ctx.AeroCalc.MODELS),['takeoff','climb','oei','cruise','landing','abnormal','goaround','timeclimb','cruiseperf']);
 for(const v of [{...example,mass:1700,wind:0,oat:0},{...example,mass:1900,wind:0,oat:0},{...example,mass:1999,wind:0,oat:0}]){
  const result=f(v);assert.ok(result.main>result.secondary&&result.secondary>0);
 }
