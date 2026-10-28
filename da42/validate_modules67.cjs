@@ -10,7 +10,7 @@ function boot(module){
  const document={querySelector(){return el},querySelectorAll(){return []}};
  const ctx={document,location:{protocol:'file:'},navigator:{},console,
    localStorage:{getItem(k){return k==='aero-ui-da42-v1'?JSON.stringify({current:module}):null},setItem(){}}};
- ctx.window=ctx;vm.createContext(ctx);vm.runInContext(script,ctx);
+ ctx.window=ctx;vm.createContext(ctx);vm.runInContext(fs.readFileSync(__dirname+'/takeoff-tables.js','utf8'),ctx);vm.runInContext(script,ctx);
  return {api:ctx.AeroCalc,html:el.html};
 }
 const ab=boot('abnormal'),go=boot('goaround');
