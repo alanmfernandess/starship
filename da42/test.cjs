@@ -27,4 +27,16 @@ for(const id of ['takeoff','climb','oei']){
 }
 const hw=f('takeoff',{pa:0,oat:15,mass:1800,wind:20}),tw=f('takeoff',{pa:0,oat:15,mass:1800,wind:-10});
 assert.ok(hw.main<tw.main,'head/tailwind');
-console.log('Regression checks passed; experimental model is NOT flight validated.');
+
+// Cruise: graphical example 10000 ft / ISA STD / 80% load / 2 engines -> 164 KTAS.
+const cruise=f('cruise',{pa:10000,oat:-5,load:80,engines:2});
+assert.ok(!cruise.error);assert.equal(Math.round(cruise.main),164);
+assert.ok(Math.abs(cruise.secondary)<.25);
+assert.ok(f('cruise',{pa:10000,oat:-5,load:92,engines:2}).main>cruise.main);
+assert.ok(f('cruise',{pa:10000,oat:5,load:80,engines:2}).main>cruise.main);
+assert.ok(f('cruise',{pa:16000,oat:-15,load:80,engines:2}).error);
+assert.ok(f('cruise',{pa:10000,oat:35,load:80,engines:2}).error);
+assert.ok(f('cruise',{pa:10000,oat:-5,load:20,engines:2}).error);
+assert.ok(f('cruise',{pa:10000,oat:-5,load:80,engines:1}).error);
+
+console.log('Four modules: references and TAS domain checks passed. Not validated for flight.');
