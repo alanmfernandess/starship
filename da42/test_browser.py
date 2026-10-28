@@ -92,6 +92,40 @@ with sync_playwright() as p:
         assert page.locator('#main-result').inner_text()=='—'
         assert len(errors)==0,errors
         all_checks+=12
+        # Module 06: Abnormal Landing / Flaps UP or APP, same segmented graph.
+        page.locator('#menu').click()
+        page.locator('button[data-module="abnormal"]').click()
+        assert page.locator('#main-result').inner_text()=='722'
+        assert page.locator('#secondary-result').inner_text()=='418 m'
+        assert page.locator('.field').count()==4
+        assert page.locator('#temp-mode-toggle').count()==0
+        assert '304 m' in page.locator('#plot-area').inner_text()
+        assert 'TOUCHDOWN' in page.locator('#plot-area').inner_text()
+        assert 'TOTAL 722 m' in page.locator('#plot-area').inner_text()
+        assert page.locator('html').evaluate('(el)=>el.scrollWidth')<=w
+        page.locator('input[data-key="wind"]').fill('0')
+        assert int(page.locator('#main-result').inner_text())>722
+        page.locator('input[data-key="mass"]').fill('1900')
+        assert 'PROCEDIMENTO ANORMAL' in page.locator('#banner').inner_text()
+        all_checks+=10
+        # Module 07: Go-Around; strictly two AFM masses, no ISA/PA extrapolation.
+        page.locator('#menu').click()
+        page.locator('button[data-module="goaround"]').click()
+        assert page.locator('.field').count()==4
+        assert page.locator('input[data-key]').count()==0
+        assert page.locator('#main-result').inner_text()=='7.5'
+        assert page.locator('#secondary-result').inner_text()=='612 ft/min'
+        assert '4.3°' in page.locator('.secondary-extra').inner_text()
+        assert page.locator('#mass-toggle').inner_text()=='1,805'
+        page.locator('#mass-toggle').click()
+        assert page.locator('#main-result').inner_text()=='6.7'
+        assert page.locator('#secondary-result').inner_text()=='547 ft/min'
+        assert '3.8°' in page.locator('.secondary-extra').inner_text()
+        assert page.locator('#mass-toggle').inner_text()=='1,900'
+        assert 'PROCEDIMENTO ANORMAL' in page.locator('#banner').inner_text()
+        assert page.locator('html').evaluate('(el)=>el.scrollWidth')<=w
+        assert len(errors)==0,errors
+        all_checks+=13
         ctx.close()
     browser.close()
     print(f'{all_checks} mobile Chromium checks passed at 5 viewport sizes.')
