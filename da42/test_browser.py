@@ -285,6 +285,38 @@ with sync_playwright() as p:
         assert page.locator('html').evaluate('(el)=>el.scrollWidth')<=w
         assert len(errors)==0,errors
         all_checks+=13
+        # Module 09: AFM 5.3.9 cumulative climb (2,000 -> 16,000 ft).
+        page.locator('#menu').click()
+        assert page.locator('button[data-module="timeclimb"]').count()==1
+        page.locator('button[data-module="timeclimb"]').click()
+        assert page.locator('.field').count()==4
+        assert page.locator('input[data-key="start"]').input_value()=='2,000'
+        assert page.locator('input[data-key="target"]').input_value()=='16,000'
+        assert page.locator('#main-result').inner_text()=='15.0'
+        assert page.locator('#secondary-result').inner_text()=='4.2 US gal'
+        assert page.locator('#distance-result').inner_text()=='26.0 NM'
+        assert page.locator('#plot-area svg.time-climb-plot').count()==1
+        curve=page.locator('#plot-area path.time-climb-curve')
+        assert curve.count()==1
+        assert ' C' in curve.get_attribute('d')
+        assert page.locator('html').evaluate('(el)=>el.scrollWidth')<=w
+        page.locator('input[data-key="oat"]').fill('21')
+        assert page.locator('#main-result').inner_text()=='16.5'
+        assert page.locator('#distance-result').inner_text()=='28.6 NM'
+        page.locator('input[data-key="oat"]').fill('11')
+        page.locator('input[data-key="mass"]').fill('1999')
+        assert page.locator('#main-result').inner_text()=='17.0'
+        assert page.locator('#secondary-result').inner_text()=='4.6 US gal'
+        assert page.locator('#distance-result').inner_text()=='30.0 NM'
+        page.locator('input[data-key="mass"]').fill('2000')
+        assert page.locator('#main-result').inner_text()=='—'
+        page.locator('input[data-key="mass"]').fill('1900')
+        page.locator('input[data-key="start"]').fill('16000')
+        assert page.locator('#main-result').inner_text()=='—'
+        page.locator('input[data-key="start"]').fill('2000')
+        assert page.locator('#main-result').inner_text()=='15.0'
+        assert len(errors)==0,errors
+        all_checks+=24
         ctx.close()
     browser.close()
     print(f'{all_checks} mobile Chromium checks passed at 5 viewport sizes.')
