@@ -1,0 +1,146 @@
+{
+  "source": "DA42 NG AFM Doc. 7.01.15-E Rev. 1 (18-Feb-2009), page 5-19. Off-anchor raster readings; not flight validation.",
+  "chartWidthPixels": 1752,
+  "xAt120Kt": 158,
+  "xAt180Kt": 1670,
+  "samples": [
+    {
+      "pa": 3000,
+      "load": 50,
+      "isaDelta": 0,
+      "xPixel": 420
+    },
+    {
+      "pa": 3000,
+      "load": 60,
+      "isaDelta": 0,
+      "xPixel": 674
+    },
+    {
+      "pa": 3000,
+      "load": 80,
+      "isaDelta": 0,
+      "xPixel": 1094
+    },
+    {
+      "pa": 7000,
+      "load": 50,
+      "isaDelta": 0,
+      "xPixel": 491
+    },
+    {
+      "pa": 7000,
+      "load": 60,
+      "isaDelta": 0,
+      "xPixel": 756
+    },
+    {
+      "pa": 11000,
+      "load": 50,
+      "isaDelta": 0,
+      "xPixel": 574
+    },
+    {
+      "pa": 11000,
+      "load": 60,
+      "isaDelta": 0,
+      "xPixel": 848
+    },
+    {
+      "pa": 11000,
+      "load": 70,
+      "isaDelta": 0,
+      "xPixel": 1081
+    },
+    {
+      "pa": 11000,
+      "load": 92,
+      "isaDelta": 0,
+      "xPixel": 1497
+    },
+    {
+      "pa": 13000,
+      "load": 50,
+      "isaDelta": 0,
+      "xPixel": 616
+    },
+    {
+      "pa": 13000,
+      "load": 60,
+      "isaDelta": 0,
+      "xPixel": 896
+    },
+    {
+      "pa": 13000,
+      "load": 92,
+      "isaDelta": 0,
+      "xPixel": 1527
+    },
+    {
+      "pa": 3000,
+      "load": 80,
+      "isaDelta": -10,
+      "xPixel": 1069
+    },
+    {
+      "pa": 3000,
+      "load": 80,
+      "isaDelta": 10,
+      "xPixel": 1118
+    },
+    {
+      "pa": 3000,
+      "load": 80,
+      "isaDelta": 20,
+      "xPixel": 1141
+    },
+    {
+      "pa": 3000,
+      "load": 80,
+      "isaDelta": 30,
+      "xPixel": 1164
+    },
+    {
+      "pa": 11000,
+      "load": 60,
+      "isaDelta": -10,
+      "xPixel": 820
+    },
+    {
+      "pa": 11000,
+      "load": 60,
+      "isaDelta": 10,
+      "xPixel": 874
+    },
+    {
+      "pa": 11000,
+      "load": 60,
+      "isaDelta": 20,
+      "xPixel": 899
+    },
+    {
+      "pa": 11000,
+      "load": 60,
+      "isaDelta": 30,
+      "xPixel": 924
+    },
+    {
+      "pa": 13000,
+      "load": 60,
+      "isaDelta": 10,
+      "xPixel": 922
+    },
+    {
+      "pa": 13000,
+      "load": 60,
+      "isaDelta": 20,
+      "xPixel": 949
+    },
+    {
+      "pa": 13000,
+      "load": 60,
+      "isaDelta": 30,
+      "xPixel": 974
+    }
+  ]
+}
