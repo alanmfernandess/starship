@@ -137,3 +137,7 @@ Validação: `node validate_optimizer.cjs` com gerador reproduzível, imutabilid
 ### v0.10.2 — Weight & Balance labels
 
 Interface reduzida aos valores **CG**, **ZFW** e **TOW**, além dos indicadores de limites de massa/centro de gravidade. CG exibido em metros com vírgula decimal brasileira (ex.: 2,423 m), e massas em kg com separação brasileira (ex.: 1.815,5 kg). A visualização não traz explicações sobre a localização do Datum Plane. Permanecem os dados de massa vazia, momento, combustível editável, cenários de degelo e aviso resumido de caráter experimental.
+
+### v0.10.3 — Redução do painel W&B
+
+Removidos do cartão de resultados o cabeçalho/valor numérico principal de CG, a mensagem de CG WITHIN LIMITS/OUT OF LIMITS e o rodapé CG · ZFW com valor em metros, conforme marcações do usuário. Mantidos o gráfico do envelope, os pontos de Zero Fuel e Takeoff CG, a legenda ZFW/TOW, os dois cartões ZFW/TOW e o indicador de massa dentro/fora dos limites. A validação de CG continua ativa no motor e no otimizador; pontos com CG fora dos limites são realçados em vermelho no gráfico. O módulo continua experimental, não homologado para planejamento ou execução de voo.
