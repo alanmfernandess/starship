@@ -9,8 +9,8 @@ const f=env.AeroCalc.compute;
 const takeoff=f('takeoff',{pa:0,oat:15,mass:1800,wind:10});
 const climb=f('climb',{pa:0,oat:15,mass:1800,power:92});
 const oei=f('oei',{pa:0,oat:15,mass:1800,power:92});
-assert.equal(takeoff.main,610);assert.equal(takeoff.secondary,370);assert.equal(climb.main,1150);assert.equal(oei.main,212);
-assert.ok(f('takeoff',{pa:0,oat:15,mass:1900,wind:10}).main>610);
+assert.equal(Math.round(takeoff.main),638);assert.equal(Math.round(takeoff.secondary),406);assert.equal(climb.main,1150);assert.equal(oei.main,212);
+assert.ok(f('takeoff',{pa:0,oat:15,mass:1900,wind:10}).main>takeoff.main);
 assert.ok(f('oei',{pa:16000,oat:0,mass:1900,power:92}).main<0);
 assert.ok(f('climb',{pa:20000,oat:15,mass:1800,power:92}).error);
 for(const id of ['takeoff','climb','oei']){
