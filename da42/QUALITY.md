@@ -68,3 +68,12 @@
 - AFM wind corrections headwind 10% por14kt, tailwind +10% por3kt; grass dry 10/15/25%; wet grass 10%; soft ground 45%; uphill slope 12% por 1%.
 - Testes automáticos novos `validate_takeoff_tables.cjs`; teste browser `test_browser.py` deve carregar script externo em origem file://, exercitar seleção de procedimento, ISA, grama e rejeição de 1999kg.
 - Dados amostrados de tabelas e verificações matemáticas **não constituem aprovação para uso aeronáutico real**.
+
+## v0.12 — Climb AFM e 1999kg
+
+- Six grids from AFM 5.3.7 all-engines-operating climb: Flaps UP/APP at 1700, 1900 and 1999 kg, 10 pressure altitudes, eight temperatures plus separate ISA.
+- Retain invalid crossed-out cells as null; exact chart anchors, in-domain multilinear interpolation and no extrapolation.
+- Verify speed schedules, both engines 92%, gear retracted; 100%-power MSL/ISA notes not mixed with tabular engine.
+- Takeoff performance range expanded through AFM's 1999kg published tables, while Weight & Balance continues to require the appropriate mass/CG supplement for extending its 1900kg envelope.
+- Numerical checks: `validate_climb_tables.cjs` and extended `validate_takeoff_tables.cjs`. Browser checks include flap selection, 1999kg, ISA, hot/missing cells, legacy modules.
+- Software remains experimental and is not a validated operational performance reference.
