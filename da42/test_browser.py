@@ -73,6 +73,25 @@ with sync_playwright() as p:
         assert page.locator('#main-result').inner_text()=='—'
         assert len(errors)==0,errors
         all_checks+=28
+        # Landing: same four-card Aero UI, proportional airborne + ground-roll chart.
+        page.locator('#menu').click()
+        page.locator('button[data-module="landing"]').click()
+        assert page.locator('#main-result').inner_text()=='480'
+        assert page.locator('#secondary-result').inner_text()=='248 m'
+        assert page.locator('.field').count()==4
+        assert page.locator('#temp-mode-toggle').count()==0
+        assert page.locator('#plot-area').inner_text().find('TOUCHDOWN')!=-1
+        assert page.locator('#plot-area').inner_text().find('232 m')!=-1
+        assert page.locator('#plot-area').inner_text().find('TOTAL 480 m')!=-1
+        assert page.locator('html').evaluate('(el)=>el.scrollWidth')<=w
+        page.locator('input[data-key="wind"]').fill('0')
+        assert int(page.locator('#main-result').inner_text())>480
+        page.locator('input[data-key="mass"]').fill('1900')
+        assert int(page.locator('#main-result').inner_text())>500
+        page.locator('input[data-key="pa"]').fill('10001')
+        assert page.locator('#main-result').inner_text()=='—'
+        assert len(errors)==0,errors
+        all_checks+=12
         ctx.close()
     browser.close()
     print(f'{all_checks} mobile Chromium checks passed at 5 viewport sizes.')
