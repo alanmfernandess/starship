@@ -203,8 +203,8 @@ function validate(v){
  if(!Number.isFinite(v.wind)||v.wind< -10||v.wind>20)return 'VENTO FORA DO INTERVALO';
  if(v.surface&&!['paved','grass5','grass10','grass25'].includes(v.surface))return 'PISTA NÃO SUPORTADA';
  if(v.wet&&(!v.surface||v.surface==='paved'))return 'PISTA MOLHADA NÃO COBERTA';
- if(!Number.isFinite(v.slope||0)||(v.slope||0)<0||(v.slope||0)>5)return 'DECLIVE NÃO DOCUMENTADO';
- if(v.soft&&v.surface==='paved')return 'SOLO MACIO EXIGE CONFIGURAÇÃO DE GRAMA';
+ if(v.slope!==undefined&&(!Number.isFinite(v.slope)||v.slope<0||v.slope>5))return 'DECLIVE NÃO DOCUMENTADO';
+ if(v.soft&&(!v.surface||v.surface==='paved'))return 'SOLO MACIO EXIGE CONFIGURAÇÃO DE GRAMA';
  return null;
 }
 function compute(v){
@@ -225,7 +225,7 @@ function compute(v){
  // increment ground roll, then carry the change to the 50ft total.
  const factors={paved:0,grass5:.10,grass10:.15,grass25:.25};
  const surface=v.surface||'paved',slope=v.slope||0;
- const adjustedGround=ground*(1+factors[surface]+(v.soft?.45:0)+.12*slope);
+ const adjustedGround=ground*(1+factors[surface]+(v.soft?0.45:0)+.12*slope);
  total+=adjustedGround-ground;ground=adjustedGround;
  // AFM: wet grass runway distance increases the dry grass calculation by 10%.
  if(v.wet){ground*=1.10;total*=1.10}
