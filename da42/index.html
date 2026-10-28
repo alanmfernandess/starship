@@ -314,8 +314,8 @@ function bannerFor(id,v,r){
  if(id==='timeclimb')return 'FLAPS UP · BOTH 92% · GEAR UP · ZERO WIND';
  if(id==='cruiseperf')return r.configReduced?'FLAPS UP · GEAR UP · OÄM −2%':'FLAPS UP · GEAR UP · 1999 KG';
  if(id==='goaround')return v.mass===1900?'MASSA 1900 KG · PROCEDIMENTO ANORMAL · NÃO USAR EM VOO':'ISA / MSL · LDG · BOTH MAX · 84 KIAS · NÃO USAR EM VOO';
- if(id==='abnormal')return v.mass>1805?'FLAPS UP / APP · MASSA > 1805 KG · PROCEDIMENTO ANORMAL':'FLAPS UP / APP · BOTH IDLE · 86 KIAS · NÃO USAR EM VOO';
- if(id==='landing'&&v.mass>1805)return 'MASSA > 1805 KG · PROCEDIMENTO ANORMAL · NÃO UTILIZAR EM VOO';
+ if(id==='abnormal')return v.mass>1805?'FLAPS UP / APP · VREF '+r.vref+' KIAS · MASSA > 1805 KG · PROCEDIMENTO ANORMAL':'FLAPS UP / APP · VREF '+r.vref+' KIAS · BOTH IDLE · NÃO USAR EM VOO';
+ if(id==='landing'&&v.mass>1805)return 'FLAPS LDG · VREF '+r.vref+' KIAS · MASSA > 1805 KG · PROCEDIMENTO ANORMAL';
  return 'DIGITALIZAÇÃO EXPERIMENTAL · NÃO UTILIZAR EM VOO';
 }
 function landingPlot(v,r){
