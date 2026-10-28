@@ -10,8 +10,7 @@ const FUEL_DENSITY=0.84;
 const EXAMPLE=Object.freeze({
  emptyMass:1450,emptyMoment:3488,pilot:80,copilot:80,pax1:0,pax2:0,
  nose:0,cabin:10,extension:8,deice:27.5,
- mainL:79.5,mainR:79.5,auxL:42,auxR:42,
- landingMainL:null,landingMainR:null,landingAuxL:null,landingAuxR:null
+ mainL:79.5,mainR:79.5,auxL:42,auxR:42
 });
 const INPUTS=Object.keys(EXAMPLE);
 const finite=v=>typeof v==="number"&&Number.isFinite(v);
@@ -33,7 +32,6 @@ function validate(p){
  const errors=[];
  for(const key of INPUTS){
   const v=p[key];
-  if(key.startsWith("landing")&&v===null)continue;
   if(!finite(v)||v<0)errors.push(key.toUpperCase()+' INVALID');
  }
  if(errors.length)return errors;
@@ -45,15 +43,6 @@ function validate(p){
  for(const key of ['mainL','mainR','auxL','auxR']){
   const max=key.startsWith('main')?MASS.mainTank:MASS.auxTank;
   if(p[key]>max+1e-6)errors.push(key.toUpperCase()+' EXCEEDS AFM REFERENCE CAPACITY');
- }
- const landKeys=['landingMainL','landingMainR','landingAuxL','landingAuxR'];
- const provided=landKeys.filter(k=>p[k]!==null).length;
- if(provided>0&&provided<4)errors.push('LANDING FUEL INCOMPLETE');
- if(provided===4){
-  for(const [i,k] of landKeys.entries()){
-   const takeoffKey=['mainL','mainR','auxL','auxR'][i];
-   if(p[k]>p[takeoffKey]+1e-8)errors.push('LANDING FUEL EXCEEDS TAKEOFF '+k.toUpperCase());
-  }
  }
  return errors;
 }
@@ -72,8 +61,6 @@ function calculate(input){
  }
  const main=p.mainL+p.mainR,aux=p.auxL+p.auxR;
  const takeoff=withFuel(main,aux);
- const landingComplete=['landingMainL','landingMainR','landingAuxL','landingAuxR'].every(k=>p[k]!==null);
- const landing=landingComplete?withFuel(p.landingMainL+p.landingMainR,p.landingAuxL+p.landingAuxR):null;
  const scenarios=[
   {name:'FUEL EMPTY · DE-ICE EMPTY',...withFuel(0,0,0)},
   {name:'FUEL FULL · DE-ICE EMPTY',...withFuel(MASS.mainTank*2,MASS.auxTank*2,0)},
@@ -83,13 +70,12 @@ function calculate(input){
  const baggageOK=p.nose<=30&&p.cabin<=45&&p.extension<=18&&p.cabin+p.extension<=45;
  const zeroFuelMassOK=zeroFuel.mass<=MASS.zeroFuel;
  const takeoffMassOK=takeoff.mass<=MASS.takeoff&&takeoff.mass>=MASS.minimum;
- const landingMassStatus=landing===null?'PENDING':landing.mass>MASS.takeoff||landing.mass<MASS.minimum?'OUT OF LIMITS':landing.mass>MASS.normalLanding?'ABNORMAL LANDING':'NORMAL';
- const cgOK=zeroFuel.cgOK&&takeoff.cgOK&&(!landing||landing.cgOK);
- const massOK=zeroFuelMassOK&&takeoffMassOK&&baggageOK&&(landingMassStatus==='PENDING'||landingMassStatus==='NORMAL'||landingMassStatus==='ABNORMAL LANDING');
+ const cgOK=zeroFuel.cgOK&&takeoff.cgOK;
+ const massOK=zeroFuelMassOK&&takeoffMassOK&&baggageOK;
  const checkScenarios=scenarios.every(c=>c.cgOK&&c.mass<=MASS.takeoff&&c.mass>=MASS.minimum);
- return {ok:true,errors:[],profile:p,zeroFuel,takeoff,landing,scenarios,
+ return {ok:true,errors:[],profile:p,zeroFuel,takeoff,scenarios,
   fuel:{main,aux,usableTotal:main+aux,litres:(main+aux)/FUEL_DENSITY},
-  statuses:{cgOK,massOK,zeroFuelMassOK,takeoffMassOK,baggageOK,landingMassStatus,scenariosOK:checkScenarios},
+  statuses:{cgOK,massOK,zeroFuelMassOK,takeoffMassOK,baggageOK,scenariosOK:checkScenarios},
   dataSource:'AFM 7.01.15-E Rev.1 example; replace empty mass and moment for specific aircraft'};
 }
 const api={ARMS,MASS,FUEL_DENSITY,EXAMPLE,INPUTS,cgBounds,validate,calculate};
