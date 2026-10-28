@@ -21,7 +21,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Validate eight modules, W&B CG envelope and stochastic loading optimizer
+      - name: Validate AFM Takeoff, Climb, OEI tables, all modules and Weight & Balance
         run: npm test
 
   mobile-ui-validation:
@@ -38,7 +38,7 @@ jobs:
         run: |
           python -m pip install playwright
           python -m playwright install --with-deps chromium
-      - name: Mobile UI: seven performance modules and Cruise ISA toggle
+      - name: Mobile UI: seven modules including OEI OAT/ISA, negative ROC and Cruise
         run: python test_browser.py
 
   weight-and-balance-ui:
