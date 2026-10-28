@@ -27,6 +27,19 @@ with sync_playwright() as p:
         assert page.locator('#main-result').inner_text()=='212'
         assert page.locator('#secondary-result').inner_text()=='1.07 m/s'
         all_checks+=2
+        page.locator('#menu').click()
+        page.locator('button[data-module="cruise"]').click()
+        assert page.locator('#main-result').inner_text()=='164'
+        assert page.locator('#secondary-result').inner_text()=='0 °C'
+        assert page.locator('.field.readonly .power-value').inner_text()=='2'
+        assert page.locator('input[data-key="load"]').count()==1
+        assert page.locator('html').evaluate('(el)=>el.scrollWidth')<=w
+        page.locator('input[data-key="load"]').fill('92')
+        assert int(page.locator('#main-result').inner_text()) > 164
+        page.locator('input[data-key="oat"]').fill('30')
+        assert page.locator('#main-result').inner_text()=='—'
+        assert len(errors)==0,errors
+        all_checks+=8
         ctx.close()
     browser.close()
     print(f'{all_checks} mobile Chromium checks passed at 5 viewport sizes.')
