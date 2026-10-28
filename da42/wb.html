@@ -37,12 +37,12 @@ button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus
 .optimize-feedback{flex:1;min-width:0;align-self:center;color:var(--amber);font-size:11px;text-align:right}
 .field input[readonly],.sheet-row input[readonly]{color:#aac2d1;cursor:default}
 
-.result{background:var(--tile);border-radius:19px;padding:18px 15px 16px;min-height:310px}
+.result{background:var(--tile);border-radius:19px;padding:15px 15px 16px;min-height:0}
 .result-head{display:flex;align-items:center;justify-content:space-between;color:#afc2ce;font-size:13px;letter-spacing:.25px}.result-head .icon{color:var(--blue);width:19px;height:19px}
 .primary{display:flex;align-items:baseline;gap:10px;margin-top:13px}
 .number{font-size:45px;line-height:1.09;letter-spacing:-1.6px;font-weight:550;font-variant-numeric:tabular-nums}.primary-unit{font-size:16px;color:#afc2ce}
 .standalone-status{display:flex;align-items:center;gap:7px;color:var(--green);font-size:11px;margin-top:7px}.standalone-status.bad{color:var(--red)}
-.graph{width:100%;display:block;margin:9px 0 5px;max-height:210px;overflow:visible}
+.graph{width:100%;display:block;margin:0 0 5px;max-height:210px;overflow:visible}
 .graph text{font-family:inherit}
 .legend{display:flex;align-items:center;justify-content:space-between;font-size:10px;color:#a9bdc9;margin-bottom:5px}
 .dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px}
@@ -111,16 +111,11 @@ function envelope(){
  if(model.ok){
   const plotted=[['zeroFuel','#e7b46d','ZERO FUEL'],['takeoff','#56b9ee','TAKEOFF']];
   if(plotted.length>1)path='<path d="'+plotted.map(([k],i)=>{const [x,y]=coords(model[k].mass,model[k].cg);return (i?'L':'M')+x.toFixed(2)+' '+y.toFixed(2)}).join(' ')+'" fill="none" stroke="#e7b46d" stroke-dasharray="4 4" stroke-width="1.7"/>';
-  points=plotted.map(([k,color,title])=>{const [x,y]=coords(model[k].mass,model[k].cg);return '<circle cx="'+x.toFixed(2)+'" cy="'+y.toFixed(2)+'" r="4.8" fill="'+color+'" stroke="#202d39" stroke-width="2"><title>'+title+'</title></circle>'}).join('');
+  points=plotted.map(([k,color,title])=>{const [x,y]=coords(model[k].mass,model[k].cg);const fill=model[k].cgOK?color:'#ff9e91';return '<circle cx="'+x.toFixed(2)+'" cy="'+y.toFixed(2)+'" r="4.8" fill="'+fill+'" stroke="#202d39" stroke-width="2"><title>'+title+'</title></circle>'}).join('');
  }
  return '<svg class="graph" viewBox="0 0 320 216" role="img" aria-label="CG envelope, center of gravity versus flight mass">'+lines+columns+'<polygon points="'+poly+'" fill="#56b9ee" fill-opacity=".10" stroke="#56b9ee" stroke-width="2"/>'+path+points+'</svg>';
 }
-function statusText(){
- if(!model.ok)return '<div class="standalone-status bad">INVALID INPUT · REVIEW LOADING</div>';
- return '<div class="standalone-status '+(model.statuses.cgOK?'':'bad')+'">'+icon(model.statuses.cgOK?'check':'next')+'CG '+(model.statuses.cgOK?'WITHIN LIMITS':'OUT OF LIMITS')+'</div>';
-}
 function content(){
- const cg=model.ok?format(model.takeoff.cg,3):'—';
  const sc=model.ok?model.statuses:{};
  const fuelText=model.ok?format(model.fuel.usableTotal,1)+' kg':'—';
  const metrics=model.ok?'<div class="metrics"><div class="metric"><label>ZFW</label><b>'+format(model.zeroFuel.mass,1)+' kg</b></div><div class="metric"><label>TOW</label><b>'+format(model.takeoff.mass,1)+' kg</b></div></div>':'<div class="metrics"><div class="metric"><label>CHECK INPUTS</label><b>—</b></div></div>';
@@ -130,11 +125,8 @@ function content(){
  '<div class="fields">'+card('pilot','PILOT')+card('copilot','COPILOT')+card('pax1','PASSENGER 1')+card('pax2','PASSENGER 2')+'</div>'+
  '<button class="open-load" id="edit-load"><span><span class="main">BAGGAGE &amp; FUEL</span><span class="sub" id="fuel-summary">'+fuelText+'</span></span>'+icon('next')+'</button>'+
  '<div class="optimize-row"><button id="optimize" class="optimize-button" type="button">OTIMIZAR</button>'+(optimizeMessage?'<span id="optimize-status" class="optimize-feedback" role="alert">'+esc(optimizeMessage)+'</span>':'')+'</div>'+
- '<section class="result" aria-live="polite"><div class="result-head"><span>CG</span>'+icon('chart')+'</div>'+
- '<div class="primary"><strong class="number" id="cg">'+cg+'</strong><span class="primary-unit">m</span></div><div id="cg-status">'+statusText()+'</div>'+
- '<div id="envelope">'+envelope()+'</div><div class="legend"><span><i class="dot" style="background:#e7b46d"></i>ZFW</span><span><i class="dot" style="background:#56b9ee"></i>TOW</span></div>'+
+ '<section class="result" aria-live="polite"><div id="envelope">'+envelope()+'</div><div class="legend"><span><i class="dot" style="background:#e7b46d"></i>ZFW</span><span><i class="dot" style="background:#56b9ee"></i>TOW</span></div>'+
  '<div id="mass-check" class="standalone-status '+(sc.massOK?'':'bad')+'">'+(model.ok?massState:'—')+'</div><div id="metrics">'+metrics+'</div>'+
- '<div class="line"><span>CG · ZFW</span><strong id="zfcg">'+(model.ok?format(model.zeroFuel.cg,3)+' m':'—')+'</strong></div>'+
  '</section><div class="notice" id="notice">NOT FOR FLIGHT</div></main>'+
  '<nav class="bottom"><button class="nav-btn active" id="nav-input" aria-label="Ocupantes">'+icon('calculator')+'</button>'+
  '<button class="nav-btn" id="nav-chart" aria-label="Envelope CG">'+icon('chart')+'</button>'+
@@ -159,12 +151,10 @@ function store(){
 function recalc(){
  model=E.calculate(profile);
  const set=(s,v)=>{const e=el(s);if(e)e.innerHTML=v};
- const cg=model.ok?format(model.takeoff.cg,3):'—';
- set('#cg',cg);set('#cg-status',statusText());set('#envelope',envelope());
+ set('#envelope',envelope());
  set('#fuel-summary',model.ok?format(model.fuel.usableTotal,1)+' kg':'—');
  set('#mass-check','<span class="'+(model.ok?(model.statuses.massOK?'good':'error'):'error')+'">'+(model.ok?(model.statuses.massOK?'MASS WITHIN LIMITS':'MASS LIMIT EXCEEDED'):'CHECK INPUTS')+'</span>');
  set('#metrics',model.ok?'<div class="metrics"><div class="metric"><label>ZFW</label><b>'+format(model.zeroFuel.mass,1)+' kg</b></div><div class="metric"><label>TOW</label><b>'+format(model.takeoff.mass,1)+' kg</b></div></div>':'');
- set('#zfcg',model.ok?format(model.zeroFuel.cg,3)+' m':'—');
  const notice=el('#notice');if(notice){notice.textContent=model.ok?'NOT FOR FLIGHT':model.errors.join(' · ');notice.classList.toggle('bad',!model.ok||!model.statuses.massOK||!model.statuses.cgOK)}
  const optStatus=el('#optimize-status');if(optStatus)optStatus.textContent=optimizeMessage;
  store();
