@@ -1,6 +1,6 @@
 {
   "name": "da42ng",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "private": true,
   "description": "Experimental DA42 NG performance nomogram digitization; not for flight",
   "scripts": {
