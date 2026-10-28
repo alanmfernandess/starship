@@ -6,6 +6,7 @@ Aplicação mobile-first estática (PWA) para análise experimental de:
 2. Climb Performance — dois motores
 3. One Engine Inoperative — climb/descent
 4. Cruising — True Airspeed (TAS) / two engines
+5. Landing Distances — Flaps LDG / 50 ft obstacle
 
 **Atenção: NÃO UTILIZAR PARA OPERAÇÃO AERONÁUTICA.** A reprodução dos pontos de exemplo não representa validação de uma ferramenta de planejamento de voo. O modelo de interpolação usa amostras gráficas limitadas extraídas de um raster das cartas, com ajuste de registro aos três exemplos impressos nos módulos anteriores. A digitalização e verificação independentes de todas as curvas permanecem pendentes.
 
@@ -17,6 +18,7 @@ Diamond Aircraft, *DA 42 NG Airplane Flight Manual*, Doc. **7.01.15-E**, **Rev. 
 - Climb Performance, Two Engines: p. 5-15 (PDF p. 273, índice zero 272)
 - One Engine Inoperative Climb/Descent: p. 5-17 (PDF p. 275, índice zero 274)
 - Cruising (TAS): p. 5-19 (PDF p. 277, índice zero 276)
+- Landing Distances — Flaps LDG: p. 5-23 (Rev. 1, 18-Feb-2009)
 
 Fonte pública de conferência: https://www.keilir.net/static/files/Flugakademian/Diamond/DA42-NG-AFM-r1.pdf
 
@@ -45,6 +47,18 @@ Parte dos pontos foi lida manualmente e outra obtida por detecção de segmentos
 `python test_browser.py` — testes de renderização Chromium em modo mobile/touch, com navegação, geometria e ausência de erros de script. Requer Python, Playwright e Chromium instalado; em sistemas diferentes, ajustar o caminho do executável.
 
 Os testes foram executados em dimensões 320×690, 390×667, 390×844, 430×932 e 706×1200. Isso é **emulação Chromium**, e não ensaio em dispositivos móveis físicos, Safari/iOS ou Android real. Não há laudo de equivalência pixel-perfect.
+
+### Landing Distances — quinto módulo
+
+Entradas: PA 0–10.000 ft, OAT −35 a +50 °C limitada também pela curva ISA +35, massa de pouso 1.500–1.900 kg, vento longitudinal de −10 kt (cauda) a +20 kt (proa). Condições fixas da carta: **flaps LDG, ambos os motores IDLE, pista nivelada, dura e seca, aproximação 84 KIAS, obstáculo de 50 ft**.
+
+O cálculo percorre a carta em quatro etapas (pressão/temperatura, massa, vento e altura), com leitura parcial das curvas rasterizadas e calibração pelo ponto publicado: PA 0 ft, OAT 15 °C, 1.800 kg, 10 kt proa → **248 m de ground roll** e **480 m sobre 50 ft**.
+
+O gráfico horizontal aprovado representa **airborne segment = landing distance over 50 ft − ground roll**, seguido de ground roll. Segmentos proporcionais, com touchdown e parada; não é uma trajetória temporal ou cinemática. O valor 232 m no exemplo é diferença calculada, não leitura separada da carta.
+
+**Acima de 1.805 kg até 1.900 kg**, a revisão do AFM descreve pouso como procedimento anormal; a interface exibe aviso, sem invalidar automaticamente o valor interpolado.
+
+**Limitação:** as curvas e inclinações de correção foram lidas parcialmente da imagem, e o exemplo foi usado para registrar a saída. Isso não é validação independente; nenhum resultado deste módulo pode fundamentar a operação da aeronave. `node validate_landing.cjs` verifica o exemplo, tendências, 1.375 combinações dentro do domínio e entradas inválidas.
 
 ### TAS — quarto módulo
 
