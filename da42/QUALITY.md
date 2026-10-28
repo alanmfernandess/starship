@@ -86,3 +86,10 @@
 - Exact table and interpolated-point numerical regression in `validate_oei_tables.cjs`; dedicated negative/zero and no-data browser checks added.
 - Existing Takeoff/Climb/other modules unchanged except test harness loading the OEI engine.
 - 1999kg performance results do not constitute certification of aircraft weight-and-balance limits; require applicable AFM supplements.
+
+## v0.13.3 — Climb / OEI Plot Direction
+
+- Result chart plots altitude difference against time in one minute at constant current ROC: positive upward, negative downward, zero level. Removes temperature-sensitivity ROC curve from main result only. Dedicated sensitivity interactions are not used to imply a flightpath.
+- Uses a fixed y scale (Climb 1400 ft/min, OEI ±320 ft/min) so distinct rates cannot appear identical through per-result rescaling.
+- Computational interpolation/tables unaffected. Uses `data-roc`, `data-direction`, `data-baseline-y`, `data-end-y` SVG properties for directional regression without interpreting screenshots.
+- Adds numerical assertions to `npm test` and browser checks in five viewports. This is a chart of **instantaneous vertical rate**, not time-to-climb or a flightpath prediction. Not for operational use.
