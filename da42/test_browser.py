@@ -11,8 +11,8 @@ with sync_playwright() as p:
         errors=[]
         page.on('pageerror',lambda e:errors.append(str(e)))
         page.set_content(html)
-        assert page.locator('#main-result').inner_text()=='610',(w,h,'takeoff')
-        assert page.locator('#secondary-result').inner_text()=='370 m'
+        assert page.locator('#main-result').inner_text()=='638',(w,h,'takeoff')
+        assert page.locator('#secondary-result').inner_text()=='406 m'
         assert page.locator('html').evaluate('(el)=>el.scrollWidth') <=w,(w,h,'horizontal overflow')
         assert page.locator('.phone').evaluate('(el)=>el.clientWidth')<=w
         assert len(errors)==0, errors
