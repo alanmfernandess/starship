@@ -251,40 +251,63 @@ with sync_playwright() as p:
         assert len(errors)==0,errors
         all_checks+=28
         # Landing: same four-card Aero UI, proportional airborne + ground-roll chart.
+        # AFM §5.3.11: Landing 4 cards, ISA and runway corrections.
         page.locator('#menu').click()
         page.locator('button[data-module="landing"]').click()
-        assert page.locator('#main-result').inner_text()=='480'
-        assert page.locator('#secondary-result').inner_text()=='248 m'
+        assert page.locator('#main-result').inner_text()=='557'
+        assert page.locator('#secondary-result').inner_text()=='330 m'
         assert page.locator('.field').count()==4
-        assert page.locator('#temp-mode-toggle').count()==0
-        assert page.locator('#plot-area').inner_text().find('TOUCHDOWN')!=-1
-        assert page.locator('#plot-area').inner_text().find('232 m')!=-1
-        assert page.locator('#plot-area').inner_text().find('TOTAL 480 m')!=-1
-        assert page.locator('html').evaluate('(el)=>el.scrollWidth')<=w
+        assert page.locator('#landing-isa-toggle').inner_text()=='ISA'
+        assert 'TOTAL 557 m' in page.locator('#plot-area').inner_text()
+        page.locator('#landing-isa-toggle').click()
+        assert page.locator('#main-result').inner_text()=='554'
+        assert page.locator('input[data-key="oat"]').get_attribute('readonly') is not None
+        page.locator('#landing-isa-toggle').click()
+        assert page.locator('#main-result').inner_text()=='557'
+        page.locator('#landing-runway').click()
+        assert page.locator('#runway-wet').inner_text()=='WET PAVEMENT · OFF'
+        assert page.locator('#runway-slope').get_attribute('min')=='0'
+        assert page.locator('#runway-slope').get_attribute('max')=='5'
+        page.locator('#runway-wet').click()
+        assert page.locator('#main-result').inner_text()=='641'
+        page.locator('#landing-runway').click()
+        page.locator('#runway-wet').click()
+        assert page.locator('#main-result').inner_text()=='557'
+        page.locator('#landing-runway').click()
+        page.locator('button[data-surface="grass10"]').click()
+        assert page.locator('#main-result').inner_text()=='607'
+        page.locator('#landing-runway').click()
+        page.locator('button[data-surface="paved"]').click()
+        assert page.locator('#main-result').inner_text()=='557'
         page.locator('input[data-key="wind"]').fill('0')
-        assert int(page.locator('#main-result').inner_text())>480
+        assert page.locator('#main-result').inner_text()=='600'
         page.locator('input[data-key="mass"]').fill('1900')
-        assert int(page.locator('#main-result').inner_text())>500
+        assert page.locator('#main-result').inner_text()=='620'
         page.locator('input[data-key="pa"]').fill('10001')
         assert page.locator('#main-result').inner_text()=='—'
-        assert len(errors)==0,errors
-        all_checks+=12
-        # Module 06: Abnormal Landing / Flaps UP or APP, same segmented graph.
+        assert page.locator('html').evaluate('(el)=>el.scrollWidth')<=w
+        all_checks+=25
+        # AFM §5.3.11: abnormal APP/UP table, strict no-data cells.
         page.locator('#menu').click()
         page.locator('button[data-module="abnormal"]').click()
-        assert page.locator('#main-result').inner_text()=='722'
-        assert page.locator('#secondary-result').inner_text()=='418 m'
+        assert page.locator('#main-result').inner_text()=='761'
+        assert page.locator('#secondary-result').inner_text()=='453 m'
         assert page.locator('.field').count()==4
-        assert page.locator('#temp-mode-toggle').count()==0
-        assert '304 m' in page.locator('#plot-area').inner_text()
-        assert 'TOUCHDOWN' in page.locator('#plot-area').inner_text()
-        assert 'TOTAL 722 m' in page.locator('#plot-area').inner_text()
-        assert page.locator('html').evaluate('(el)=>el.scrollWidth')<=w
+        assert page.locator('#abnormal-isa-toggle').inner_text()=='ISA'
+        assert page.locator('#landing-runway').count()==1
+        assert 'TOTAL 761 m' in page.locator('#plot-area').inner_text()
         page.locator('input[data-key="wind"]').fill('0')
-        assert int(page.locator('#main-result').inner_text())>722
+        assert page.locator('#main-result').inner_text()=='820'
         page.locator('input[data-key="mass"]').fill('1900')
+        assert page.locator('#main-result').inner_text()=='855'
         assert 'PROCEDIMENTO ANORMAL' in page.locator('#banner').inner_text()
-        all_checks+=10
+        page.locator('input[data-key="mass"]').fill('1999')
+        page.locator('input[data-key="oat"]').fill('50')
+        page.locator('input[data-key="pa"]').fill('6000')
+        assert page.locator('#main-result').inner_text()=='—'
+        assert 'CÉLULA NÃO PUBLICADA' in page.locator('#banner').inner_text()
+        assert page.locator('html').evaluate('(el)=>el.scrollWidth')<=w
+        all_checks+=16
         # Module 07: Go-Around; strictly two AFM masses, no ISA/PA extrapolation.
         page.locator('#menu').click()
         page.locator('button[data-module="goaround"]').click()
