@@ -5,7 +5,7 @@ const code=html.match(/<script>([\s\S]*?)<\/script>/)[1];
 const dom={innerHTML:'',classList:{toggle(){}},addEventListener(){}};
 const document={querySelector(){return dom},querySelectorAll(){return []}};
 const ctx={document,localStorage:{getItem(){return null},setItem(){}},navigator:{},location:{protocol:'file:'},console};ctx.window=ctx;
-vm.createContext(ctx);vm.runInContext(fs.readFileSync(__dirname+'/takeoff-tables.js','utf8'),ctx);vm.runInContext(fs.readFileSync(__dirname+'/climb-tables.js','utf8'),ctx);vm.runInContext(fs.readFileSync(__dirname+'/oei-tables.js','utf8'),ctx);vm.runInContext(code,ctx);
+vm.createContext(ctx);vm.runInContext(fs.readFileSync(__dirname+'/takeoff-tables.js','utf8'),ctx);vm.runInContext(fs.readFileSync(__dirname+'/climb-tables.js','utf8'),ctx);vm.runInContext(fs.readFileSync(__dirname+'/oei-tables.js','utf8'),ctx);vm.runInContext(fs.readFileSync(__dirname+'/goaround-tables.js','utf8'),ctx);vm.runInContext(code,ctx);
 const f=(pa,d,load)=>ctx.AeroCalc.compute('cruise',{pa,load,engines:2,oat:15-.0019812*pa+d});
 const alt=[0,500,1000,2000,3500,5000,7000,9000,10000,11000,12000,13500,14000,15000,16000,17000,18000],load=[50,55,60,65,70,75,80,85,90,92],deltas=[-10,0,10,20,30];
 let n=0,min=Infinity,max=-Infinity;
