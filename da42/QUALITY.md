@@ -1,4 +1,4 @@
-# Evidências de teste — DA42NG v0.7 (Cruising / TAS)
+# Evidências de teste — DA42NG v0.8 (Cruising / TAS)
 
 **Fonte primária:** DA42 NG AFM, Doc. 7.01.15-E, Rev. 1, 18-Feb-2009. Módulo TAS: p. 5-19; demais módulos: p. 5-13, p. 5-15 e p. 5-17.
 
@@ -21,3 +21,13 @@
 - **Landing v0.7:** módulo FLAPS LDG com gráfico segmentado 50 ft → touchdown → parada, 4 entradas, saída ground roll e distância sobre 50 ft. Ponto do AFM (p. 5-23): **248 m e 480 m**; trecho aéreo de **232 m** calculado por diferença.
 - **Regressão Landing:** 1.375 combinações de PA/OAT/massa/vento dentro dos limites, 10 casos inválidos, 4 relações de tendência e consistência total > ground roll. Ensaios de navegador adicionados para 5 tamanhos de tela na CI; a simples disponibilização do arquivo não prova execução CI.
 - **Aplicabilidade:** Flaps LDG, ambos IDLE, pista nivelada/dura/seca, 84 KIAS; >1.805 kg constitui procedimento anormal conforme AFM Rev.1. Aproximações do nomograma não foram validadas independentemente para desempenho operacional.
+
+## Módulos 06–07 · Revisão v0.8
+
+- Abnormal Landing (Flaps UP/APP): ponto publicado **418/722 m** (trecho aéreo por diferença = 304 m). Digitalização **parcial e aproximada** de carta própria, calibração no exemplo; não há verificação independente de exatidão física.
+- Em uma malha de 1375 condições cobertas por limites de entrada, o modelo computa **1369 condições** e rejeita **6 casos** cuja distância excede o eixo da carta (1400 m). Verificações de massa, vento, temperatura e altitude; rejeição de entradas inválidas.
+- Go-Around: exclusivamente **1805 kg = 7,5%, 4,3°, 612 ft/min**; **1900 kg = 6,7%, 3,8°, 547 ft/min**. ISA/MSL, 84 KIAS, flaps LDG, gear extended, both MAX. Sem interpolação ou extrapolação.
+- UI: quatro cards, gráfico de trechos proporcionais no Landing anormal e indicador de gradiente de subida no Go-Around; seletor tátil de massa 1805/1900; não modifica o restante do Aero UI.
+- Testes de navegador para ambas as telas adicionados ao script Playwright em cinco resoluções; a execução do GitHub Actions ainda precisa ser observada separadamente.
+
+**Ferramenta experimental; NÃO USAR PARA VOO.**
