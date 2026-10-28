@@ -308,24 +308,48 @@ with sync_playwright() as p:
         assert 'CÉLULA NÃO PUBLICADA' in page.locator('#banner').inner_text()
         assert page.locator('html').evaluate('(el)=>el.scrollWidth')<=w
         all_checks+=16
-        # Module 07: Go-Around; strictly two AFM masses, no ISA/PA extrapolation.
+        # AFM §5.3.12: Go-Around; full 1700–1999kg, OAT & ISA and no-data cells.
         page.locator('#menu').click()
         page.locator('button[data-module="goaround"]').click()
         assert page.locator('.field').count()==4
-        assert page.locator('input[data-key]').count()==0
-        assert page.locator('#main-result').inner_text()=='7.5'
-        assert page.locator('#secondary-result').inner_text()=='612 ft/min'
-        assert '4.3°' in page.locator('.secondary-extra').inner_text()
-        assert page.locator('#mass-toggle').inner_text()=='1,805'
-        page.locator('#mass-toggle').click()
-        assert page.locator('#main-result').inner_text()=='6.7'
-        assert page.locator('#secondary-result').inner_text()=='547 ft/min'
+        assert page.locator('input[data-key]').count()==3
+        assert page.locator('#main-result').inner_text()=='547'
+        assert page.locator('#secondary-result').inner_text()=='2.78 m/s'
         assert '3.8°' in page.locator('.secondary-extra').inner_text()
-        assert page.locator('#mass-toggle').inner_text()=='1,900'
-        assert 'PROCEDIMENTO ANORMAL' in page.locator('#banner').inner_text()
+        assert page.locator('#goaround-isa-toggle').inner_text()=='OAT'
+        assert page.locator('input[data-key="oat"]').get_attribute('readonly') is not None
+        assert page.locator('.field.readonly .power-value').inner_text()=='84'
+        assert page.locator('#plot-area svg.vertical-rate-plot').count()==1
+        assert ' C' in page.locator('#plot-area path.vertical-curve').get_attribute('d')
+        assert page.locator('#plot-area svg.vertical-rate-plot').get_attribute('data-direction')=='subida'
+        page.locator('input[data-key="mass"]').fill('1999')
+        assert page.locator('#main-result').inner_text()=='454'
+        assert '3.1°' in page.locator('.secondary-extra').inner_text()
+        assert page.locator('.field.readonly .power-value').inner_text()=='86'
+        page.locator('input[data-key="mass"]').fill('1805')
+        assert page.locator('#main-result').inner_text()=='615'
+        assert '4.3°' in page.locator('.secondary-extra').inner_text()
+        assert page.locator('.field.readonly .power-value').inner_text()=='84'
+        page.locator('input[data-key="mass"]').fill('1700')
+        assert page.locator('#main-result').inner_text()=='690'
+        assert not page.locator('.secondary-extra').is_visible()
+        page.locator('input[data-key="pa"]').fill('2000')
+        assert page.locator('#main-result').inner_text()=='659'
+        assert page.locator('input[data-key="oat"]').input_value()=='11'
+        page.locator('#goaround-isa-toggle').click()
+        assert page.locator('#goaround-isa-toggle').inner_text()=='ISA'
+        assert page.locator('input[data-key="oat"]').get_attribute('readonly') is None
+        assert page.locator('#main-result').inner_text()=='658'
+        page.locator('input[data-key="mass"]').fill('1999')
+        page.locator('input[data-key="pa"]').fill('6000')
+        page.locator('input[data-key="oat"]').fill('50')
+        assert page.locator('#main-result').inner_text()=='—'
+        assert 'CÉLULA NÃO PUBLICADA' in page.locator('#banner').inner_text()
+        page.locator('input[data-key="pa"]').fill('10001')
+        assert page.locator('#main-result').inner_text()=='—'
         assert page.locator('html').evaluate('(el)=>el.scrollWidth')<=w
         assert len(errors)==0,errors
-        all_checks+=13
+        all_checks+=30
         # Module 09: AFM 5.3.9 cumulative climb (2,000 -> 16,000 ft).
         page.locator('#menu').click()
         assert page.locator('button[data-module="timeclimb"]').count()==1
