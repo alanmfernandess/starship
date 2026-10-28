@@ -503,13 +503,13 @@ function refresh(){const v=inputs[current],m=MODELS[current],r=compute(current,v
 function showSheet(type){const main=el('.phone'),title={modules:'PERFORMANCE',settings:'PREFERÊNCIAS',chart:'SENSIBILIDADE',history:'HISTÓRICO',runway:'RUNWAY'}[type]||'';const v=inputs[current];const r=compute(current,v);let content='';
  if(type==='modules'){
   const names={
-   takeoff:'TAKEOFF PERFORMANCE',
-   climb:'CLIMB PERFORMANCE',
+   takeoff:'TAKEOFF',
+   climb:'CLIMB',
    oei:'ONE ENGINE CLIMB / DESCENT',
-   cruise:'CRUISING · TRUE AIRSPEED',
-   landing:'LANDING · FLAPS LDG',
-   abnormal:'ABNORMAL LANDING · UP / APP',
-   goaround:'GO-AROUND · CLIMB GRADIENT',
+   cruise:'CRUISE',
+   landing:'LANDING',
+   abnormal:'ABNORMAL LANDING',
+   goaround:'GO-AROUND',
    timeclimb:'TIME · FUEL · DISTANCE TO CLIMB'
   };
   const weightBalance='<a class="option" href="./wb.html" style="text-decoration:none"><span><strong>WEIGHT &amp; BALANCE</strong></span>'+icon('next')+'</a>';
