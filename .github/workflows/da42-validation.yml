@@ -21,7 +21,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verify five modules: references, TAS holdouts, 850-point TAS grid and landing envelope
+      - name: Validate seven modules, TAS holdouts, LDG and abnormal landing grids, AFM go-around table
         run: npm test
 
   mobile-ui-validation:
@@ -38,5 +38,5 @@ jobs:
         run: |
           python -m pip install playwright
           python -m playwright install --with-deps chromium
-      - name: Verify five modules, Cruise ISA toggle and Landing segment chart on mobile
+      - name: Mobile UI: seven modules, Cruise ISA toggle and both landing charts
         run: python test_browser.py
