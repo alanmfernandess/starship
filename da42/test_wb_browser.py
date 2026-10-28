@@ -16,12 +16,16 @@ with sync_playwright() as p:
         errors=[]
         page.on('pageerror',lambda e:errors.append(str(e)))
         page.goto(url)
-        assert page.locator('#cg').inner_text()=='2.447'
+        assert page.locator('#cg').inner_text()=='2,447'
         assert 'WITHIN LIMITS' in page.locator('#cg-status').inner_text()
         assert 'MASS WITHIN LIMITS' in page.locator('#mass-check').inner_text()
         assert page.locator('input[data-wb]').count()==4
-        assert page.locator('#metrics').inner_text().find('1,898.5')!=-1
-        assert page.locator('#metrics').inner_text().find('1,655.5')!=-1
+        assert page.locator('#metrics').inner_text().find('1.898,5')!=-1
+        assert page.locator('#metrics').inner_text().find('1.655,5')!=-1
+        assert page.locator('#metrics').inner_text().find('ZFW')!=-1
+        assert page.locator('#metrics').inner_text().find('TOW')!=-1
+        assert '2,35' in page.locator('svg.graph').inner_text()
+        assert page.locator('#zfcg').inner_text()=='2,391 m'
         assert page.locator('html').evaluate('(el)=>el.scrollWidth')<=w
         assert page.locator('svg.graph polygon').count()==1
         count+=8
@@ -51,11 +55,11 @@ with sync_playwright() as p:
         page.locator('#nav-settings').click()
         assert page.locator('input[data-wb="emptyMass"]').count()==1
         assert page.locator('input[data-wb="emptyMoment"]').count()==1
-        assert page.locator('input[data-wb="emptyMass"]').input_value()=='1,450.0'
+        assert page.locator('input[data-wb="emptyMass"]').input_value()=='1.450,0'
         page.locator('input[data-wb="emptyMass"]').fill('1470')
         assert page.locator('#notice').inner_text()=='NOT FOR FLIGHT'
         page.locator('#reset-example').click()
-        assert page.locator('#cg').inner_text()=='2.447'
+        assert page.locator('#cg').inner_text()=='2,447'
         count+=7
         # Stochastic optimizer must only generate hypothetical occupants/baggage.
         assert page.locator('#optimize').inner_text()=='OTIMIZAR'
