@@ -1,0 +1,25 @@
+name: DA42NG validation
+on:
+  push:
+    paths:
+      - 'da42/**'
+      - '.github/workflows/da42-validation.yml'
+  pull_request:
+    paths:
+      - 'da42/**'
+      - '.github/workflows/da42-validation.yml'
+permissions:
+  contents: read
+jobs:
+  numerical-validation:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: da42
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify four reference samples, 23 TAS holdouts and 650 surface points
+        run: npm test
