@@ -171,3 +171,13 @@ O motor `climb-tables.js` digitaliza diretamente seis matrizes publicadas na se�
 **Referências exatas em MSL/ISA:** UP 1999 kg = 982 ft/min, APP 1999 kg = 953 ft/min; UP 1900 kg = 1065 ft/min, APP 1900 kg = 1034 ft/min. A 1800kg MSL OAT 15°C, UP 1147,5 ft/min, APP 1120 ft/min. Testes `validate_climb_tables.cjs` conferem dados e domínio; `validate_takeoff_tables.cjs` agora cobre os 1999kg.
 
 **Não aprovado para planejamento de voo.** O perfil individual e os limites de CG e MZFM/MLM devem ser compatíveis com o suplemento e o relatório de peso e balanceamento aplicáveis.
+
+### v0.13.0 — OEI Climb AFM 5.3.8
+
+Novo motor OEI separado em `oei-tables.js`, com três matrizes tabuladas do AFM §5.3.8 para **1.700 kg, 1.900 kg e 1.999 kg**, altitudes de pressão de 0 a 18.000 ft a cada 2.000 ft, temperaturas OAT −20/−10/0/10/20/30/40/50°C e coluna ISA independente. **Valores negativos e zero permanecem válidos**, representando performance de descida/nula: nunca são convertidos em zero nem em subida positiva. **Células riscadas são indisponíveis** (`null`); interpolação linear de massa, altitude e temperatura somente quando todos os pontos adjacentes necessários foram publicados.
+
+Condições fixas AFM: motor remanescente com carga de 92%, motor inoperante embandeirado e assegurado, flaps UP, trem recolhido, VYSE 85 KIAS e sideslip half ball out. Referências ISA/MSL: 1.700 kg = 252 ft/min, 1.900 kg = 175 ft/min e 1.999 kg = 140 ft/min. A 1.999 kg, 18.000 ft ISA, o valor é **−169 ft/min** (descida). O valor zero também é permitido, exemplo 1.999 kg / 4.000 ft / 50°C. Interpolação no exemplo anterior (1.800 kg, SL, 15°C) = 211,25 ft/min (em lugar da aproximação 212 ft/min).
+
+A UI mantém quatro cartões Aero UI, o seletor OAT/ISA, a taxa em ft/min e m/s, e sinaliza em amarelo **ROC inferior a 50 ft/min**, conforme área cinza escura do AFM. ROC negativo é exibido com sinal e identificação de descida. O gráfico marca referências de 0 e 50 ft/min. Regressões em `validate_oei_tables.cjs` incluem todos os valores tabulados, negativos, zeros, 42 células sem dados, interpolação e rejeição de extrapolações. Os testes móveis foram estendidos.
+
+**Atenção:** valores de performance para 1.999 kg não atualizam automaticamente os limites de massa/CG do módulo Weight & Balance; a documentação aplicável à configuração da aeronave e MÄM 42-678 deve ser verificada. Ferramenta experimental, **não usar para voo**.
