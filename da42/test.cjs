@@ -34,9 +34,10 @@ assert.ok(!cruise.error);assert.equal(Math.round(cruise.main),164);
 assert.ok(Math.abs(cruise.secondary)<.25);
 assert.ok(f('cruise',{pa:10000,oat:-5,load:92,engines:2}).main>cruise.main);
 assert.ok(f('cruise',{pa:10000,oat:5,load:80,engines:2}).main>cruise.main);
-assert.ok(f('cruise',{pa:16000,oat:-15,load:80,engines:2}).error);
+assert.ok(!f('cruise',{pa:16000,oat:-15,load:80,engines:2}).error);
+assert.ok(f('cruise',{pa:18001,oat:-15,load:80,engines:2}).error);
 assert.ok(f('cruise',{pa:10000,oat:35,load:80,engines:2}).error);
 assert.ok(f('cruise',{pa:10000,oat:-5,load:20,engines:2}).error);
 assert.ok(f('cruise',{pa:10000,oat:-5,load:80,engines:1}).error);
 
-console.log('Four modules: references and TAS domain checks passed. Not validated for flight.');
+console.log('Seven modules: legacy references and TAS domain checks passed. Not validated for flight.');
