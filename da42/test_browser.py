@@ -64,6 +64,23 @@ with sync_playwright() as p:
         assert page.locator('#main-result').inner_text()=='638'
         all_checks+=31
         page.locator('#menu').click()
+        expected_modules=[
+            'TAKEOFF PERFORMANCE',
+            'CLIMB PERFORMANCE',
+            'ONE ENGINE CLIMB / DESCENT',
+            'CRUISING · TRUE AIRSPEED',
+            'LANDING · FLAPS LDG',
+            'ABNORMAL LANDING · UP / APP',
+            'GO-AROUND · CLIMB GRADIENT',
+            'TIME · FUEL · DISTANCE TO CLIMB'
+        ]
+        assert page.locator('.sheet button[data-module] strong').all_inner_texts()==expected_modules
+        assert page.locator('.sheet a.option[href="./wb.html"] strong').inner_text()=='WEIGHT & BALANCE'
+        assert page.locator('.sheet .option').count()==9
+        assert page.locator('.sheet .option .sub').count()==0
+        assert page.locator('.sheet .option').evaluate_all("(xs)=>xs.every(x=>x.querySelectorAll('strong').length===1)")
+        assert page.locator('html').evaluate('(el)=>el.scrollWidth')<=w
+        all_checks+=6
         page.locator('button[data-module="climb"]').click()
         assert page.locator('#main-result').inner_text()=='1,148'
         assert page.locator('#secondary-result').inner_text()=='5.8 m/s'
