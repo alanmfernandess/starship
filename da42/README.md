@@ -7,6 +7,8 @@ Aplicação mobile-first estática (PWA) para análise experimental de:
 3. One Engine Inoperative — climb/descent
 4. Cruising — True Airspeed (TAS) / two engines
 5. Landing Distances — Flaps LDG / 50 ft obstacle
+6. Abnormal Landing Distances — Flaps UP / APP, 86 KIAS
+7. Go-Around Gradient of Climb — ISA/MSL, 1.805/1.900 kg
 
 **Atenção: NÃO UTILIZAR PARA OPERAÇÃO AERONÁUTICA.** A reprodução dos pontos de exemplo não representa validação de uma ferramenta de planejamento de voo. O modelo de interpolação usa amostras gráficas limitadas extraídas de um raster das cartas, com ajuste de registro aos três exemplos impressos nos módulos anteriores. A digitalização e verificação independentes de todas as curvas permanecem pendentes.
 
@@ -19,6 +21,8 @@ Diamond Aircraft, *DA 42 NG Airplane Flight Manual*, Doc. **7.01.15-E**, **Rev. 
 - One Engine Inoperative Climb/Descent: p. 5-17 (PDF p. 275, índice zero 274)
 - Cruising (TAS): p. 5-19 (PDF p. 277, índice zero 276)
 - Landing Distances — Flaps LDG: p. 5-23 (Rev. 1, 18-Feb-2009)
+- Landing Distances — Abnormal Flap Position: carta enviada pelo usuário
+- Gradient of Climb on Go-Around: AFM §5.3.11, tabela enviada pelo usuário
 
 Fonte pública de conferência: https://www.keilir.net/static/files/Flugakademian/Diamond/DA42-NG-AFM-r1.pdf
 
@@ -71,6 +75,14 @@ Apenas no módulo Cruising/TAS, o campo de temperatura tem um seletor compacto *
 
 
 A carta Cruising / True Airspeed fornecida pelo usuário foi parcialmente digitalizada por amostras das curvas ISA STD nos grupos 50, 60, 70, 80 e 92% de carga. Interpolação entre altitude (0–18.000 ft), carga e desvios ISA (-10 a +30°C). Referência de leitura: 164 KTAS a 10.000 ft/ISA STD/80% (2 motores). A extensão acima de 14.000 ft utiliza novas leituras gráficas das curvas em 16.000 e 18.000 ft (incluindo a inflexão da curva de 92% de carga). A variação com temperatura é interpolada usando separações em pixels estimadas das curvas. Os 23 pontos de verificação independentes dos pontos de calibração mostraram concordância numérica com essas leituras dentro de 0,456 KTAS; **isso não quantifica a incerteza do procedimento de leitura nem garante erro inferior a esse limite em outros pontos**. O motor rejeita valores fora do eixo TAS de 120–180 kt. Massa não aparece como entrada nesta carta. Dois motores é condição fixa.
+
+### Módulos 06 e 07 — implementação 0.8
+
+**Abnormal Landing (Flaps UP ou APP).** Quatro parâmetros: Pressure Altitude, OAT, landing mass e headwind (vento de cauda como valor negativo). Os demais parâmetros são fixos: ambos IDLE, pista nivelada/dura/seca e 86 KIAS. O módulo utiliza um conjunto de amostras gráficas *separado* do Landing LDG e registra os resultados pelo único ponto de exemplo publicado: PA 0 ft, OAT 15°C, 1800 kg, vento 10 kt de proa → **418 m Ground Roll** e **722 m sobre 50 ft**. O desenho segmentado mostra 304 m de trecho aéreo por diferença. **Não é validação independente** do modelo ao longo de toda a carta. Bloqueio explícito de total acima de 1400 m, limite do eixo gráfico.
+
+**Go-Around — Gradient of Climb.** Reprodução fiel da tabela do AFM §5.3.11: apenas **1805 kg** (7,5%, 4,3°, 612 ft/min) ou **1900 kg** (6,7%, 3,8°, 547 ft/min). Conditions: ISA, MSL, flaps LDG, landing gear extended, both MAX, 84 KIAS. O seletor de massa alterna os dois valores; PA, ISA e velocidade são fixos. O aplicativo rejeita massas intermediárias e outras condições, sem interpolação ou extrapolação. A faixa 1805–1900 kg constitui procedimento operacional anormal conforme a nota do AFM.
+
+**Validação e ressalvas:** `node validate_modules67.cjs` verifica os exemplos, rejeições, integridade dos módulos anteriores, a geometria das telas e uma malha de condições do gráfico de pouso. Esses testes são de implementação e não certificam a precisão do desempenho. Não utilizar qualquer módulo para planejamento ou execução de voo.
 
 ## Publicação
 
