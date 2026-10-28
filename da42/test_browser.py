@@ -33,6 +33,22 @@ with sync_playwright() as p:
         page.locator('#takeoff-isa-toggle').click()
         page.locator('input[data-key="pa"]').fill('0')
         page.locator('#takeoff-runway').click()
+        assert page.locator('.sheet').get_by_text('RUNWAY SURFACE').count()==0
+        slope=page.locator('#runway-slope')
+        assert slope.get_attribute('type')=='range'
+        assert slope.get_attribute('min')=='0'
+        assert slope.get_attribute('max')=='5'
+        assert slope.get_attribute('step')=='0.5'
+        assert page.locator('.slope-limits').inner_text().split()==['0%', '5%']
+        assert page.locator('#slope-value').inner_text()=='0%'
+        slope.evaluate("(el)=>{el.value='2.5';el.dispatchEvent(new Event('input',{bubbles:true}))}")
+        assert page.locator('#slope-value').inner_text()=='2,5%'
+        assert int(page.locator('#main-result').inner_text())>638
+        slope.evaluate("(el)=>{el.value='5';el.dispatchEvent(new Event('input',{bubbles:true}))}")
+        assert page.locator('#slope-value').inner_text()=='5%'
+        assert page.locator('#runway-slope').input_value()=='5'
+        slope.evaluate("(el)=>{el.value='0';el.dispatchEvent(new Event('input',{bubbles:true}))}")
+        assert page.locator('#main-result').inner_text()=='638'
         assert page.locator('button[data-surface="grass5"]').count()==1
         page.locator('button[data-surface="grass5"]').click()
         assert 'GRASS' in page.locator('#takeoff-runway').inner_text()
@@ -44,7 +60,7 @@ with sync_playwright() as p:
         assert page.locator('#main-result').inner_text()=='—'
         page.locator('input[data-key="mass"]').fill('1800')
         assert page.locator('#main-result').inner_text()=='638'
-        all_checks+=18
+        all_checks+=31
         page.locator('#menu').click()
         page.locator('button[data-module="climb"]').click()
         assert page.locator('#main-result').inner_text()=='1,150'
