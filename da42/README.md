@@ -9,6 +9,7 @@ Aplicação mobile-first estática (PWA) para análise experimental de:
 5. Landing Distances — Flaps LDG / 50 ft obstacle
 6. Abnormal Landing Distances — Flaps UP / APP, 86 KIAS
 7. Go-Around Gradient of Climb — ISA/MSL, 1.805/1.900 kg
+8. Weight & Balance — occupant loading, fuel, de-icing and CG envelope
 
 **Atenção: NÃO UTILIZAR PARA OPERAÇÃO AERONÁUTICA.** A reprodução dos pontos de exemplo não representa validação de uma ferramenta de planejamento de voo. O modelo de interpolação usa amostras gráficas limitadas extraídas de um raster das cartas, com ajuste de registro aos três exemplos impressos nos módulos anteriores. A digitalização e verificação independentes de todas as curvas permanecem pendentes.
 
@@ -106,3 +107,17 @@ URL temporária (**o envio do código ao GitHub não confirma propagação do Pa
 - testes em navegadores e aparelhos reais;
 - verificação de conformidade de layout com os mockups aprovados em viewports de referência;
 - revisão aeronáutica independente do AFM atual e respectivos suplementos.
+
+### Módulo 08 — Weight & Balance
+
+Tela integrada ao menu de módulos do DA42 NG em \`wb.html\`, com motor matemático isolado em \`wb-engine.js\`. Visual Aero UI Master Design 1.0. Entrada de massa individual para Pilot, Copilot, Passenger 1 e Passenger 2, com braços dianteiros de 2,30 m e traseiros de 3,25 m. Painel de carregamento para bagagens (nose 0,60 m; cabin 3,89 m; extension 4,54 m), fuel mains L/R (2,63 m), aux L/R (3,20 m) e fluido de degelo (1,00 m).
+
+O perfil inicial é **AFM EXAMPLE**, com Empty Mass 1450 kg / Empty Moment 3488 kg·m. O exemplo oficial reproduz Zero Fuel Mass 1655,5 kg / 3958,7 kg·m / CG 2,391 m e Takeoff Mass 1898,5 kg / 4645,7 kg·m / CG 2,447 m. O perfil é editável e salvo no navegador, mas os números oficiais do exemplo **não descrevem automaticamente qualquer aeronave real**.
+
+**CG envelope (m):** forward 2,357 @1510 kg até 2,418 @1900 kg (interpolação linear), aft 2,460 @1510 kg a 2,480 @1700 kg (linear), depois 2,480 até 1900 kg. Verificações numéricas independentes de ZFM <=1765 kg, takeoff mass <=1900 kg, min flight mass >=1510 kg e landing normal <=1805 kg; pouso acima de 1805 kg até 1900 kg é identificado como procedimento anormal. Bagagens: nose 30 kg, cabin 45 kg, extension 18 kg e cabin+extension 45 kg no total.
+
+**Fuel:** entrada em kg por tanque para casar exatamente com o exemplo AFM (main 79,5 kg × 2, aux 42,0 kg × 2), correspondendo a valores arredondados da tabela do fabricante; densidade de referência 0,84 kg/L. O combustível não utilizável já faz parte do peso vazio; somente o utilizável é adicionado. Landing Fuel é um conjunto opcional de quatro entradas, inicialmente em branco, e é usado para massa/CG previstos no pouso. Nunca se presume combustível remanescente sem entrada explícita.
+
+**De-icing:** fluido editável, valor inicial de 27,5 kg do AFM example; quatro cenários exibidos com combustível utilizável vazio/cheio e fluido carregado/retirado. Não interpretar 27,5 kg como capacidade máxima certificada sem o suplemento do sistema de degelo. Simulações de limites de combustível/fluido dependem da configuração real.
+
+**Validação:** \`node validate_wb.cjs\` cobre exemplos, limites de envelope, massa, bagagens, combustível e centenas de combinações. \`python test_wb_browser.py\` verifica a interface em cinco resoluções com Chromium instalado; configurado na CI. Não é certificação e não substitui o Mass and Balance Report específico da aeronave, o AFM vigente e seus suplementos. **NÃO UTILIZAR PARA PLANEJAMENTO OU EXECUÇÃO DE VOO.**
