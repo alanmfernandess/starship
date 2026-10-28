@@ -12,7 +12,7 @@ for(const mode of ['normal','short'])for(const mass of [1700,1900,1999]){
    const g=t.ground[a][j],d=t.total[a][j];
    assert.equal(g===null,d===null,'identical unsupported cells');
    if(g!==null)assert.ok(d>g,'total over 50 ft must exceed ground roll');
-   if(mass!==1999&&g!==null){
+   if(g!==null){
     eq({procedure:mode,mass,pa:T.ALT[a],oat:j===6?15:T.TEMPS[j],isa:j===6},g,d);
    }
   }
@@ -28,6 +28,10 @@ eq({procedure:'short',mass:1900,pa:0,isa:true},445,657);
 eq({procedure:'short',mass:1900,pa:10000,isa:true},843,1221);
 assert.equal(T.TABLES.normal[1999].ground[0][0],490);
 assert.equal(T.TABLES.short[1999].total[10][6],1441);
+eq({procedure:'normal',mass:1999,pa:0,oat:10},530,840);
+eq({procedure:'short',mass:1999,pa:0,oat:10},510,750);
+eq({procedure:'normal',mass:1999,pa:0,isa:true},540,866);
+eq({procedure:'short',mass:1999,pa:0,isa:true},525,775);
 // Trilinear interpolation between published 1700/1900kg mass points.
 eq({procedure:'normal',mass:1800,pa:0,oat:10},425,665);
 eq({procedure:'short',mass:1800,pa:0,oat:10},405,600);
@@ -49,14 +53,14 @@ assert.ok(wet.main>base.main&&wet.secondary>base.secondary);
 const soft=T.compute({procedure:'normal',mass:1900,pa:0,oat:10,wind:0,surface:'grass5',soft:true});
 assert.ok(soft.main>grass.main);
 for(const p of [
- {mass:1999},{mass:1500},{mass:1699},{mass:1901},{mass:2000},
+ {mass:1500},{mass:1699},{mass:2000},
  {pa:10001},{pa:-1},{pa:5000,oat:50},{pa:10000,oat:40},
  {surface:'gravel'},{surface:'paved',wet:true},{slope:-1},{slope:6}
 ])assert.ok(T.compute({procedure:'normal',mass:1900,pa:0,oat:10,wind:0,...p}).error,JSON.stringify(p));
-let validated=0;for(const procedure of ['normal','short'])for(let mass=1700;mass<=1900;mass+=50)for(let pa=0;pa<=10000;pa+=1000)for(let oat=0;oat<=50;oat+=10){
+let validated=0;for(const procedure of ['normal','short'])for(let mass=1700;mass<=1999;mass+=13)for(let pa=0;pa<=10000;pa+=1000)for(let oat=0;oat<=50;oat+=10){
  const r=T.compute({procedure,pa,mass,oat,wind:0});
  if(r.error){assert.equal(r.error,'SEM DADOS PUBLICADOS NA TABELA');continue}
  assert.ok(Number.isFinite(r.main)&&Number.isFinite(r.secondary)&&r.main>r.secondary&&r.secondary>0);
  validated++;
 }
-console.log('PASS AFM takeoff: 6 published grids, 1700–1900 kg range, temperature/altitude, ISA, wind, runway corrections, '+validated+' 3D samples. Not for flight.');
+console.log('PASS AFM takeoff: 6 published grids, 1700–1999 kg range, temperature/altitude, ISA, wind, runway corrections, '+validated+' 3D samples. Not for flight.');
