@@ -133,3 +133,7 @@ O botão **OTIMIZAR** gera um **cenário hipotético randômico**, variando some
 **IMPORTANTE:** os pesos de ocupantes são inventados para explorar a geometria do envelope. Não representam pessoas reais, não corrigem fisicamente uma aeronave nem podem ser usados como manifesto de carga; a UI identifica o resultado como **SIMULAÇÃO**. O algoritmo não deve ser utilizado para aprovar um carregamento real fora do CG.
 
 Validação: `node validate_optimizer.cjs` com gerador reproduzível, imutabilidade dos inputs fixos, variação de cenários, limites e insatisfatibilidade; `test_wb_browser.py` verifica botões, campos bloqueados, manutenção da edição do fuel e persistência.
+
+### v0.10.2 — Weight & Balance labels
+
+Interface reduzida aos valores **CG**, **ZFW** e **TOW**, além dos indicadores de limites de massa/centro de gravidade. CG exibido em metros com vírgula decimal brasileira (ex.: 2,423 m), e massas em kg com separação brasileira (ex.: 1.815,5 kg). A visualização não traz explicações sobre a localização do Datum Plane. Permanecem os dados de massa vazia, momento, combustível editável, cenários de degelo e aviso resumido de caráter experimental.
