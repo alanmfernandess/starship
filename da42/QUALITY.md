@@ -117,3 +117,11 @@
 - Cruise performance note: optional 2% reduction when OÄM 42-278 installed and OÄM 42-193 absent. TAS adjusted only in prototype; FF remains original tabulation pending equipment applicability confirmation.
 - Aero UI four cards with fixed mass, OAT/ΔISA input switch, configuration toggle and smoothed TAS vs pressure altitude curve.
 - Regression: `validate_cruise_performance.cjs`; five viewport browser checks plus prior modules. Not approved for flight.
+
+## v0.16.0 — Official AFM landing tabular upgrade
+
+- AFM §5.3.11 2 flap configurations (LDG, APP/UP), 3 masses (1700/1900/1999kg), 11 altitude rows (0-10000ft), six OAT anchors (0..50°C) plus separate published ISA column. 420 numerical anchors and 42 unavailable pairs of cells.
+- Strict no extrapolation on mass/altitude/OAT, no interpolation through crossed-out cells, and published ISA numbers used independently.
+- Headwind -10%/14kt; tailwind +10%/3kt, applied once. Pavement wet +15% to full landing distance. Grass 5cm/5-10cm/>10cm and wet/soft plus downhill 9%/1% applied to ground roll and added to total distance.
+- Strong warning: grass >10cm minimum +25% only; wet/soft conditions, unusually uneven runway or adverse meteorology may greatly increase actual distance. Results are not approved or operational predictions.
+- Aero UI unchanged four parameter cards, ISA/OAT switch, dedicated runway sheet including slope control. Landing and Abnormal older digitized nomograms no longer used for computation. Regression and browser tests updated.
