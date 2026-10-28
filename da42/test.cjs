@@ -4,7 +4,7 @@ const html=fs.readFileSync(__dirname+'/index.html','utf8');
 const script=html.match(/<script>([\s\S]*?)<\/script>/)[1];
 const node={set innerHTML(v){this.html=v},get innerHTML(){return this.html},onclick:null,classList:{toggle(){}},addEventListener(){},textContent:''};
 const document={querySelector(){return node},querySelectorAll(){return []}};
-const env={document,localStorage:{getItem(){return null},setItem(){}},location:{protocol:'file:'},navigator:{},console,Intl,Math,Date,Number};env.window=env;vm.createContext(env);vm.runInContext(script,env);
+const env={document,localStorage:{getItem(){return null},setItem(){}},location:{protocol:'file:'},navigator:{},console,Intl,Math,Date,Number};env.window=env;vm.createContext(env);vm.runInContext(fs.readFileSync(__dirname+'/takeoff-tables.js','utf8'),env);vm.runInContext(script,env);
 const f=env.AeroCalc.compute;
 const takeoff=f('takeoff',{pa:0,oat:15,mass:1800,wind:10});
 const climb=f('climb',{pa:0,oat:15,mass:1800,power:92});
