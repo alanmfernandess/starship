@@ -189,3 +189,9 @@ Conformidade visual dos cartões de parâmetros: o cabeçalho OAT ocupa a mesma 
 ### v0.13.2 — Engine Power typography
 
 A fonte numérica de `ENGINE POWER` foi unificada às demais entradas do Aero UI por uma **única declaração CSS compartilhada**, incluindo tamanho responsivo, altura de linha, peso, espaçamento e numerais tabulares. Corrigida também a regra específica para telas com largura de até 355px, sem alterar dimensões dos cartões, conteúdo, posições, quatro parâmetros ou resultados aeronáuticos. O teste móvel confere as propriedades tipográficas calculadas em cinco viewports, nos módulos OEI e Cruise.
+
+### v0.13.3 — Climb / OEI Vertical Plots
+
+Os gráficos de resultado de Climb e OEI passaram a representar **a variação de altitude durante um minuto, com a razão de subida (ROC) atual assumida constante nesse minuto**. Um ROC positivo é visualmente ascendente, zero gera linha horizontal e ROC negativo (possível no OEI) gera linha descendente. O sentido visual não é mais a curva de sensibilidade do ROC à temperatura, cujo declínio com OAT crescente era correto numericamente mas podia parecer uma trajetória de voo. Mantidos sem modificações as taxas calculadas das tabelas AFM §5.3.7 e §5.3.8, velocidades, advertência abaixo de 50 ft/min, escala numérica e cartões Aero UI.
+
+A escala do gráfico é **fixa por módulo** (Climb 0–1400 ft e OEI ±320 ft por minuto); não autoajusta para fazer qualquer taxa parecer equivalente. O gráfico é apenas uma visualização linear de taxa instantânea, não representa ângulo de trajetória, altitude realmente alcançável, TAS ou previsão operacional de subida. Testes numéricos de sentido e escala em `validate_vertical_plots.cjs` e testes móveis de Climb positivo, OEI positivo, negativo e nulo em `test_browser.py`.
