@@ -59,3 +59,12 @@
 - Após otimização, pesos fictícios de ocupantes/bagagens ficam somente leitura, até restauração explícita da carga manual anterior ou do exemplo AFM.
 - O aplicativo identifica de forma visível que os valores são **SIMULADOS**, não registros de pessoas reais ou um plano de carregamento seguro. Não usar para operação.
 - Testes JS estocásticos reproduzíveis adicionados a `npm test` e testes de UI às cinco viewports do script Playwright. A execução da CI depende de confirmação independente do pipeline.
+
+## v0.11 — Takeoff AFM §5.3.6
+
+- Digitalização tabular direta de 6 matrizes (Normal UP / Short APP × 1700/1900/1999 kg), 11 altitudes, seis temperaturas OAT mais coluna ISA, Ground Roll / 15 m 50 ft. Null em todas as células riscadas.
+- Verificação de interpolação de massa, altitude e temperatura em células publicadas; comparação com referências exatas e modo ISA independente.
+- MTOW fixo 1900kg conforme AFM §2.7 recebido; gráfico 1999kg retido somente para rastreabilidade até aplicação de suplemento apropriado.
+- AFM wind corrections headwind 10% por14kt, tailwind +10% por3kt; grass dry 10/15/25%; wet grass 10%; soft ground 45%; uphill slope 12% por 1%.
+- Testes automáticos novos `validate_takeoff_tables.cjs`; teste browser `test_browser.py` deve carregar script externo em origem file://, exercitar seleção de procedimento, ISA, grama e rejeição de 1999kg.
+- Dados amostrados de tabelas e verificações matemáticas **não constituem aprovação para uso aeronáutico real**.
