@@ -385,11 +385,19 @@ function verticalRatePlot(id,r){
  const value=fmt(Math.abs(roc));
  const color=oei&&roc<50?'#e7b46d':'#56b9ee';
  const y=Number(endY.toFixed(2));
- const aria='Variação vertical em um minuto a razão constante: '+direction+' '+sign+value+' pés. Sem previsão de trajetória de voo.';
+ // Aero UI Master: use the same smooth cubic path language as Cruise.
+ // Both control ordinates remain BETWEEN start and end; a positive ROC
+ // always rises, a negative ROC always descends, and zero stays level.
+ // Intermediate curvature is schematic, not integrated from changing ROC.
+ const dx=endX-startX,dy=endY-baseline;
+ const c1x=startX+dx*.23,c2x=startX+dx*.77;
+ const c1y=baseline+dy*.09,c2y=baseline+dy*.91;
+ const curvedPath='M'+startX+' '+baseline+' C'+c1x.toFixed(2)+' '+c1y.toFixed(2)+' '+c2x.toFixed(2)+' '+c2y.toFixed(2)+' '+endX+' '+y;
+ const aria='Variação vertical esquemática em um minuto: '+direction+' '+sign+value+' pés. Curvatura visual; sem previsão de trajetória de voo.';
  return '<svg class="plot vertical-rate-plot" viewBox="0 0 290 138" preserveAspectRatio="xMidYMid meet" role="img" aria-label="'+aria+'" data-roc="'+roc+'" data-direction="'+direction+'" data-end-y="'+y+'" data-baseline-y="'+baseline+'">'
  +'<path class="grid" d="M28 24H278M28 70H278M28 116H278"/>'
  +'<path d="M28 '+baseline+'H278" stroke="#e7b46d" stroke-width="1" stroke-dasharray="4 5" opacity=".8"/>'
- +'<path d="M'+startX+' '+baseline+' L'+endX+' '+y+'" fill="none" stroke="'+color+'" stroke-width="3.5" stroke-linecap="round"/>'
+ +'<path class="vertical-curve" d="'+curvedPath+'" fill="none" stroke="'+color+'" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>'
  +'<circle cx="'+endX+'" cy="'+y+'" r="5.5" fill="'+color+'" stroke="#202d39" stroke-width="2"/>'
  +'<text x="'+startX+'" y="135" fill="#91a8b8" font-size="10">0</text>'
  +'<text x="278" y="135" text-anchor="end" fill="#91a8b8" font-size="10">1 MIN</text>'
