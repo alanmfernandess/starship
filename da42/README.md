@@ -213,3 +213,7 @@ Condições AFM: ambos 92%, flaps UP, trem recolhido, VY 90 KIAS até 1900 kg ou
 **Teste oficial do manual:** altitude de partida 2000 ft/OAT 11°C, destino 16000 ft, massa 1900 kg: acumulados iniciais (2 min, 0,5 US gal, 3 NM), finais (17 min, 4,7 US gal, 29 NM) e resultado **15 min, 4,2 US gal, 26 NM**, sem correção de temperatura. Teste adicional +10°C sobre ISA: 16,5 min, 4,62 US gal, 28,6 NM. Outros cenários entre dados tabulados são interpolados; valores finais não estão aprovados para voo.
 
 Validação em `validate_time_to_climb.cjs` e testes de interface móvel em `test_browser.py`. **Não substitui o AFM e as limitações de massa/CG aplicáveis à aeronave.**
+
+### v0.14.1 — Menu PERFORMANCE com nomes apenas
+
+Menu de módulos simplificado segundo Aero UI Master Design: nove acessos identificados apenas pelo nome funcional (Takeoff, Climb, One Engine Climb / Descent, Cruise, Landing, Abnormal Landing, Go-Around, Weight & Balance e Time/Fuel/Distance to Climb). Removidos integralmente ordinais 01–09, subtítulos operacionais e complementos técnicos dos títulos, mantendo botões, dimensões, destaque do selecionado, link de Weight & Balance e motores de cálculo. Testes móveis exigem nove opções, ausência de subtítulos e texto correto em cinco viewports.
