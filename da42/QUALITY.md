@@ -51,3 +51,11 @@
 - Eliminados os quatro campos de Landing Fuel, estado de massa previsto para pouso, ponto Landing CG no gráfico e mensagens de combustível de pouso pendente.
 - Preservados os pontos Zero Fuel e Takeoff, além das quatro combinações estáticas combustível vazio/cheio e degelo carregado/vazio.
 - Regressão ajustada para verificar que entradas antigas de pouso não afetam cálculos de massa e CG e que perfis salvos são saneados; não há funcionalidade de autonomia.
+
+## v0.10 — Gerador de carregamento simulado
+
+- Botão "OTIMIZAR" apenas no Módulo 08. Busca estocástica amostral para Pilot/Copilot/Passenger 1/Passenger 2/Nose/Cabin/Extension; nenhum resultado é aplicado sem passar no motor existente de limitações de massa/CG e quatro cenários estáticos.
+- Combustível Main/Aux L/R **sempre manual**, deicing e dados vazios preservados; se forem incompatíveis, o gerador rejeita.
+- Após otimização, pesos fictícios de ocupantes/bagagens ficam somente leitura, até restauração explícita da carga manual anterior ou do exemplo AFM.
+- O aplicativo identifica de forma visível que os valores são **SIMULADOS**, não registros de pessoas reais ou um plano de carregamento seguro. Não usar para operação.
+- Testes JS estocásticos reproduzíveis adicionados a `npm test` e testes de UI às cinco viewports do script Playwright. A execução da CI depende de confirmação independente do pipeline.
