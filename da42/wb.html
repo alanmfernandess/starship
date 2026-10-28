@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#101820"><meta name="description" content="DA42 NG Weight & Balance — experimental engineering study">
+<title>DA42 NG · Weight & Balance</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" type="image/svg+xml" href="./icon.svg">
+<style>
+:root{color-scheme:dark;--bg:#101820;--tile:#202d39;--txt:#f1f5f9;--label:#91a8b8;--blue:#56b9ee;--amber:#e7b46d;--line:#344652;--green:#67caa9;--red:#ff9e91}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;scrollbar-width:none}
+*::-webkit-scrollbar{display:none}
+html,body{width:100%;height:100%;margin:0;padding:0;background:#fdfdfd;overscroll-behavior:none}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Arial,sans-serif;color:var(--txt)}
+button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+#app{height:100dvh;width:100%;display:flex;align-items:center;justify-content:center;background:#fdfdfd}
+.phone{width:100%;max-width:480px;height:100dvh;min-height:610px;max-height:950px;overflow:hidden;background:var(--bg);position:relative;display:flex;flex-direction:column}
+@media(min-width:550px){#app{padding:18px}.phone{width:min(420px,calc(100dvh*.59));height:min(860px,calc(100dvh - 36px));min-height:620px;border-radius:37px;box-shadow:0 14px 65px #0c121b32}}
+.topbar{height:clamp(64px,9.8dvh,108px);flex:none;margin:0 14px;border-bottom:1px solid var(--line);display:grid;grid-template-columns:44px 1fr 44px;align-items:start;padding-top:clamp(23px,3dvh,38px)}
+.topbar h1{font-size:23px;font-weight:500;letter-spacing:-.5px;line-height:30px;text-align:center;margin:0}
+.icon-btn{border:0;background:transparent;color:#9eb2c0;width:42px;height:36px;display:grid;place-items:center;padding:4px;border-radius:10px;text-decoration:none}
+.icon{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.scroller{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;overscroll-behavior:contain;padding:0 14px 12px}
+.module-heading{display:flex;align-items:center;justify-content:space-between;margin:clamp(22px,4dvh,44px) 0 clamp(12px,2dvh,20px);font-size:13px;color:#b3c4d0;white-space:nowrap}
+.accent{color:var(--blue)}
+.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(10px,1.7dvh,18px);margin-bottom:clamp(12px,2dvh,24px)}
+.field{min-width:0;height:clamp(94px,14dvh,158px);background:var(--tile);border-radius:16px;padding:15px 15px 13px;display:flex;flex-direction:column;justify-content:space-between}
+.field label,.field .field-label{color:var(--label);font-size:clamp(10px,1.6dvh,15px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:.3px}
+.entry{display:flex;align-items:baseline;gap:5px;min-width:0}
+.entry input{color:var(--txt);background:none;border:0;outline:none;width:100%;min-width:0;font-size:clamp(30px,4.7dvh,52px);font-weight:500;font-variant-numeric:tabular-nums;letter-spacing:-.7px}
+.entry input:focus{outline:0}.field:focus-within{box-shadow:inset 0 0 0 1px var(--blue)}
+.unit{font-size:15px;color:#89a6b9;white-space:nowrap;flex:none}
+.open-load{width:100%;background:var(--tile);border:0;border-radius:16px;padding:15px;min-height:70px;margin-bottom:clamp(12px,2dvh,24px);display:flex;align-items:center;justify-content:space-between;text-align:left;color:var(--txt)}
+.open-load .main{display:block;font-size:13px;font-weight:500;color:#b3c4d0;letter-spacing:.15px}.open-load .sub{display:block;font-size:11px;color:var(--label);margin-top:8px}
+.result{background:var(--tile);border-radius:19px;padding:18px 15px 16px;min-height:310px}
+.result-head{display:flex;align-items:center;justify-content:space-between;color:#afc2ce;font-size:13px;letter-spacing:.25px}.result-head .icon{color:var(--blue);width:19px;height:19px}
+.primary{display:flex;align-items:baseline;gap:10px;margin-top:13px}
+.number{font-size:45px;line-height:1.09;letter-spacing:-1.6px;font-weight:550;font-variant-numeric:tabular-nums}.primary-unit{font-size:16px;color:#afc2ce}
+.standalone-status{display:flex;align-items:center;gap:7px;color:var(--green);font-size:11px;margin-top:7px}.standalone-status.bad{color:var(--red)}
+.graph{width:100%;display:block;margin:9px 0 5px;max-height:210px;overflow:visible}
+.graph text{font-family:inherit}
+.legend{display:flex;align-items:center;justify-content:space-between;font-size:10px;color:#a9bdc9;margin-bottom:5px}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px}
+.line{display:flex;align-items:baseline;justify-content:space-between;gap:10px;font-size:13px;color:#96abb9;border-top:1px solid var(--line);padding:10px 0 0;margin-top:8px}.line strong{color:var(--txt);font-size:15px;font-weight:500;font-variant-numeric:tabular-nums}
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}.metric{background:#1a2732;border-radius:12px;padding:10px;min-width:0}
+.metric label{display:block;font-size:10px;color:var(--label);margin-bottom:5px}.metric b{font-size:16px;font-weight:500}
+.notice{min-height:12px;margin:11px 0 2px;text-align:center;color:#8ba2b2;font-size:9px;letter-spacing:.15px}.notice.bad{color:var(--amber)}
+.bottom{height:65px;flex:0 0 auto;display:flex;justify-content:space-around;align-items:center;padding:3px 24px 10px;background:var(--bg)}
+.nav-btn{color:#839bae;background:none;border:0;width:46px;height:47px;display:grid;place-items:center;border-radius:10px}.nav-btn.active{color:var(--blue)}
+.sheet-backdrop{position:absolute;inset:0;background:#050b12b8;z-index:4;display:flex;align-items:flex-end}
+.sheet{width:100%;max-height:82%;overflow:auto;background:#17232e;border-radius:24px 24px 0 0;padding:20px 19px max(24px,env(safe-area-inset-bottom));overscroll-behavior:contain}
+.sheet-head{display:flex;align-items:center;justify-content:space-between;padding-bottom:13px;border-bottom:1px solid var(--line);margin-bottom:15px}.sheet-head h2{font-size:17px;margin:0;font-weight:500}
+.sheet-head .close{border:0;background:transparent;color:#adc2d0;font-size:24px}
+.section-title{color:#7cbde2;font-size:11px;font-weight:600;margin:20px 0 9px;letter-spacing:.3px}
+.sheet-row{display:flex;align-items:center;gap:9px;min-height:55px;border-bottom:1px solid #304251;padding:7px 0}.sheet-row label{font-size:12px;flex:1;color:#b4c4cf}
+.sheet-row input{width:92px;max-width:37%;background:#202d39;border:1px solid #395061;border-radius:9px;padding:10px 8px;color:#f1f5f9;font-size:16px;text-align:right;font-variant-numeric:tabular-nums}
+.sheet-row .unit{width:36px;text-align:right;font-size:11px}
+.s-note{color:#8fa5b5;font-size:11px;line-height:1.5;margin:10px 0}
+.sheet .action,.sheet a.action{width:100%;min-height:45px;padding:12px;background:#243c4d;border:1px solid #456777;border-radius:11px;color:#dcebf4;display:block;text-align:center;text-decoration:none;font-size:12px;margin:12px 0}
+.case{padding:11px 0;border-bottom:1px solid #304251}.case .name{font-size:11px;color:#a9bfcd}.case .value{display:flex;justify-content:space-between;margin-top:6px;font-size:14px;gap:9px}.case .value b{font-weight:500}
+.error{color:var(--red)}.good{color:var(--green)}.warn{color:var(--amber)}
+@media(max-width:355px){.field{height:87px;padding:13px 12px 9px}.entry input{font-size:27px}.module-heading{margin-top:20px}}
+@media(max-height:730px){.topbar{height:72px;padding-top:17px}.module-heading{margin-top:15px;margin-bottom:12px}.field{height:87px}.fields{margin-bottom:10px}.result{padding-top:14px}.bottom{height:57px}}
+</style></head>
+<body><div id="app"></div><script src="./wb-engine.js"></script><script>
+'use strict';
+const E=window.WBEngine,KEY='da42-wb-profile-v1';
+const icons={
+ menu:'<path d="M5 7h14M5 12h9M5 17h6"/>',
+ settings:'<path d="M4 7h16M4 17h16M9 3v8M15 13v8"/><circle cx="9" cy="7" r="2"/><circle cx="15" cy="17" r="2"/>',
+ calculator:'<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M8 7h8M9 11h1M14 11h1M9 15h1M14 15h1M9 19h1M14 19h1"/>',
+ chart:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M6 15l4-4 3 3 5-6"/>',
+ history:'<path d="M3 12a9 9 0 1 0 3-7M3 4v5h5M12 7v5l3 2"/>',
+ next:'<path d="m9 5 7 7-7 7"/>',
+ check:'<path d="m4 13 5 5L20 6"/>',
+ plane:'<path d="m3 19 18-14M8 10l-1-6M14 14l7 1"/>'
+};
+const icon=name=>'<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">'+icons[name]+'</svg>';
+const el=s=>document.querySelector(s);
+const format=(x,d=0)=>typeof x==='number'&&Number.isFinite(x)?new Intl.NumberFormat('en-US',{minimumFractionDigits:d,maximumFractionDigits:d}).format(x):'—';
+let profile=E.EXAMPLE;
+try{const saved=JSON.parse(localStorage.getItem(KEY));if(saved&&typeof saved==='object')profile={...E.EXAMPLE,...saved}}catch(e){}
+let model=E.calculate(profile);
+function esc(s){return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;')}
+const profilesInputs=[
+ ['nose','NOSE BAGGAGE','kg'],['cabin','CABIN BAGGAGE','kg'],['extension','EXTENSION','kg'],
+ ['deice','DE-ICING FLUID','kg'],['mainL','MAIN LEFT','kg'],['mainR','MAIN RIGHT','kg'],
+ ['auxL','AUX LEFT','kg'],['auxR','AUX RIGHT','kg'],
+ ['landingMainL','LDG MAIN LEFT','kg'],['landingMainR','LDG MAIN RIGHT','kg'],
+ ['landingAuxL','LDG AUX LEFT','kg'],['landingAuxR','LDG AUX RIGHT','kg'],
+ ['emptyMass','EMPTY MASS','kg'],['emptyMoment','EMPTY MOMENT','kg·m']
+];
+function currentProfileName(){
+ return Object.keys(E.EXAMPLE).every(k=>profile[k]===E.EXAMPLE[k])?'AFM EXAMPLE':'CUSTOM PROFILE';
+}
+function card(key,label){
+ const v=profile[key];
+ return '<div class="field"><label for="val-'+key+'">'+label+'</label><div class="entry"><input data-wb="'+key+'" id="val-'+key+'" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" value="'+esc(format(v,0))+'" aria-label="'+label+' kg"><span class="unit">kg</span></div></div>';
+}
+function coords(m,c){const width=270,axisL=2.33,axisR=2.51;return [31+(c-axisL)/(axisR-axisL)*width,181-(m-1500)/450*160]}
+function envelope(){
+ const poly=[[1510,2.357],[1900,2.418],[1900,2.480],[1700,2.480],[1510,2.460]].map(([m,c])=>coords(m,c).map(v=>v.toFixed(2)).join(',')).join(' ');
+ const lines=[1510,1700,1900].map(m=>{const y=coords(m,2.33)[1].toFixed(2);return '<path d="M31 '+y+'H301" stroke="#425362" stroke-width=".8"/><text x="26" y="'+(+y+4)+'" text-anchor="end" font-size="10" fill="#9ab0bf">'+m+'</text>'}).join('');
+ const columns=[2.35,2.40,2.45,2.50].map(c=>{const x=coords(1600,c)[0].toFixed(2);return '<path d="M'+x+' 21V181" stroke="#3b4b59" stroke-width=".8"/><text x="'+x+'" y="198" text-anchor="middle" font-size="10" fill="#91a8b8">'+c.toFixed(2)+'</text>'}).join('');
+ let path='',points='';
+ if(model.ok){
+  const plotted=[['zeroFuel','#e7b46d','ZERO FUEL'],['takeoff','#56b9ee','TAKEOFF'],['landing','#67caa9','LANDING']].filter(([k])=>model[k]);
+  if(plotted.length>1)path='<path d="'+plotted.map(([k],i)=>{const [x,y]=coords(model[k].mass,model[k].cg);return (i?'L':'M')+x.toFixed(2)+' '+y.toFixed(2)}).join(' ')+'" fill="none" stroke="#e7b46d" stroke-dasharray="4 4" stroke-width="1.7"/>';
+  points=plotted.map(([k,color,title])=>{const [x,y]=coords(model[k].mass,model[k].cg);return '<circle cx="'+x.toFixed(2)+'" cy="'+y.toFixed(2)+'" r="4.8" fill="'+color+'" stroke="#202d39" stroke-width="2"><title>'+title+'</title></circle>'}).join('');
+ }
+ return '<svg class="graph" viewBox="0 0 320 216" role="img" aria-label="CG envelope, center of gravity versus flight mass">'+lines+columns+'<polygon points="'+poly+'" fill="#56b9ee" fill-opacity=".10" stroke="#56b9ee" stroke-width="2"/>'+path+points+'</svg>';
+}
+function statusText(){
+ if(!model.ok)return '<div class="standalone-status bad">INVALID INPUT · REVIEW LOADING</div>';
+ return '<div class="standalone-status '+(model.statuses.cgOK?'':'bad')+'">'+icon(model.statuses.cgOK?'check':'next')+'CG '+(model.statuses.cgOK?'WITHIN LIMITS':'OUT OF LIMITS')+'</div>';
+}
+function content(){
+ const cg=model.ok?format(model.takeoff.cg,3):'—';
+ const sc=model.ok?model.statuses:{};
+ const fuelText=model.ok?format(model.fuel.usableTotal,1)+' kg · DE-ICE '+format(profile.deice,1)+' kg':'INVALID INPUT';
+ const metrics=model.ok?'<div class="metrics"><div class="metric"><label>ZERO FUEL MASS</label><b>'+format(model.zeroFuel.mass,1)+' kg</b></div><div class="metric"><label>TAKEOFF MASS</label><b>'+format(model.takeoff.mass,1)+' kg</b></div></div>':'<div class="metrics"><div class="metric"><label>CHECK INPUTS</label><b>—</b></div></div>';
+ const massState=model.ok?(sc.massOK?'MASS WITHIN LIMITS':'MASS LIMIT EXCEEDED'):'CHECK INPUTS';
+ return '<div class="phone"><header class="topbar"><button class="icon-btn" id="menu" aria-label="Abrir módulos">'+icon('menu')+'</button><h1>DA42 NG</h1><button class="icon-btn" id="settings" aria-label="Configurações da aeronave">'+icon('settings')+'</button></header>'+
+ '<main class="scroller" id="scroller"><div class="module-heading"><span>WEIGHT &amp; BALANCE</span><span class="accent">CG ENVELOPE</span></div>'+
+ '<div class="fields">'+card('pilot','PILOT')+card('copilot','COPILOT')+card('pax1','PASSENGER 1')+card('pax2','PASSENGER 2')+'</div>'+
+ '<button class="open-load" id="edit-load"><span><span class="main">BAGGAGE &amp; FUEL</span><span class="sub" id="fuel-summary">'+fuelText+'</span></span>'+icon('next')+'</button>'+
+ '<section class="result" aria-live="polite"><div class="result-head"><span>TAKEOFF CG</span>'+icon('chart')+'</div>'+
+ '<div class="primary"><strong class="number" id="cg">'+cg+'</strong><span class="primary-unit">m</span></div><div id="cg-status">'+statusText()+'</div>'+
+ '<div id="envelope">'+envelope()+'</div><div class="legend"><span><i class="dot" style="background:#e7b46d"></i>ZERO FUEL</span><span><i class="dot" style="background:#56b9ee"></i>TAKEOFF</span><span><i class="dot" style="background:#67caa9"></i>LANDING</span></div>'+
+ '<div id="mass-check" class="standalone-status '+(sc.massOK?'':'bad')+'">'+(model.ok?massState:'—')+'</div><div id="metrics">'+metrics+'</div>'+
+ '<div class="line"><span>ZERO FUEL CG</span><strong id="zfcg">'+(model.ok?format(model.zeroFuel.cg,3)+' m':'—')+'</strong></div>'+
+ '</section><div class="notice" id="notice">AFM EXAMPLE / CUSTOM · NOT FOR FLIGHT</div></main>'+
+ '<nav class="bottom"><button class="nav-btn active" id="nav-input" aria-label="Ocupantes">'+icon('calculator')+'</button>'+
+ '<button class="nav-btn" id="nav-chart" aria-label="Envelope CG">'+icon('chart')+'</button>'+
+ '<button class="nav-btn" id="nav-scenarios" aria-label="Cenários de combustível e degelo">'+icon('history')+'</button>'+
+ '<button class="nav-btn" id="nav-settings" aria-label="Dados da aeronave">'+icon('settings')+'</button></nav></div>';
+}
+function parseNumber(text,optional=false){
+ const v=String(text).trim().replaceAll(' ','').replace(',','.');
+ if(!v)return optional?null:NaN;
+ return /^[-+]?\d+(\.\d+)?$/.test(v)?Number(v):NaN;
+}
+function store(){
+ if(E.validate(profile).length===0){try{localStorage.setItem(KEY,JSON.stringify(profile))}catch(e){}}
+}
+function recalc(){
+ model=E.calculate(profile);
+ const set=(s,v)=>{const e=el(s);if(e)e.innerHTML=v};
+ const cg=model.ok?format(model.takeoff.cg,3):'—';
+ set('#cg',cg);set('#cg-status',statusText());set('#envelope',envelope());
+ set('#fuel-summary',model.ok?format(model.fuel.usableTotal,1)+' kg · DE-ICE '+format(profile.deice,1)+' kg':'INVALID INPUT');
+ set('#mass-check','<span class="'+(model.ok?(model.statuses.massOK?'good':'error'):'error')+'">'+(model.ok?(model.statuses.massOK?'MASS WITHIN LIMITS':'MASS LIMIT EXCEEDED'):'CHECK INPUTS')+'</span>');
+ set('#metrics',model.ok?'<div class="metrics"><div class="metric"><label>ZERO FUEL MASS</label><b>'+format(model.zeroFuel.mass,1)+' kg</b></div><div class="metric"><label>TAKEOFF MASS</label><b>'+format(model.takeoff.mass,1)+' kg</b></div></div>':'');
+ set('#zfcg',model.ok?format(model.zeroFuel.cg,3)+' m':'—');
+ const notice=el('#notice');if(notice){notice.textContent=model.ok?(currentProfileName()+' · '+(model.statuses.landingMassStatus==='PENDING'?'LANDING FUEL NOT SET':'LANDING '+model.statuses.landingMassStatus)+' · NOT FOR FLIGHT'):model.errors.join(' · ');notice.classList.toggle('bad',!model.ok||!model.statuses.massOK||!model.statuses.cgOK)}
+ store();
+}
+function bindInputs(root=document){
+ root.querySelectorAll('[data-wb]').forEach(inp=>{
+  inp.addEventListener('input',()=>{
+   const k=inp.dataset.wb,optional=k.startsWith('landing');
+   profile={...profile,[k]:parseNumber(inp.value,optional)};
+   recalc();
+  });
+ });
+}
+function sheet(type){
+ const titles={load:'LOAD CONFIGURATION',settings:'AIRCRAFT PROFILE',scenarios:'FUEL & DE-ICE',modules:'PERFORMANCE'};
+ const sections={
+  load:[
+   ['BAGGAGE',['nose','cabin','extension']],
+   ['FUEL · USEABLE MASS',['mainL','mainR','auxL','auxR']],
+   ['DE-ICING',['deice']],
+   ['LANDING FUEL · REMAINING',['landingMainL','landingMainR','landingAuxL','landingAuxR']]
+  ],
+  settings:[['EMPTY AIRCRAFT',['emptyMass','emptyMoment']]]
+ };
+ let body='';
+ if(type==='load'||type==='settings'){
+  for(const [title,keys] of sections[type]){
+   body+='<div class="section-title">'+title+'</div>';
+   for(const k of keys){
+    const field=profilesInputs.find(([id])=>id===k);
+    body+='<div class="sheet-row"><label for="sheet-'+k+'">'+field[1]+'</label><input data-wb="'+k+'" id="sheet-'+k+'" inputmode="decimal" autocomplete="off" type="text" value="'+(profile[k]===null?'':esc(format(profile[k],k==='emptyMoment'?1:1)))+'" placeholder="—" aria-label="'+field[1]+'"><span class="unit">'+field[2]+'</span></div>';
+   }
+   if(title==='FUEL · USEABLE MASS')body+='<div class="s-note">Main: 79.5 kg per side · Aux: 42.0 kg per side · Density 0.84 kg/L</div>';
+   if(title==='LANDING FUEL · REMAINING')body+='<div class="s-note">Leave all four empty until planned landing fuel is known. No fuel may exceed its takeoff quantity.</div>';
+  }
+  if(type==='settings')body+='<div class="s-note">Empty mass includes unusable fuel and installed equipment. Use the aircraft current Mass &amp; Balance Report for actual flight.</div><button class="action" id="reset-example">RESTORE AFM EXAMPLE</button>';
+ }
+ if(type==='scenarios'){
+  const title='<div class="s-note">CG checks at usable fuel empty/full and de-ice empty/loaded. These are study cases, not a substitute for the aircraft report.</div>';
+  body=title+(model.ok?model.scenarios.map(c=>'<div class="case"><div class="name">'+c.name+'</div><div class="value"><b>'+format(c.mass,1)+' kg</b><span class="'+(c.cgOK?'good':'error')+'">'+format(c.cg,3)+' m · '+(c.cgOK?'CG OK':'CG OUT')+'</span></div></div>').join(''):'<p class="error">'+model.errors.join(', ')+'</p>');
+  if(model.ok)body+='<div class="section-title">CURRENT / PLANNED</div><div class="case"><div class="value"><span>ZERO FUEL</span><b>'+format(model.zeroFuel.mass,1)+' kg</b></div></div><div class="case"><div class="value"><span>TAKEOFF</span><b>'+format(model.takeoff.mass,1)+' kg</b></div></div><div class="case"><div class="value"><span>LANDING</span><b>'+ (model.landing?format(model.landing.mass,1)+' kg':'NOT SET') +'</b></div></div>';
+ }
+ if(type==='modules')body='<a class="action" href="./index.html">PERFORMANCE MODULES 01–07</a><a class="action" href="./wb.html">08 · WEIGHT &amp; BALANCE</a>';
+ const d=document.createElement('div');d.className='sheet-backdrop';d.innerHTML='<div class="sheet" role="dialog" aria-modal="true" aria-label="'+titles[type]+'"><div class="sheet-head"><h2>'+titles[type]+'</h2><button class="close" aria-label="Fechar">×</button></div>'+body+'</div>';
+ el('.phone').appendChild(d);
+ d.addEventListener('click',ev=>{if(ev.target===d)d.remove()});
+ d.querySelector('.close').onclick=()=>d.remove();
+ bindInputs(d);
+ const reset=d.querySelector('#reset-example');if(reset)reset.onclick=()=>{profile={...E.EXAMPLE};model=E.calculate(profile);localStorage.removeItem(KEY);d.remove();render()};
+}
+function render(){
+ model=E.calculate(profile);el('#app').innerHTML=content();bindInputs();
+ el('#menu').onclick=()=>sheet('modules');
+ el('#settings').onclick=()=>sheet('settings');
+ el('#edit-load').onclick=()=>sheet('load');
+ el('#nav-input').onclick=()=>{el('#scroller').scrollTo({top:0,behavior:'smooth'})};
+ el('#nav-chart').onclick=()=>el('.result').scrollIntoView({behavior:'smooth',block:'start'});
+ el('#nav-scenarios').onclick=()=>sheet('scenarios');
+ el('#nav-settings').onclick=()=>sheet('settings');
+ recalc();
+}
+window.WBApp={get profile(){return profile},get model(){return model},render,sheet};
+render();
+if('serviceWorker'in navigator&&location.protocol==='https:')window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+</script></body></html>
