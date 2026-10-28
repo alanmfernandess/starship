@@ -1,4 +1,4 @@
-# Evidências de teste — DA42NG v0.8 (Cruising / TAS)
+# Evidências de teste — DA42NG v0.9 (Cruising / TAS)
 
 **Fonte primária:** DA42 NG AFM, Doc. 7.01.15-E, Rev. 1, 18-Feb-2009. Módulo TAS: p. 5-19; demais módulos: p. 5-13, p. 5-15 e p. 5-17.
 
@@ -31,3 +31,17 @@
 - Testes de navegador para ambas as telas adicionados ao script Playwright em cinco resoluções; a execução do GitHub Actions ainda precisa ser observada separadamente.
 
 **Ferramenta experimental; NÃO USAR PARA VOO.**
+
+
+## v0.9 — Weight & Balance
+
+- Referência primária: figuras e tabelas fornecidas pelo usuário, seções AFM 2.7, 2.8, 6.4.1–6.4.5.
+- Exemplo oficial reproduzido: empty 1450 kg e 3488 kg·m; Zero Fuel 1655,5 kg / 3958,72 kg·m / CG 2,391 m; Takeoff 1898,5 kg / 4645,69 kg·m / CG 2,447 m.
+- Cálculo direto por somatório de massas e momentos; envelope CG por interpolação exata dos pontos numéricos da seção 2.8, em vez de digitalização de pixels.
+- Limites individuais de bagagens, combinado cabin+extension, MZFM 1765 kg, MTOM 1900 kg, MLW normal 1805 kg e mínimo de voo 1510 kg.
+- Cargas individuais de piloto/copiloto, passageiros traseiros, compartimentos, quatro tanques de combustível utilizável e fluido de degelo.
+- Landing Fuel pendente até entrada explícita de quatro quantidades; casos de CG com combustível vazio/cheio e fluido carregado/retirado.
+- Testes: \`validate_wb.cjs\` (motor, limites, regressão oficial, combinação de cargas), \`test_wb_browser.py\` (tela mobile, limites, persistência da entrada, envelope e cenário).
+- Código W&B na pasta \`da42\` do repositório Starship em \`wb.html\` e \`wb-engine.js\`, sem modificar a aplicação Starship principal.
+
+**Escopo:** precisão matemática das fórmulas do exemplo e limites documentados, não aprovação operacional da aeronave. O relatório de peso e balanceamento atualizado e suplementos são imprescindíveis para uso específico. O dispositivo e o software não são certificados. 
