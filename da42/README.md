@@ -181,3 +181,7 @@ Condições fixas AFM: motor remanescente com carga de 92%, motor inoperante emb
 A UI mantém quatro cartões Aero UI, o seletor OAT/ISA, a taxa em ft/min e m/s, e sinaliza em amarelo **ROC inferior a 50 ft/min**, conforme área cinza escura do AFM. ROC negativo é exibido com sinal e identificação de descida. O gráfico marca referências de 0 e 50 ft/min. Regressões em `validate_oei_tables.cjs` incluem todos os valores tabulados, negativos, zeros, 42 células sem dados, interpolação e rejeição de extrapolações. Os testes móveis foram estendidos.
 
 **Atenção:** valores de performance para 1.999 kg não atualizam automaticamente os limites de massa/CG do módulo Weight & Balance; a documentação aplicável à configuração da aeronave e MÄM 42-678 deve ser verificada. Ferramenta experimental, **não usar para voo**.
+
+### v0.13.1 — Aero UI OAT/ISA alignment
+
+Conformidade visual dos cartões de parâmetros: o cabeçalho OAT ocupa a mesma altura que os outros rótulos e o botão ISA fica posicionado independentemente dentro do cartão, sem deslocar o campo numérico. Removido o subtítulo redundante `ONE ENGINE (REMAINING)` do cartão de potência do OEI. Mantidos os quatro parâmetros, tamanhos, espaçamentos gerais, dimensões dos cartões e todos os motores de performance. Regressão em cinco viewports para alinhamento de rótulos e entradas OAT/Pressure Alt, em ambos os modos OAT/ISA.
