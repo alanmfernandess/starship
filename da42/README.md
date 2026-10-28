@@ -185,3 +185,7 @@ A UI mantém quatro cartões Aero UI, o seletor OAT/ISA, a taxa em ft/min e m/s,
 ### v0.13.1 — Aero UI OAT/ISA alignment
 
 Conformidade visual dos cartões de parâmetros: o cabeçalho OAT ocupa a mesma altura que os outros rótulos e o botão ISA fica posicionado independentemente dentro do cartão, sem deslocar o campo numérico. Removido o subtítulo redundante `ONE ENGINE (REMAINING)` do cartão de potência do OEI. Mantidos os quatro parâmetros, tamanhos, espaçamentos gerais, dimensões dos cartões e todos os motores de performance. Regressão em cinco viewports para alinhamento de rótulos e entradas OAT/Pressure Alt, em ambos os modos OAT/ISA.
+
+### v0.13.2 — Engine Power typography
+
+A fonte numérica de `ENGINE POWER` foi unificada às demais entradas do Aero UI por uma **única declaração CSS compartilhada**, incluindo tamanho responsivo, altura de linha, peso, espaçamento e numerais tabulares. Corrigida também a regra específica para telas com largura de até 355px, sem alterar dimensões dos cartões, conteúdo, posições, quatro parâmetros ou resultados aeronáuticos. O teste móvel confere as propriedades tipográficas calculadas em cinco viewports, nos módulos OEI e Cruise.
