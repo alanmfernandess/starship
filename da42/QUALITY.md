@@ -125,3 +125,13 @@
 - Headwind -10%/14kt; tailwind +10%/3kt, applied once. Pavement wet +15% to full landing distance. Grass 5cm/5-10cm/>10cm and wet/soft plus downhill 9%/1% applied to ground roll and added to total distance.
 - Strong warning: grass >10cm minimum +25% only; wet/soft conditions, unusually uneven runway or adverse meteorology may greatly increase actual distance. Results are not approved or operational predictions.
 - Aero UI unchanged four parameter cards, ISA/OAT switch, dedicated runway sheet including slope control. Landing and Abnormal older digitized nomograms no longer used for computation. Regression and browser tests updated.
+
+## v0.17.0 — AFM Go-Around Climb Performance 5.3.12
+
+- Three masses: 1700 / 1900 / 1999kg; six pressure altitudes 0–10000ft; 8 OAT anchors −20..50°C and an independent published ISA column.
+- Complete tabulation of **150 numeric ROC cells + 12 diagonally crossed-out cells**. No extrapolation and no interpolation through a crossed-out corner.
+- Four cards in the established Aero UI: PA/OAT+ISA/MASS/fixed dynamic VREF (84/86 KIAS). Flaps LDG, gear extended, both engines MAX.
+- Main result ROC ft/min and vertical speed m/s; rising cubic curve schematic for one minute's climb. Three exact AFM angles shown only at MSL/ISA 1805/1900/1999kg; no gradient or angle inferred from indicated speed at other conditions.
+- Exact reference MSL/ISA: 690 / 547 / 454 ft/min (1700/1900/1999kg); 1805kg table interpolation ≈614.925 ft/min and official angle 4.3°.
+- Strict 1999kg applicability note for MÄM 42-678; non-flight educational model.
+- Regression via `validate_goaround_tables.cjs`, `validate_modules67.cjs` and five viewport `test_browser.py`.
