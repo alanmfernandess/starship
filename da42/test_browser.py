@@ -72,11 +72,12 @@ with sync_playwright() as p:
             'LANDING',
             'ABNORMAL LANDING',
             'GO-AROUND',
-            'TIME · FUEL · DISTANCE TO CLIMB'
+            'TIME · FUEL · DISTANCE TO CLIMB',
+            'CRUISE PERFORMANCE'
         ]
         assert page.locator('.sheet button[data-module] strong').all_inner_texts()==expected_modules
         assert page.locator('.sheet a.option[href="./wb.html"] strong').inner_text()=='WEIGHT & BALANCE'
-        assert page.locator('.sheet .option').count()==9
+        assert page.locator('.sheet .option').count()==10
         assert page.locator('.sheet .option .sub').count()==0
         assert page.locator('.sheet .option').evaluate_all("(xs)=>xs.every(x=>x.querySelectorAll('strong').length===1)")
         assert page.locator('html').evaluate('(el)=>el.scrollWidth')<=w
@@ -334,6 +335,45 @@ with sync_playwright() as p:
         assert page.locator('#main-result').inner_text()=='15.0'
         assert len(errors)==0,errors
         all_checks+=24
+        # Cruise Performance §5.3.10 — published 1999kg power/FF/TAS grids.
+        page.locator('#menu').click()
+        assert page.locator('button[data-module="cruiseperf"]').count()==1
+        page.locator('button[data-module="cruiseperf"]').click()
+        assert page.locator('.field').count()==4
+        assert page.locator('input[data-key="mass"]').count()==0
+        assert page.locator('.field.readonly .power-value').inner_text()=='1,999'
+        assert page.locator('#main-result').inner_text()=='156'
+        assert page.locator('#secondary-result').inner_text()=='13.0 US gal/h'
+        assert page.locator('#cruise-config').inner_text()=='STANDARD'
+        assert page.locator('#plot-area svg.cruise-performance-plot').count()==1
+        assert page.locator('#plot-area path.cruise-performance-curve').count()>=1
+        assert ' C' in page.locator('#plot-area path.cruise-performance-curve').first.get_attribute('d')
+        page.locator('input[data-key="load"]').fill('92')
+        assert page.locator('#main-result').inner_text()=='172'
+        assert page.locator('#secondary-result').inner_text()=='16.5 US gal/h'
+        page.locator('#cruise-config').click()
+        assert page.locator('#cruise-config').inner_text()=='OÄM −2%'
+        assert page.locator('#main-result').inner_text()=='169'
+        assert page.locator('#secondary-result').inner_text()=='16.5 US gal/h'
+        page.locator('#cruise-config').click()
+        assert page.locator('#main-result').inner_text()=='172'
+        page.locator('#temp-mode-toggle').click()
+        assert page.locator('#val-oat').input_value()=='0.0'
+        page.locator('input[data-key="oat"]').fill('30')
+        assert page.locator('#main-result').inner_text()=='—'
+        page.locator('input[data-key="load"]').fill('90')
+        assert page.locator('#main-result').inner_text()=='174'
+        assert page.locator('#secondary-result').inner_text()=='16.1 US gal/h'
+        page.locator('input[data-key="pa"]').fill('18000')
+        assert page.locator('#main-result').inner_text()=='—'
+        page.locator('input[data-key="load"]').fill('75')
+        assert page.locator('#main-result').inner_text()=='168'
+        assert page.locator('#secondary-result').inner_text()=='13.0 US gal/h'
+        page.locator('input[data-key="pa"]').fill('19000')
+        assert page.locator('#main-result').inner_text()=='—'
+        assert page.locator('html').evaluate('(el)=>el.scrollWidth')<=w
+        assert len(errors)==0,errors
+        all_checks+=29
         ctx.close()
     browser.close()
     print(f'{all_checks} mobile Chromium checks passed at 5 viewport sizes.')
