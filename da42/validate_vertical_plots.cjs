@@ -23,6 +23,18 @@ function check(id,v){
  }
  assert.ok(svg.includes('class="plot vertical-rate-plot"'),id+' needs rate-of-climb vertical profile');
  assert.ok(svg.includes('1 MIN'),id+' needs time scale');
+ // A real SVG cubic (C) must replace the old M..L line in every result.
+ const path=svg.match(/<path class="vertical-curve" d="([^"]+)"/)?.[1];
+ assert.ok(path,id+': dedicated smoothed path missing');
+ const bezier=path.match(/^M([\d.-]+) ([\d.-]+) C([\d.-]+) ([\d.-]+) ([\d.-]+) ([\d.-]+) ([\d.-]+) ([\d.-]+)$/);
+ assert.ok(bezier,id+': expected cubic Bezier curve');
+ const [x0,y0,x1,y1,x2,y2,x3,y3]=bezier.slice(1).map(Number);
+ assert.ok(x0<x1&&x1<x2&&x2<x3,'x-coordinates must advance');
+ assert.ok(Math.abs(y0-numberAttr(svg,'baseline-y'))<.001);
+ assert.ok(Math.abs(y3-numberAttr(svg,'end-y'))<.001);
+ if(r.main>0)assert.ok(y0>=y1&&y1>=y2&&y2>=y3,'curved ascent must be monotone');
+ if(r.main<0)assert.ok(y0<=y1&&y1<=y2&&y2<=y3,'curved descent must be monotone');
+ if(r.main===0)assert.ok([y0,y1,y2,y3].every(y=>y===y0),'zero ROC must remain flat');
  assert.ok(!svg.includes('−20°C'),id+' must not show OAT sensitivity on result card');
  const baseline=numberAttr(svg,'baseline-y'),end=numberAttr(svg,'end-y'),roc=numberAttr(svg,'roc');
  assert.equal(roc,r.main);
