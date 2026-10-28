@@ -1,4 +1,4 @@
-# Evidências de teste — DA42NG v0.6 (Cruising / TAS)
+# Evidências de teste — DA42NG v0.7 (Cruising / TAS)
 
 **Fonte primária:** DA42 NG AFM, Doc. 7.01.15-E, Rev. 1, 18-Feb-2009. Módulo TAS: p. 5-19; demais módulos: p. 5-13, p. 5-15 e p. 5-17.
 
@@ -17,3 +17,7 @@
 - **UI/Cruise:** seletor OAT ↔ ΔISA (somente Cruising); teste de atualização do TAS, preservação do desvio durante mudança de altitude, persistência na navegação e domínio das curvas; 100 verificações locais Chromium em cinco viewports para a alteração.
 
 - **Correção v0.6 (carta original):** PA estendida de 14.000 até 18.000 ft, usando leituras dos traços em 16.000/18.000 ft para cargas 50/60/70/80/92%, com inflexão do grupo 92%. ΔISA −10/+30 °C, carga 50–92%, eixo TAS 120–180 kt. Testes adicionais em cinco resoluções móveis nas bordas do domínio.
+
+- **Landing v0.7:** módulo FLAPS LDG com gráfico segmentado 50 ft → touchdown → parada, 4 entradas, saída ground roll e distância sobre 50 ft. Ponto do AFM (p. 5-23): **248 m e 480 m**; trecho aéreo de **232 m** calculado por diferença.
+- **Regressão Landing:** 1.375 combinações de PA/OAT/massa/vento dentro dos limites, 10 casos inválidos, 4 relações de tendência e consistência total > ground roll. Ensaios de navegador adicionados para 5 tamanhos de tela na CI; a simples disponibilização do arquivo não prova execução CI.
+- **Aplicabilidade:** Flaps LDG, ambos IDLE, pista nivelada/dura/seca, 84 KIAS; >1.805 kg constitui procedimento anormal conforme AFM Rev.1. Aproximações do nomograma não foram validadas independentemente para desempenho operacional.
