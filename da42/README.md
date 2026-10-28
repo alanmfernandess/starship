@@ -145,3 +145,13 @@ Removidos do cartão de resultados o cabeçalho/valor numérico principal de CG,
 ### v0.10.4 — ZFW/TOW sem decimais
 
 As massas ZFW/TOW são **exibidas arredondadas ao quilograma inteiro** nos cartões principais e nos cenários (exemplo AFM: 1.656 kg e 1.899 kg). Os somatórios de massa e momento, validação MZFM/MTOM, cálculos de CG e otimizador mantêm integralmente os valores numéricos originais sem arredondamento intermediário.
+
+### v0.11 — Módulo 01 Takeoff, AFM §5.3.6
+
+Reimplementado o modelo de distância de decolagem a partir das **seis tabelas enviadas pelo usuário**, com dois procedimentos: **Normal / Flaps UP (VR 80 KIAS, V50 85 KIAS)** e **Short Field / Flaps APP (VR 76 KIAS, V50 82 KIAS)**, ambos MAX, pista seca e nivelada como referência. A interface permite alternar Normal/Short, selecionar coluna ISA ou OAT tabular, e configurar as correções de grama seca 5 cm (+10% corrida), 5–10 cm (+15%), 25 cm (+25%), grama molhada (+10% cálculo seco), solo macio (+45% corrida adicional) e aclive (+12% corrida por 1%). Vento de proa: −10% a cada 14 kt; vento de cauda: +10% a cada 3 kt, conforme AFM. Não aplicar uma segunda correção para frações de vento, já incorporadas nos fatores.
+
+O motor independente `takeoff-tables.js` contém dados completos para **1.700, 1.900 e 1.999 kg**, altitudes 0–10.000 ft, OAT 0/10/20/30/40/50°C e coluna ISA. Células riscadas/sem valores são `null` e nunca são extrapoladas. Interpolação linear somente entre pontos publicados válidos. **Regras de limitação:** cálculo restrito a 1.700–1.900 kg, de acordo com o MTOW 1.900 kg do AFM §2.7 fornecido. Os números de 1.999 kg são mantidos como dados da carta de referência, mas não habilitados na calculadora sem demonstração de aplicabilidade de um suplemento/certificação de massa superior. Valores fora do envelope tabular são rejeitados.
+
+Resultado inclui Ground Roll e distância sobre 50 ft, com gráfico proporcional. Referência de teste: massa 1.900 kg, SL, OAT 10°C, vento zero, pista pavimentada: Normal 450/710 m, Short 430/640 m. Em ISA (SL) Normal 458/734 m e Short 445/657 m; valores da coluna ISA usados diretamente. Ponto da interface original (1.800 kg, SL, 15°C, vento de proa 10kt): 406,25m corrida e 638,393m total, agora derivados da tabela e correção de vento.
+
+**Nota de validade:** fatores de superfície e declive são típicos, e condições de pista molhada, irregular ou macia podem causar distâncias muito superiores. A distância disponível deve ser comparada com a distância sobre 50 ft; este software não está aprovado para cálculo operacional. Testes adicionais em `validate_takeoff_tables.cjs` e `test_browser.py`.
