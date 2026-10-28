@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover,user-scalable=no" />
+<meta name="theme-color" content="#101820" />
+<meta name="description" content="DA42 NG Performance — laboratório de engenharia: decolagem, subida bimotor e subida/descida monomotor." />
+<link rel="manifest" href="./manifest.webmanifest" />
+<link rel="icon" type="image/svg+xml" href="./icon.svg" />
+<title>DA42 NG · Performance Lab</title>
+<style>
+:root{color-scheme:dark;--bg:#101820;--tile:#202d39;--txt:#f1f5f9;--label:#91a8b8;--blue:#56b9ee;--amber:#e7b46d;--line:#344652;--space:12px;--r:17px}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;padding:0;min-height:100%;width:100%;background:#fff;overscroll-behavior:none}html{touch-action:pan-y}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Arial,sans-serif;color:var(--txt)}button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible{outline:2px solid var(--blue);outline-offset:2px}*::-webkit-scrollbar{display:none}*{scrollbar-width:none}
+#app{width:100%;min-height:100dvh;display:flex;align-items:center;justify-content:center;background:#fdfdfd;padding:0}
+.phone{--px:min(1px, calc(100vw / 390));background:var(--bg);height:100dvh;min-height:610px;max-height:950px;width:100%;max-width:480px;overflow:hidden;position:relative;display:flex;flex-direction:column;isolation:isolate}
+@media(min-width:550px){#app{padding:18px}.phone{width:min(420px,calc(100dvh * .59));height:min(860px, calc(100dvh - 36px));min-height:620px;border-radius:37px;box-shadow:0 14px 65px #0c121b32}}
+.topbar{flex:0 0 auto;height:clamp(64px,9.8dvh,108px);margin:0 14px;border-bottom:1px solid var(--line);display:grid;grid-template-columns:44px 1fr 44px;align-items:start;padding-top:clamp(23px,3.0dvh,38px)}
+.topbar h1{font-size:23px;letter-spacing:-.5px;font-weight:500;margin:0;text-align:center;line-height:30px;white-space:nowrap}
+.icon-btn{border:none;background:transparent;color:#9eb2c0;width:42px;height:36px;display:grid;place-items:center;padding:4px;border-radius:10px}
+.icon-btn:last-child{justify-self:end}.icon{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.scroller{flex:1 1 auto;min-height:0;overflow:auto;scrollbar-width:none;padding:0 14px 14px;overscroll-behavior:contain}
+.module-heading{margin-top:clamp(28px,4dvh,47px);margin-bottom:clamp(12px,2.3dvh,24px);min-height:23px;display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:13px;letter-spacing:.15px;color:#b3c4d0;font-weight:400;white-space:nowrap}
+.module-heading .name{min-width:0;overflow:hidden;text-overflow:ellipsis;font-size:clamp(10px,2.7vw,13px)}.module-heading .accent{color:var(--blue);flex-shrink:0}
+.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(10px,1.7dvh,18px);margin-bottom:clamp(13px,2dvh,24px)}
+.field{min-width:0;position:relative;background:var(--tile);height:clamp(94px,14dvh,158px);border-radius:16px;padding:15px 15px 13px;display:flex;flex-direction:column;justify-content:space-between}
+.field label{color:var(--label);font-size:clamp(10px,1.6dvh,15px);letter-spacing:.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;user-select:none}
+.field .entry{width:100%;display:flex;gap:5px;align-items:baseline;justify-content:space-between;min-width:0}
+.field input{color:var(--txt);background:none;padding:0;border:0;border-radius:0;outline:0;font-size:clamp(30px,4.7dvh,52px);line-height:1.15;font-weight:500;min-width:0;width:100%;max-width:100%;font-variant-numeric:tabular-nums;letter-spacing:-.7px}
+.field input:focus{outline:none}.field:focus-within{box-shadow:inset 0 0 0 1px var(--blue)}.field output{color:#89a6b9;font-size:15px;white-space:nowrap;flex-shrink:0}.field.readonly{cursor:default}.field.readonly .power-value{font-size:30px;line-height:38px;color:var(--txt);letter-spacing:-.8px}.field .power-note{font-size:9px;letter-spacing:.2px;color:var(--label);white-space:nowrap;position:absolute;bottom:8px;left:15px}
+.result{background:var(--tile);border-radius:19px;padding:21px 15px 16px;position:relative;overflow:hidden;min-height:clamp(282px,38dvh,485px)}
+.result-head{display:flex;align-items:center;justify-content:space-between;color:#afc2ce;font-size:13px;letter-spacing:.25px}.result-head svg{width:19px;height:19px;color:var(--blue)}
+.primary{display:flex;align-items:baseline;gap:10px;margin-top:15px;white-space:nowrap}.primary-number{font-size:45px;line-height:1.09;letter-spacing:-1.6px;font-weight:550;font-variant-numeric:tabular-nums}.primary-unit{font-size:16px;color:#afc2ce}.primary-number.negative{color:var(--amber)}
+.plot{height:clamp(138px,18dvh,215px);width:100%;display:block;margin:8px 0 6px;overflow:visible}.plot .grid{stroke:#354b5a;stroke-width:.8}.plot .blue{fill:none;stroke:var(--blue);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}.plot .gold{fill:none;stroke:var(--amber);stroke-width:1.35;stroke-linecap:round;stroke-linejoin:round}.plot .dot{fill:var(--blue);stroke:var(--tile);stroke-width:2}
+.secondary{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-top:0;font-size:13px;color:#96abb9;letter-spacing:.1px}.secondary strong{font-size:16px;color:var(--txt);font-weight:500;letter-spacing:0;font-variant-numeric:tabular-nums}.secondary strong.negative{color:var(--amber)}
+.banner{margin-top:10px;min-height:13px;color:#7892a3;font-size:9px;text-align:center;letter-spacing:.18px}.banner.error{color:#ffbb9c}
+.bottom{height:65px;flex:0 0 auto;display:flex;justify-content:space-around;align-items:center;padding:3px 24px 10px;background:var(--bg)}.nav-btn{color:#839bae;background:none;border:0;width:46px;height:47px;display:grid;place-items:center;border-radius:10px}.nav-btn.active{color:var(--blue)}.nav-btn .icon{width:23px;height:23px}
+.sheet-backdrop{position:absolute;inset:0;background:#050b12ab;z-index:4;display:flex;align-items:flex-end}.sheet{width:100%;max-height:79%;overflow:auto;background:#17232e;border-radius:24px 24px 0 0;padding:20px 20px max(24px,env(safe-area-inset-bottom));box-shadow:0 -8px 40px #0003}.sheet-header{display:flex;align-items:center;justify-content:space-between;padding-bottom:16px;border-bottom:1px solid var(--line);margin-bottom:16px}.sheet h2{font-size:18px;margin:0;font-weight:500}.sheet button.close{border:0;background:none;color:#9cb4c3;font-size:24px;padding:0 7px}.sheet .option{width:100%;min-height:62px;border:none;background:#202d39;color:#ecf5fa;text-align:left;border-radius:14px;padding:12px 15px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:12px}.sheet .option .sub{display:block;color:#90a7b7;font-size:11px;margin-top:4px}.sheet .option.selected{box-shadow:inset 0 0 0 1px var(--blue)}.sheet .option svg{width:18px;height:18px;color:var(--blue)}.sheet small{color:#a7bdc8;line-height:1.5;font-size:12px;display:block;margin-top:12px}.sheet .mini{font-size:12px;color:#91a9b9}.sheet .disclaimer{margin-top:16px;color:#e2b176;font-size:12px;line-height:1.5}.sheet .history-empty{color:#90a7b7;font-size:12px;margin:20px 0}.sheet .small-action{background:transparent;border:1px solid #415567;border-radius:10px;color:#aec2d0;padding:11px 14px;width:100%;margin-top:10px}
+@media(max-width:355px){.topbar{height:78px;margin:0 17px}.scroller{padding:0 17px 12px}.module-heading{margin-top:22px;margin-bottom:13px}.field{height:87px;padding:13px 12px 9px}.field input{font-size:27px}.result{min-height:265px}.plot{height:125px}}
+@media(max-height:730px){.topbar{height:72px;padding-top:17px}.module-heading{margin-top:15px;margin-bottom:12px}.field{height:87px}.fields{margin-bottom:10px}.result{padding-top:14px;min-height:265px}.plot{height:124px}.bottom{height:57px}}
+@media(prefers-reduced-motion:no-preference){.sheet{animation:rise .2s ease-out}@keyframes rise{from{transform:translateY(15px);opacity:.85}to{transform:translateY(0);opacity:1}}}
+</style>
+</head>
+<body><div id="app"></div>
+<script>
+'use strict';
+/**
+ * Aero UI 1.0 — Prototype / engineering demonstration only.
+ * Raster-digitized, piecewise-interpolated graphical nomogram curves; calibration anchored to published examples.
+ * NOT independently validated at off-example conditions. Not approved for flight.
+ */
+const MODELS={
+ takeoff:{label:'TAKEOFF',panel:'TAKEOFF DISTANCE',metric:'GROUND ROLL',unit:'m',metricUnit:'m',fields:[{k:'pa',name:'PRESSURE ALT',u:'ft'},{k:'oat',name:'OAT',u:'°C'},{k:'mass',name:'T/O MASS',u:'kg'},{k:'wind',name:'HEADWIND',u:'kt'}],defaults:{pa:0,oat:15,mass:1800,wind:10}},
+ climb:{label:'CLIMB',panel:'RATE OF CLIMB',metric:'VERTICAL SPEED',unit:'ft/min',metricUnit:'m/s',fields:[{k:'pa',name:'PRESSURE ALT',u:'ft'},{k:'oat',name:'OAT',u:'°C'},{k:'mass',name:'FLIGHT MASS',u:'kg'},{k:'power',name:'POWER',u:'%',fixed:true}],defaults:{pa:0,oat:15,mass:1800,power:92}},
+ oei:{label:'ONE ENGINE CLIMB / DESCENT',panel:'RATE OF CLIMB',metric:'VERTICAL SPEED',unit:'ft/min',metricUnit:'m/s',fields:[{k:'pa',name:'PRESSURE ALT',u:'ft'},{k:'oat',name:'OAT',u:'°C'},{k:'mass',name:'FLIGHT MASS',u:'kg'},{k:'power',name:'ENGINE POWER',u:'%',fixed:true}],defaults:{pa:0,oat:15,mass:1800,power:92}}
+};
+const el=s=>document.querySelector(s),escapeHTML=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const persisted=(()=>{try{return JSON.parse(localStorage.getItem('aero-ui-da42-v1'))||{}}catch{return {}}})();
+let current=Object.prototype.hasOwnProperty.call(MODELS,persisted.current)?persisted.current:'takeoff';let inputs={};for(const id in MODELS)inputs[id]={...MODELS[id].defaults,...(persisted.inputs&&persisted.inputs[id]||{})};let history=Array.isArray(persisted.history)?persisted.history.slice(0,20):[];
+function persist(){try{localStorage.setItem('aero-ui-da42-v1',JSON.stringify({current,inputs,history}))}catch{}}
+/**
+ * Reverse-engineered graphical nomograms, 7.01.15-E Rev.1 (2009):
+ * - Left-panel curves: 3 manually digitized ordinate anchors per altitude.
+ * - Other panels: Hough line-segment fits from the rasterized AFM charts.
+ * - Piecewise interpolation only (no atmospheric/performance proxy formula).
+ * - One published example per module sets the ordinate registration.
+ * Important: graphical readings have NOT been independently verified at
+ * off-example conditions. Not suitable for aircraft operations.
+ */
+const NOMOGRAMS={
+ takeoff:{pa:[0,2000,4000,6000,8000,10000],start:[627,608,585,560,540,512],mid:[582,559,531,497,449,395],end:[522,495,463,412,354,302],
+  mass:[[304.6,.691],[351.8,.610],[390.4,.542],[437.6,.473],[479.7,.397],[527.7,.321],[563.8,.265],[591.8,.224],[620.7,.177]],
+  headwind:[[304,.502],[351,.459],[390,.427],[438,.362],[479,.326],[528,.280],[564,.240],[610,.190],[646,.149]],
+  tailwind:[[303,-1.65],[351,-1.52],[389,-1.38],[436,-1.22],[477,-1.10],[525,-.96],[562,-.84],[608,-.65],[646,-.49]],
+  height:[[273,-8.30],[381,-6.47],[426,-5.20],[473,-4.20],[523,-3.13],[568,-2.42],[611,-1.91],[623,-1.60],[667,-1.00]]},
+ climb:{pa:[0,2000,4000,6000,8000,10000,12000,14000,16000,18000],
+  start:[545,537,527,515,498,480,460,435,381,328],mid:[518,501,486,469,452,429,378,326,260,202],end:[462,441,422,402,382,362,330,294,254,202],
+  mass:[[196,.295],[231,.306],[263,.339],[310,.361],[357,.380],[405,.426],[446,.444],[494,.460],[516,.440],[538,.436]]},
+ oei:{pa:[0,2000,4000,6000,8000,10000,12000,14000,16000,18000],
+  start:[563,553,539,522,504,486,469,424,370,320],mid:[530,511,489,465,441,415,366,315,257,210],end:[476,459,440,419,398,378,352,315,258,210],
+  mass:[[198.5,.198],[229.6,.218],[262.2,.234],[299.5,.261],[336.7,.283],[390.4,.306],[438,.325],[499.6,.333],[562.7,.356],[635,.370]]}
+};
+function lerp(a,b,q){return a+(b-a)*q}
+function interp(rows,x){if(x<rows[0][0]||x>rows[rows.length-1][0])throw Error('FORA DO DOMÍNIO DIGITALIZADO');for(let i=1;i<rows.length;i++)if(x<=rows[i][0]){const a=rows[i-1],b=rows[i],q=(x-a[0])/(b[0]-a[0]);return lerp(a[1],b[1],q)}return rows.at(-1)[1]}
+function isaMax(pa){return 50-.0019812*pa}
+function leftPanel(id,pa,oat){const n=NOMOGRAMS[id];const deltaISA=oat-(15-.0019812*pa);const rows=[];
+ for(let i=0;i<n.pa.length;i++){
+  const altitude=n.pa[i],max=isaMax(altitude),mid=Math.min(15,max);
+  const temperature=deltaISA+15-.0019812*altitude;
+  const anchors=[[-35,n.start[i]],[mid,n.mid[i]]];
+  if(max>mid+1e-4)anchors.push([max,n.end[i]]);
+  const j=temperature< -35?-35:temperature>max?max:temperature;
+  rows.push([altitude,interp(anchors,j)]);
+ }
+ return interp(rows,pa)
+}
+function stage(rows,yIn,dx){return yIn+interp(rows,yIn)*dx}
+function takeoffDistance(y){return 100+(708-y)*1500/527}
+function rawCompute(id,v){const n=NOMOGRAMS[id];let y=leftPanel(id,v.pa,v.oat);
+ if(id==='takeoff'){
+  y=stage(n.mass,y,((1900-v.mass)/400)*153);
+  const w=v.wind>=0?n.headwind:n.tailwind;
+  y=stage(w,y,Math.abs(v.wind)*(v.wind>=0?154/20:78/10));
+  return {ground:takeoffDistance(y),total:takeoffDistance(stage(n.height,y,45))};
+ }
+ y=stage(n.mass,y,((1900-v.mass)/400)*358);
+ return {roc:id==='climb'?300+(y-179)*1200/528:-300+(y-167)*700/533};
+}
+const EXAMPLES={takeoff:{pa:0,oat:15,mass:1800,wind:10},climb:{pa:0,oat:15,mass:1800,power:92},oei:{pa:0,oat:15,mass:1800,power:92}};
+let GRAPH_REGISTRATION={};
+function calibrate(){// Anchor the plotted ordinate to the published example, not to invented physics coefficients.
+ const a=rawCompute('takeoff',EXAMPLES.takeoff);GRAPH_REGISTRATION.takeoff={ground:370-a.ground,total:610-a.total};
+ GRAPH_REGISTRATION.climb=1150-rawCompute('climb',EXAMPLES.climb).roc;
+ GRAPH_REGISTRATION.oei=212-rawCompute('oei',EXAMPLES.oei).roc;
+}
+calibrate();
+function limits(id,v){
+ if(!Number.isFinite(v.pa)||!Number.isFinite(v.oat)||!Number.isFinite(v.mass))return 'COMPLETE OS VALORES';
+ const n=NOMOGRAMS[id];if(v.pa<0||v.pa>n.pa.at(-1))return 'ALTITUDE FORA DO GRÁFICO';
+ if(v.oat< -35||v.oat>50)return 'OAT FORA DO GRÁFICO';
+ if(v.oat>isaMax(v.pa)+1e-5)return 'FORA DA CURVA ISA +35';
+ if(v.mass<1500||v.mass>1900)return 'MASSA FORA DO GRÁFICO';
+ if(id==='takeoff'&&(!Number.isFinite(v.wind)||v.wind < -10||v.wind >20))return 'VENTO FORA DO GRÁFICO';
+ return null;
+}
+function compute(id,v){const error=limits(id,v);if(error)return {error};
+ try{
+ const out=rawCompute(id,v);
+ if(id==='takeoff'){const ground=out.ground+GRAPH_REGISTRATION.takeoff.ground,total=out.total+GRAPH_REGISTRATION.takeoff.total;return {main:total,secondary:ground,primaryLabel:'TAKEOFF DISTANCE'};}
+ const roc=out.roc+GRAPH_REGISTRATION[id];return {main:roc,secondary:roc*0.00508,primaryLabel:id==='oei'&&roc<0?'RATE OF DESCENT':'RATE OF CLIMB'};
+ }catch(e){return {error:'DADO GRÁFICO NÃO DIGITALIZADO'};}
+}
+function verticalFmt(v){return current==='climb'?fmt(v,1):fmt(Math.trunc(v*100)/100,2)}
+function fmt(v,n=0){if(!Number.isFinite(v))return '—';return new Intl.NumberFormat('en-US',{maximumFractionDigits:n,minimumFractionDigits:n}).format(v)}
+function icon(name){const paths={menu:'<path d="M4 7h16M4 12h12M4 17h8"/>',sliders:'<path d="M4 6h8m4 0h4M4 12h3m7 0h6M4 18h10m6 0h0"/><circle cx="14" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="17" cy="18" r="2"/>',calculator:'<rect x="5" y="2.5" width="14" height="19" rx="2"/><path d="M8 7.5h8M8 12h1m3 0h1m3 0h0M8 16h1m3 0h1m3 0h0"/>',chart:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M5 15l4-5 3 3 4-6 3 3"/>',history:'<path d="M3 11a9 9 0 1 1 2.6 6.4M3 4v7h7M12 7v5l3 2"/>',chartUp:'<path d="M3 17v4m4-8v8m4-10v10m4-13v13m4-17v17M2 10l6-5 4 3 8-6m-5 0h5v5"/>',close:'<path d="M5 5l14 14M19 5L5 19"/>',check:'<path d="m5 12 5 5L20 7"/>',next:'<path d="m9 5 7 7-7 7"/>'};return `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">${paths[name]||paths.chart}</svg>`}
+function createPlot(id,v,res){if(res.error)return `<svg class="plot" viewBox="0 0 290 138" aria-label="Gráfico indisponível" role="img"></svg>`;
+ // Smoothed spline for the live model's response to temperature, sampled at constant PA/mass.
+ const T=[-30,-25,-20,-15,-10,-5,0,5,10,15,20,25,30,35,40,45].filter(t=>t<=15-0.0019812*v.pa+35 && t>=-35);
+ const usable=T.map(t=>{const r=compute(id,{...v,oat:t});return {t,val:r.error?null:r.main,second:r.error?null:r.secondary}}).filter(x=>x.val!=null);
+ if(usable.length<2)return '';
+ const values=usable.map(x=>x.val),min=Math.min(...values),max=Math.max(...values),spread=Math.max(max-min,1);const yFor=val=>119-((val-min)/spread)*98;
+ const pts=usable.map((x,i)=>({x:6+i*(278/(usable.length-1)),y:yFor(x.val)}));
+ const gold=pts.map(p=>({...p,y:Math.min(129,p.y+18)}));
+ // Monotone input, cubic Bezier with zero overshoot at extrema for clean curves.
+ const path=a=>{let s=`M ${a[0].x.toFixed(1)} ${a[0].y.toFixed(1)}`;for(let i=0;i<a.length-1;i++){const p=a[i],q=a[i+1],prev=a[Math.max(i-1,0)],next=a[Math.min(i+2,a.length-1)];const dx=(q.x-p.x);let slope1=(q.y-prev.y)/Math.max(q.x-prev.x,1),slope2=(next.y-p.y)/Math.max(next.x-p.x,1);const local=(q.y-p.y)/dx;if(local===0){slope1=0;slope2=0}else{slope1=Math.sign(local)*Math.min(Math.abs(slope1),Math.abs(local)*2);slope2=Math.sign(local)*Math.min(Math.abs(slope2),Math.abs(local)*2)}s+=` C ${(p.x+dx/3).toFixed(1)} ${(p.y+dx*slope1/3).toFixed(1)}, ${(q.x-dx/3).toFixed(1)} ${(q.y-dx*slope2/3).toFixed(1)}, ${q.x.toFixed(1)} ${q.y.toFixed(1)}`;}return s};
+ const markerX=6+(v.oat-usable[0].t)*(278/(usable.at(-1).t-usable[0].t));const calcY=yFor(res.main);const inDomain=v.oat>=usable[0].t&&v.oat<=usable.at(-1).t;
+ return `<svg class="plot" viewBox="0 0 290 138" preserveAspectRatio="none" role="img" aria-label="Sensibilidade da performance à temperatura externa"><path class="grid" d="M0 28H290M0 75H290M0 121H290"/><path class="gold" d="${path(gold)}"/><path class="blue" d="${path(pts)}"/>${inDomain?`<circle class="dot" cx="${markerX.toFixed(1)}" cy="${calcY.toFixed(1)}" r="4.5"/>`:''}</svg>`
+}
+function render(){const m=MODELS[current],v=inputs[current],r=compute(current,v);document.title=`DA42 NG · ${m.label}`;
+ const fields=m.fields.map(f=>`<div class="field ${f.fixed?'readonly':''}"><label for="val-${f.k}">${escapeHTML(f.name)}</label><div class="entry">${f.fixed?`<span class="power-value">92</span>`:`<input id="val-${f.k}" data-key="${f.k}" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="${escapeHTML(f.name)} (${escapeHTML(f.u)})" type="text" value="${escapeHTML(fmt(v[f.k]))}" />`}<output>${escapeHTML(f.u)}</output></div>${f.fixed&&current==='oei'?'<span class="power-note">ONE ENGINE (REMAINING)</span>':''}</div>`).join('');
+ el('#app').innerHTML=`<main class="phone"><header class="topbar"><button class="icon-btn" id="menu" aria-label="Escolher módulo">${icon('menu')}</button><h1>DA42 NG</h1><button class="icon-btn" id="settings" aria-label="Preferências">${icon('sliders')}</button></header><div class="scroller"><div class="module-heading"><span class="name">${m.label}</span><span class="accent">PERFORMANCE</span></div><section class="fields" aria-label="Parâmetros">${fields}</section><section class="result" aria-live="polite"><div class="result-head"><span id="result-name">${r.primaryLabel||m.panel}</span>${icon('chartUp')}</div><div class="primary"><span class="primary-number ${r.main<0?'negative':''}" id="main-result">${r.error?'—':fmt(current==='takeoff'?r.main:Math.round(r.main))}</span><span class="primary-unit">${m.unit}</span></div><div id="plot-area">${createPlot(current,v,r)}</div><div class="secondary"><span>${m.metric}</span><strong class="${r.secondary<0?'negative':''}" id="secondary-result">${r.error?'—':current==='takeoff'?fmt(r.secondary)+' m':verticalFmt(r.secondary)+' m/s'}</strong></div></section><div class="banner ${r.error?'error':''}" id="banner">${r.error||'DIGITALIZAÇÃO EXPERIMENTAL · NÃO UTILIZAR EM VOO'}</div></div><nav class="bottom" aria-label="Navegação"><button data-panel="calculator" class="nav-btn active" aria-label="Calculadora">${icon('calculator')}</button><button data-panel="chart" class="nav-btn" aria-label="Gráfico">${icon('chart')}</button><button data-panel="history" class="nav-btn" aria-label="Histórico">${icon('history')}</button><button data-panel="settings" class="nav-btn" aria-label="Preferências">${icon('sliders')}</button></nav></main>`;
+ el('#menu').onclick=()=>showSheet('modules');el('#settings').onclick=()=>showSheet('settings');document.querySelectorAll('button[data-panel]').forEach(b=>b.onclick=()=>{const p=b.dataset.panel;if(p!=='calculator')showSheet(p)});
+ document.querySelectorAll('input[data-key]').forEach(inp=>{inp.addEventListener('focus',()=>{if(Number.isFinite(inputs[current][inp.dataset.key]))inp.value=String(inputs[current][inp.dataset.key]);inp.select()});inp.addEventListener('input',e=>{const raw=e.target.value.replaceAll(' ','').replaceAll(',','.');inputs[current][inp.dataset.key]=raw===''?NaN:Number(raw);refresh();persist()});inp.addEventListener('blur',()=>{const x=inputs[current][inp.dataset.key];if(Number.isFinite(x))inp.value=fmt(x)})});persist();
+}
+function refresh(){const v=inputs[current],m=MODELS[current],r=compute(current,v);el('#main-result').textContent=r.error?'—':fmt(current==='takeoff'?r.main:Math.round(r.main));el('#main-result').classList.toggle('negative',!r.error&&r.main<0);el('#result-name').textContent=r.primaryLabel||m.panel;el('#secondary-result').textContent=r.error?'—':current==='takeoff'?fmt(r.secondary)+' m':verticalFmt(r.secondary)+' m/s';el('#secondary-result').classList.toggle('negative',!r.error&&r.secondary<0);el('#plot-area').innerHTML=createPlot(current,v,r);el('#banner').textContent=r.error||'DIGITALIZAÇÃO EXPERIMENTAL · NÃO UTILIZAR EM VOO';el('#banner').classList.toggle('error',!!r.error)}
+function showSheet(type){const main=el('.phone'),title={modules:'PERFORMANCE',settings:'PREFERÊNCIAS',chart:'SENSIBILIDADE',history:'HISTÓRICO'}[type]||'';const v=inputs[current];const r=compute(current,v);let content='';
+ if(type==='modules')content=Object.entries(MODELS).map(([k,m],i)=>`<button class="option ${current===k?'selected':''}" data-module="${k}"><span><strong>0${i+1} · ${k==='oei'?'ONE ENGINE CLIMB / DESCENT':m.label+' PERFORMANCE'}</strong><span class="sub">${k==='takeoff'?'Takeoff distance / ground roll':k==='climb'?'Two engines · 92%':'One engine inoperative · 92%'}</span></span>${current===k?icon('check'):icon('next')}</button>`).join('');
+ if(type==='settings')content=`<div class="mini">AERO UI · MASTER DESIGN 1.0</div><small>Parâmetros: gráficos do DA42 NG enviados pelo usuário. Condições: flaps UP; pista pavimentada na decolagem; ambos MAX/2.300 RPM no Takeoff, ambos 92%/90 KIAS no Climb, e motor restante a 92%/85 KIAS no OEI, com motor inoperante embandeirado e assegurado.</small><div class="disclaimer">MODELO DE ENGENHARIA PRELIMINAR<br>Curvas parcialmente digitalizadas e interpoladas da carta AFM 7.01.15-E Rev.1. Somente os três exemplos foram conferidos; demais pontos ainda exigem validação independente. Não utilizar para planejamento, despacho ou execução de voo.</div><button class="small-action" id="reset">RESTAURAR VALORES DE EXEMPLO</button>`;
+ if(type==='history')content=history.length?history.map(h=>`<button class="option" data-restore="${h.id}"><span><strong>${escapeHTML(h.name)} · ${escapeHTML(h.result)}</strong><span class="sub">${escapeHTML(h.when)} · ${escapeHTML(h.in)}</span></span>${icon('next')}</button>`).join(''):'<p class="history-empty">Nenhum cálculo salvo.</p>';
+ if(type==='chart')content=`<div style="background:#202d39;border-radius:17px;padding:15px"><div class="mini">${escapeHTML(MODELS[current].panel)}</div><div style="font-size:31px;margin:12px 0 6px">${r.error?'—':fmt(r.main)} <span style="color:#9cb1bf;font-size:16px">${MODELS[current].unit}</span></div>${createPlot(current,v,r)}</div><small>Curvas derivadas da digitalização gráfica preliminar. Sem autorização para uso operacional.</small><button class="small-action" id="save">SALVAR CÁLCULO NO HISTÓRICO</button>`;
+ const d=document.createElement('div');d.className='sheet-backdrop';d.innerHTML=`<div class="sheet" role="dialog" aria-modal="true" aria-label="${title}"><div class="sheet-header"><h2>${title}</h2><button class="close" aria-label="Fechar">×</button></div>${content}</div>`;main.appendChild(d);d.addEventListener('click',e=>{if(e.target===d)d.remove()});d.querySelector('.close').onclick=()=>d.remove();d.querySelectorAll('[data-module]').forEach(b=>b.onclick=()=>{current=b.dataset.module;d.remove();render()});if(d.querySelector('#reset'))d.querySelector('#reset').onclick=()=>{inputs[current]={...MODELS[current].defaults};d.remove();render()};if(d.querySelector('#save'))d.querySelector('#save').onclick=()=>{const val=compute(current,v);if(val.error)return;history.unshift({id:Date.now(),name:MODELS[current].label,result:`${fmt(val.main)} ${MODELS[current].unit}`,when:new Date().toLocaleString('pt-BR'),in:`${fmt(v.pa)} ft · ${fmt(v.oat)} °C · ${fmt(v.mass)} kg`,module:current,values:{...v}});history=history.slice(0,20);persist();d.remove()};d.querySelectorAll('[data-restore]').forEach(b=>b.onclick=()=>{const h=history.find(z=>String(z.id)===b.dataset.restore);if(!h)return;current=h.module;inputs[current]={...h.values};d.remove();render()});}
+window.AeroCalc={MODELS,NOMOGRAMS,GRAPH_REGISTRATION,limits,compute,showSheet,get current(){return current}};
+render();if('serviceWorker' in navigator&&location.protocol==='https:')window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+</script>
+</body>
+</html>
