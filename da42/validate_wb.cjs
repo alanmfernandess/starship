@@ -16,7 +16,9 @@ assert.equal(x.fuel.aux,84);
 assert.equal(x.fuel.usableTotal,243);
 assert.equal(x.statuses.cgOK,true);
 assert.equal(x.statuses.massOK,true);
-assert.equal(x.statuses.landingMassStatus,'PENDING');
+assert.ok(!Object.hasOwn(x,'landing'));
+assert.ok(!Object.hasOwn(x.statuses,'landingMassStatus'));
+assert.ok(!e.INPUTS.some(k=>k.startsWith('landing')));
 assert.equal(x.scenarios.length,4);
 assert.equal(x.scenarios[0].mass,1628);
 assert.equal(x.scenarios[1].mass,1871);
@@ -46,14 +48,10 @@ const zeroFuelOver=load({pax1:110,pax2:110});
 assert.ok(zeroFuelOver.ok&&!zeroFuelOver.statuses.zeroFuelMassOK);
 const light=load({pilot:0,copilot:0,deice:0,cabin:0,extension:0,mainL:0,mainR:0,auxL:0,auxR:0});
 assert.ok(light.ok&&!light.statuses.takeoffMassOK);
-const lands=load({landingMainL:79.5,landingMainR:79.5,landingAuxL:42,landingAuxR:42});
-assert.equal(lands.statuses.landingMassStatus,'ABNORMAL LANDING');
-const normal=load({landingMainL:0,landingMainR:0,landingAuxL:0,landingAuxR:0});
-assert.equal(normal.statuses.landingMassStatus,'NORMAL');
-assert.equal(normal.landing.mass,normal.zeroFuel.mass);
-assert.equal(normal.landing.cg,normal.zeroFuel.cg);
-assert.ok(!load({landingMainL:30}).ok);
-assert.ok(!load({landingMainL:90,landingMainR:0,landingAuxL:0,landingAuxR:0}).ok);
+const unaffected=load({landingMainL:5000,landingMainR:5000});
+assert.equal(unaffected.takeoff.mass,x.takeoff.mass);
+assert.equal(unaffected.takeoff.cg,x.takeoff.cg);
+assert.ok(!Object.hasOwn(unaffected,'landing'));
 let count=0;
 for(let pilot=0;pilot<=120;pilot+=20)
  for(let copilot=0;copilot<=120;copilot+=20)
@@ -66,4 +64,4 @@ for(let pilot=0;pilot<=120;pilot+=20)
    assert.ok(r.zeroFuel.moment<=r.takeoff.moment);
    count++;
  }
-console.log('PASS: official AFM W&B example, CG envelope breakpoints, 4 fuel/deice cases, baggage/MTOW/MZFM/MLW boundaries, '+count+' loading combinations. NOT approved for flight.');
+console.log('PASS: official AFM W&B example, CG envelope breakpoints, 4 fuel/deice cases, baggage/MTOW/MZFM boundaries, '+count+' loading combinations. NOT approved for flight.');
