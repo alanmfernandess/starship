@@ -7,7 +7,7 @@ const script=html.match(/<script>([\s\S]*?)<\/script>/)[1];
 const node={innerHTML:'',classList:{toggle(){}},addEventListener(){}};
 const document={querySelector(){return node},querySelectorAll(){return []}};
 const context={document,localStorage:{getItem(k){return k==='aero-ui-da42-v1'?JSON.stringify({current:'landing'}):null},setItem(){}},location:{protocol:'file:'},navigator:{},console};
-context.window=context;vm.createContext(context);vm.runInContext(script,context);
+context.window=context;vm.createContext(context);vm.runInContext(fs.readFileSync(__dirname+'/takeoff-tables.js','utf8'),context);vm.runInContext(script,context);
 const f=v=>context.AeroCalc.compute('landing',v);
 const example={pa:0,oat:15,mass:1800,wind:10};
 const r=f(example);
