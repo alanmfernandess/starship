@@ -48,11 +48,15 @@ Os testes foram executados em dimensões 320×690, 390×667, 390×844, 430×932 
 
 ### TAS — quarto módulo
 
+**Limites corrigidos da carta:** ΔISA −10 a +30 °C; TAS 120–180 kt; carga 50–92%; PA 0–18.000 ft. Nem toda combinação desses limites é necessariamente válida; a calculadora rejeita TAS fora da escala da carta.
+
+
+
 Apenas no módulo Cruising/TAS, o campo de temperatura tem um seletor compacto **OAT ↔ ΔISA**. No modo ΔISA, insere-se o desvio relativo à ISA padrão no nível de pressão: `OAT = 15 - 0,0019812 × PA(ft) + ΔISA`. Ao alterar PA no modo ΔISA, OAT é recalculada automaticamente mantendo o mesmo desvio. Nos outros módulos, a interface permanece OAT.
 
 
 
-A carta Cruising / True Airspeed fornecida pelo usuário foi parcialmente digitalizada por amostras das curvas ISA STD nos grupos 50, 60, 70, 80 e 92% de carga. Interpolação entre altitude (0–14.000 ft), carga e desvios ISA (-10 a +30°C). Referência de leitura: 164 KTAS a 10.000 ft/ISA STD/80% (2 motores). A variação com temperatura é interpolada usando separações em pixels estimadas das curvas. Os 23 pontos de verificação independentes dos pontos de calibração mostraram concordância numérica com essas leituras dentro de 0,456 KTAS; **isso não quantifica a incerteza do procedimento de leitura nem garante erro inferior a esse limite em outros pontos**. O motor rejeita valores fora do eixo TAS de 120–180 kt. Massa não aparece como entrada nesta carta. Dois motores é condição fixa.
+A carta Cruising / True Airspeed fornecida pelo usuário foi parcialmente digitalizada por amostras das curvas ISA STD nos grupos 50, 60, 70, 80 e 92% de carga. Interpolação entre altitude (0–18.000 ft), carga e desvios ISA (-10 a +30°C). Referência de leitura: 164 KTAS a 10.000 ft/ISA STD/80% (2 motores). A extensão acima de 14.000 ft utiliza novas leituras gráficas das curvas em 16.000 e 18.000 ft (incluindo a inflexão da curva de 92% de carga). A variação com temperatura é interpolada usando separações em pixels estimadas das curvas. Os 23 pontos de verificação independentes dos pontos de calibração mostraram concordância numérica com essas leituras dentro de 0,456 KTAS; **isso não quantifica a incerteza do procedimento de leitura nem garante erro inferior a esse limite em outros pontos**. O motor rejeita valores fora do eixo TAS de 120–180 kt. Massa não aparece como entrada nesta carta. Dois motores é condição fixa.
 
 ## Publicação
 
