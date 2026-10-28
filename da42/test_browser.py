@@ -1,22 +1,50 @@
 """Chromium responsive smoke/regression tests. Runs via page.set_content in sandbox."""
 from pathlib import Path
 from playwright.sync_api import sync_playwright
-html=Path(__file__).with_name('index.html').read_text()
+url=Path(__file__).with_name('index.html').resolve().as_uri()
 with sync_playwright() as p:
-    browser=p.chromium.launch(headless=True,executable_path='/usr/bin/chromium' if Path('/usr/bin/chromium').exists() else p.chromium.executable_path,args=['--no-sandbox'])
+    browser=p.chromium.launch(headless=True,executable_path='/usr/bin/chromium' if Path('/usr/bin/chromium').exists() else p.chromium.executable_path,args=['--no-sandbox','--allow-file-access-from-files'])
     all_checks=0
     for w,h in [(320,690),(390,667),(390,844),(430,932),(706,1200)]:
         ctx=browser.new_context(viewport={'width':w,'height':h},is_mobile=True,has_touch=True,device_scale_factor=1)
         page=ctx.new_page()
         errors=[]
         page.on('pageerror',lambda e:errors.append(str(e)))
-        page.set_content(html)
+        page.goto(url)
         assert page.locator('#main-result').inner_text()=='638',(w,h,'takeoff')
         assert page.locator('#secondary-result').inner_text()=='406 m'
         assert page.locator('html').evaluate('(el)=>el.scrollWidth') <=w,(w,h,'horizontal overflow')
         assert page.locator('.phone').evaluate('(el)=>el.clientWidth')<=w
         assert len(errors)==0, errors
         all_checks+=5
+        assert page.locator('#takeoff-procedure').inner_text()=='NORMAL · UP'
+        assert page.locator('#takeoff-isa-toggle').inner_text()=='ISA'
+        assert page.locator('#plot-area').inner_text().find('50 FT')!=-1
+        page.locator('#takeoff-procedure').click()
+        assert page.locator('#takeoff-procedure').inner_text()=='SHORT · APP'
+        assert int(page.locator('#main-result').inner_text())<638
+        page.locator('#takeoff-procedure').click()
+        assert page.locator('#main-result').inner_text()=='638'
+        page.locator('#takeoff-isa-toggle').click()
+        assert page.locator('#takeoff-isa-toggle').inner_text()=='OAT'
+        assert page.locator('input[data-key="oat"]').get_attribute('readonly') is not None
+        page.locator('input[data-key="pa"]').fill('1000')
+        assert page.locator('#main-result').inner_text()!='—'
+        page.locator('#takeoff-isa-toggle').click()
+        page.locator('input[data-key="pa"]').fill('0')
+        page.locator('#takeoff-runway').click()
+        assert page.locator('button[data-surface="grass5"]').count()==1
+        page.locator('button[data-surface="grass5"]').click()
+        assert 'GRASS' in page.locator('#takeoff-runway').inner_text()
+        assert int(page.locator('#main-result').inner_text())>638
+        page.locator('#takeoff-runway').click()
+        page.locator('button[data-surface="paved"]').click()
+        assert page.locator('#main-result').inner_text()=='638'
+        page.locator('input[data-key="mass"]').fill('1999')
+        assert page.locator('#main-result').inner_text()=='—'
+        page.locator('input[data-key="mass"]').fill('1800')
+        assert page.locator('#main-result').inner_text()=='638'
+        all_checks+=18
         page.locator('#menu').click()
         page.locator('button[data-module="climb"]').click()
         assert page.locator('#main-result').inner_text()=='1,150'
