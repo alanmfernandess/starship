@@ -16,6 +16,7 @@ Diamond Aircraft, *DA 42 NG Airplane Flight Manual*, Doc. **7.01.15-E**, **Rev. 
 - Takeoff Distances: p. 5-13 (PDF p. 271, índice zero 270)
 - Climb Performance, Two Engines: p. 5-15 (PDF p. 273, índice zero 272)
 - One Engine Inoperative Climb/Descent: p. 5-17 (PDF p. 275, índice zero 274)
+- Cruising (TAS): p. 5-19 (PDF p. 277, índice zero 276)
 
 Fonte pública de conferência: https://www.keilir.net/static/files/Flugakademian/Diamond/DA42-NG-AFM-r1.pdf
 
@@ -35,7 +36,11 @@ Parte dos pontos foi lida manualmente e outra obtida por detecção de segmentos
 
 ### Testes
 
-`node test.cjs` — regressões de referência, domínio e tendências físicas.
+`npm test` — executa três conjuntos de testes sem dependências externas:
+
+- `node test.cjs`: regressão dos quatro exemplos, limites e tendências dos módulos;
+- `node validate_cruise.cjs`: 23 pontos do gráfico TAS fora dos pontos de ancoragem do ajuste, comparando leituras visuais independentes com o motor (erro máximo observado **0,456 KTAS**, erro absoluto médio **0,101 KTAS**);
+- `node validate_grid.cjs`: 650 configurações dentro do domínio, continuidade/tendências e oito entradas inválidas. Os testes não medem a exatidão física fora dos pontos digitalizados.
 
 `python test_browser.py` — testes de renderização Chromium em modo mobile/touch, com navegação, geometria e ausência de erros de script. Requer Python, Playwright e Chromium instalado; em sistemas diferentes, ajustar o caminho do executável.
 
@@ -43,13 +48,13 @@ Os testes foram executados em dimensões 320×690, 390×667, 390×844, 430×932 
 
 ### TAS — quarto módulo
 
-A carta Cruising / True Airspeed fornecida pelo usuário foi parcialmente digitalizada por amostras das curvas ISA STD nos grupos 50, 60, 70, 80 e 92% de carga. Interpolação entre altitude (0–14.000 ft), carga e desvios ISA (-10 a +30°C). Referência de leitura: 164 KTAS a 10.000 ft/ISA STD/80% (2 motores). A variação com temperatura foi aproximada por espaçamento entre curvas; erros fora do exemplo permanecem desconhecidos. Massa não aparece como entrada nesta carta. Dois motores é condição fixa.
+A carta Cruising / True Airspeed fornecida pelo usuário foi parcialmente digitalizada por amostras das curvas ISA STD nos grupos 50, 60, 70, 80 e 92% de carga. Interpolação entre altitude (0–14.000 ft), carga e desvios ISA (-10 a +30°C). Referência de leitura: 164 KTAS a 10.000 ft/ISA STD/80% (2 motores). A variação com temperatura é interpolada usando separações em pixels estimadas das curvas. Os 23 pontos de verificação independentes dos pontos de calibração mostraram concordância numérica com essas leituras dentro de 0,456 KTAS; **isso não quantifica a incerteza do procedimento de leitura nem garante erro inferior a esse limite em outros pontos**. O motor rejeita valores fora do eixo TAS de 120–180 kt. Massa não aparece como entrada nesta carta. Dois motores é condição fixa.
 
 ## Publicação
 
 Publicação temporária em `alanmfernandess/starship/da42/` via GitHub Pages já existente no repositório Starship. O aplicativo permanece isolado em subpasta e poderá ser migrado posteriormente para um repositório independente.
 
-URL temporária (confirmar deploy): `https://alanmfernandess.github.io/starship/da42/`.
+URL temporária (**o envio do código ao GitHub não confirma propagação do Pages**): `https://alanmfernandess.github.io/starship/da42/`.
 
 ## Condições das cartas
 
