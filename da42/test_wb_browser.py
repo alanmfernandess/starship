@@ -26,8 +26,8 @@ with sync_playwright() as p:
         assert 'TOW' in page.locator('.legend').inner_text()
         assert 'MASS WITHIN LIMITS' in page.locator('#mass-check').inner_text()
         assert page.locator('input[data-wb]').count()==4
-        assert page.locator('#metrics').inner_text().find('1.898,5')!=-1
-        assert page.locator('#metrics').inner_text().find('1.655,5')!=-1
+        assert page.locator('#metrics').inner_text().find('1.899')!=-1
+        assert page.locator('#metrics').inner_text().find('1.656')!=-1
         assert page.locator('#metrics').inner_text().find('ZFW')!=-1
         assert page.locator('#metrics').inner_text().find('TOW')!=-1
         assert '2,35' in page.locator('svg.graph').inner_text()
@@ -53,6 +53,8 @@ with sync_playwright() as p:
         count+=5
         page.locator('#nav-scenarios').click()
         assert page.locator('.case').count()==6
+        assert '1.656 kg' in page.locator('.sheet').inner_text()
+        assert '1.899 kg' in page.locator('.sheet').inner_text()
         assert 'LANDING' not in page.locator('.sheet').inner_text()
         assert 'FUEL FULL' in page.locator('.sheet').inner_text()
         assert 'study cases' not in page.locator('.sheet').inner_text()
