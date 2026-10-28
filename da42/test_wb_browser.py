@@ -17,6 +17,10 @@ with sync_playwright() as p:
         page.on('pageerror',lambda e:errors.append(str(e)))
         page.goto(url)
         assert page.locator('#cg').inner_text()=='2,447'
+        assert page.locator('.result-head').inner_text().strip()=='CG'
+        assert page.locator('.line').inner_text().startswith('CG · ZFW')
+        assert 'ZFW' in page.locator('.legend').inner_text()
+        assert 'TOW' in page.locator('.legend').inner_text()
         assert 'WITHIN LIMITS' in page.locator('#cg-status').inner_text()
         assert 'MASS WITHIN LIMITS' in page.locator('#mass-check').inner_text()
         assert page.locator('input[data-wb]').count()==4
