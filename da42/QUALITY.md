@@ -120,7 +120,7 @@
 
 ## v0.16.0 — Official AFM landing tabular upgrade
 
-- AFM §5.3.11 2 flap configurations (LDG, APP/UP), 3 masses (1700/1900/1999kg), 11 altitude rows (0-10000ft), six OAT anchors (0..50°C) plus separate published ISA column. 420 numerical anchors and 42 unavailable pairs of cells.
+- AFM §5.3.11 2 flap configurations (LDG, APP/UP), 3 masses (1700/1900/1999kg), 11 altitude rows (0-10000ft), six OAT anchors (0..50°C) plus separate published ISA column. 420 published pairs of ground/total distances (840 numerical anchors) and 42 unavailable pairs of cells.
 - Strict no extrapolation on mass/altitude/OAT, no interpolation through crossed-out cells, and published ISA numbers used independently.
 - Headwind -10%/14kt; tailwind +10%/3kt, applied once. Pavement wet +15% to full landing distance. Grass 5cm/5-10cm/>10cm and wet/soft plus downhill 9%/1% applied to ground roll and added to total distance.
 - Strong warning: grass >10cm minimum +25% only; wet/soft conditions, unusually uneven runway or adverse meteorology may greatly increase actual distance. Results are not approved or operational predictions.
