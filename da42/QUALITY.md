@@ -100,3 +100,12 @@
 - Constrained control point ordinates between original and final values: positive ROC ascends, negative ROC descends, zero ROC remains horizontal.
 - Chart represents a stylized one-minute altitude difference rather than an integrated physical trajectory; no synthetic second performance data series.
 - Regression: `validate_vertical_plots.cjs` tests cubic control values and signed direction across the reference grid; mobile Chromium smoke checks the path command on five viewports. No AFM interpolation or performance result changes.
+
+## v0.14.0 — AFM 5.3.9 Time / Fuel / Distance to Climb
+
+- Three cumulative table grids: 1700, 1900, 1999 kg, 0–18000 ft in 2000ft steps; official TAS, ROC, time (min), fuel (US gal) and distance (NM).
+- Strict ascending start/target range validation; bilinear mass/altitude interpolation, subtraction of cumulative start from target. No ROC integration or fuel-flow inference.
+- Default AFM example 2000ft/11°C to 16000ft at 1900kg exactly 15min / 4.2 US gal / 26NM.
+- Warmer OAT correction only: +10% per +10°C versus table's ISA, no credit for colder OAT; for this prototype ΔISA>+30°C unsupported.
+- Aero UI 2×2 cards and a curved chart of altitude against cumulative elapsed climb time; outputs three metrics. Zero wind and engine 92%, UP, gear retracted.
+- New `validate_time_to_climb.cjs`, five-viewports mobile checks; software not approved for flight.
