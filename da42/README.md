@@ -141,3 +141,7 @@ Interface reduzida aos valores **CG**, **ZFW** e **TOW**, além dos indicadores 
 ### v0.10.3 — Redução do painel W&B
 
 Removidos do cartão de resultados o cabeçalho/valor numérico principal de CG, a mensagem de CG WITHIN LIMITS/OUT OF LIMITS e o rodapé CG · ZFW com valor em metros, conforme marcações do usuário. Mantidos o gráfico do envelope, os pontos de Zero Fuel e Takeoff CG, a legenda ZFW/TOW, os dois cartões ZFW/TOW e o indicador de massa dentro/fora dos limites. A validação de CG continua ativa no motor e no otimizador; pontos com CG fora dos limites são realçados em vermelho no gráfico. O módulo continua experimental, não homologado para planejamento ou execução de voo.
+
+### v0.10.4 — ZFW/TOW sem decimais
+
+As massas ZFW/TOW são **exibidas arredondadas ao quilograma inteiro** nos cartões principais e nos cenários (exemplo AFM: 1.656 kg e 1.899 kg). Os somatórios de massa e momento, validação MZFM/MTOM, cálculos de CG e otimizador mantêm integralmente os valores numéricos originais sem arredondamento intermediário.
