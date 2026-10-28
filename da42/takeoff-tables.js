@@ -1,8 +1,8 @@
 /* DA42 NG Take-off AFM §5.3.6 user-supplied tables.
  * Reference: 1700/1900/1999 kg, NORMAL UP or SHORT APP; both MAX,
  * paved/dry/level, VR 80/76 KIAS, V50 85/82 KIAS respectively.
- * 1999 kg is SOURCE DATA ONLY; the available aircraft AFM §2.7
- * specifies 1900 kg MTOM. This implementation rejects mass >1900 kg.
+ * Supports source reference through 1999 kg. Applicability depends on
+ * MÄM 42-678 and the aircraft-specific limitations / AFM supplements.
  * Experimental calculator, not approved for actual operations.
  */
 (function(root){
@@ -197,7 +197,7 @@ function sample(grid,pa,oat,isa){
 }
 function validate(v){
  if(!v||!['normal','short'].includes(v.procedure||'normal'))return 'PROCEDIMENTO INVÁLIDO';
- if(!Number.isFinite(v.mass)||v.mass<1700||v.mass>1900)return 'MASSA FORA DAS TABELAS / MTOW';
+ if(!Number.isFinite(v.mass)||v.mass<1700||v.mass>1999)return 'MASSA FORA DAS TABELAS / MTOW';
  if(!Number.isFinite(v.pa)||v.pa<0||v.pa>10000)return 'ALTITUDE FORA DAS TABELAS';
  if(!v.isa&&(!Number.isFinite(v.oat)||v.oat<0||v.oat>50))return 'OAT FORA DAS TABELAS';
  if(!Number.isFinite(v.wind)||v.wind< -10||v.wind>20)return 'VENTO FORA DO INTERVALO';
@@ -209,13 +209,13 @@ function validate(v){
 }
 function compute(v){
  const err=validate(v);if(err)return {error:err};
- const procedure=v.procedure||'normal',masses=[1700,1900],fraction=(v.mass-1700)/200;
+ const procedure=v.procedure||'normal',masses=[1700,1900,1999],bounds=locate(masses,v.mass);
  const values={};
  for(const metric of ['ground','total']){
-  const a=sample(TABLES[procedure][1700][metric],v.pa,v.oat,!!v.isa);
-  const b=sample(TABLES[procedure][1900][metric],v.pa,v.oat,!!v.isa);
+  const a=sample(TABLES[procedure][masses[bounds[0]]][metric],v.pa,v.oat,!!v.isa);
+  const b=sample(TABLES[procedure][masses[bounds[1]]][metric],v.pa,v.oat,!!v.isa);
   if(a===null||b===null)return {error:'SEM DADOS PUBLICADOS NA TABELA'};
-  values[metric]=mix(a,b,fraction);
+  values[metric]=mix(a,b,bounds[2]);
  }
  // AFM §5.3.6: 10% reduction per 14kt headwind or 10% increase per 3kt tailwind.
  // The source already incorporates 50% headwind and 150% tailwind component.
