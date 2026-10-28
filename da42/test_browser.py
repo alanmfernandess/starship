@@ -37,6 +37,7 @@ with sync_playwright() as p:
         page.locator('input[data-key="load"]').fill('92')
         assert int(page.locator('#main-result').inner_text()) > 164
         # Cruise-only ΔISA/OAT mode. Keep deviation fixed when PA changes.
+        page.locator('input[data-key="load"]').fill('80')
         assert page.locator('#temp-mode-toggle').inner_text()=='ΔISA'
         page.locator('#temp-mode-toggle').click()
         assert page.locator('#temp-mode-toggle').inner_text()=='OAT'
