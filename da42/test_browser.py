@@ -48,6 +48,22 @@ with sync_playwright() as p:
         assert page.locator('#secondary-result').inner_text()=='10 °C'
         page.locator('input[data-key="pa"]').fill('8000')
         assert page.locator('#secondary-result').inner_text()=='10 °C'
+        page.locator('input[data-key="pa"]').fill('18000')
+        assert page.locator('#secondary-result').inner_text()=='10 °C'
+        assert page.locator('#main-result').inner_text()!='—',page.locator('#banner').inner_text()
+        page.locator('input[data-key="load"]').fill('92')
+        assert page.locator('#main-result').inner_text()!='—'
+        page.locator('input[data-key="oat"]').fill('-10')
+        assert page.locator('#main-result').inner_text()!='—'
+        page.locator('input[data-key="oat"]').fill('30')
+        assert page.locator('#main-result').inner_text()!='—'
+        page.locator('input[data-key="oat"]').fill('31')
+        assert page.locator('#main-result').inner_text()=='—'
+        page.locator('input[data-key="oat"]').fill('10')
+        page.locator('input[data-key="pa"]').fill('18001')
+        assert page.locator('#main-result').inner_text()=='—'
+        page.locator('input[data-key="pa"]').fill('18000')
+        assert page.locator('#main-result').inner_text()!='—'
         page.locator('#temp-mode-toggle').click()
         assert page.locator('#temp-mode-toggle').inner_text()=='ΔISA'
         page.locator('#temp-mode-toggle').click()
@@ -56,7 +72,7 @@ with sync_playwright() as p:
         page.locator('input[data-key="oat"]').fill('30')
         assert page.locator('#main-result').inner_text()=='—'
         assert len(errors)==0,errors
-        all_checks+=19
+        all_checks+=28
         ctx.close()
     browser.close()
     print(f'{all_checks} mobile Chromium checks passed at 5 viewport sizes.')
