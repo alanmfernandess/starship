@@ -217,3 +217,15 @@ Validação em `validate_time_to_climb.cjs` e testes de interface móvel em `tes
 ### v0.14.1 — Menu PERFORMANCE com nomes apenas
 
 Menu de módulos simplificado segundo Aero UI Master Design: nove acessos identificados apenas pelo nome funcional (Takeoff, Climb, One Engine Climb / Descent, Cruise, Landing, Abnormal Landing, Go-Around, Weight & Balance e Time/Fuel/Distance to Climb). Removidos integralmente ordinais 01–09, subtítulos operacionais e complementos técnicos dos títulos, mantendo botões, dimensões, destaque do selecionado, link de Weight & Balance e motores de cálculo. Testes móveis exigem nove opções, ausência de subtítulos e texto correto em cinco viewports.
+
+### v0.15.0 — AFM §5.3.10 Cruise Performance
+
+Novo módulo autônomo **CRUISE PERFORMANCE**, preservando o módulo CRUISE anterior e o Aero UI 2×2: altitude de pressão [ft], OAT [°C] ou ΔISA, potência [%, por motor] e massa de referência fixa de **1.999 kg**. Resultados: **TRUE AIRSPEED (KTAS)** e **FUEL FLOW (US gal/h)**. Gráfico suave de TAS versus altitude com indicação da condição selecionada.
+
+Tabela exata fornecida na seção 5.3.10: **9 altitudes (2.000–18.000 ft) × 5 temperaturas (ISA−10, ISA, ISA+10, ISA+20, ISA+30) × 4 linhas de potência**, 180 células Power% / FF / TAS. A potência máxima disponível varia com altitude e temperatura: o modelo usa valores tabulados adjacentes e **não extrapola** fora do envelope de potência. Os pontos tabulados são preservados; interpolação linear apenas entre valores publicados válidos. O sistema considera ISA=15°C−2°C/1.000ft, tal como as tabelas do AFM. Massa, flaps UP e trem recolhido são condições fixas do gráfico.
+
+A nota de instalação **OÄM 42-278 presente e OÄM 42-193 ausente** pode ser representada pelo botão `STANDARD` / `OÄM −2%`, por decisão explícita. O protótipo aplica a redução de 2% sobre TAS calculada, mas conserva o consumo tabulado: a nota não fornece correção independente de fuel flow; a aplicabilidade e interpretação precisam ser confirmadas nas publicações suplementares da aeronave. O modo padrão não presume os equipamentos instalados.
+
+Exemplos exatos: 10.000 ft/ISA/75% = **156 KTAS, 13,0 US gal/h**; 18.000 ft/ISA/85% = **169 KTAS, 15,0 US gal/h**; 18.000 ft/ISA+30/75% = **168 KTAS, 13,0 US gal/h**. Potência de 92% a 18.000 ft ISA não é publicada e é rejeitada.
+
+Testes automatizados: `validate_cruise_performance.cjs` para as 180 células, potência disponível e rejeição de extrapolação; `test_browser.py` para gráficos, controle OAT/ΔISA e mudança da configuração em cinco viewports. **Ferramenta experimental, não aprovada para planejamento ou execução de voo.**
