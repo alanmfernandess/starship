@@ -365,7 +365,32 @@ function takeoffPlot(v,r){
  +tx(145,132,'TOTAL '+fmt(total)+' m','#d3e0ea')
  +'</svg>';
 }
-function createPlot(id,v,res){if(id==='takeoff')return takeoffPlot(v,res);if(id==='goaround')return goAroundPlot(v,res);if(id==='landing'||id==='abnormal')return landingPlot(v,res);if(id==='cruise')return cruisePlot(v,res);if(res.error)return `<svg class="plot" viewBox="0 0 290 138" aria-label="Gráfico indisponível" role="img"></svg>`;
+function oeiPlot(v,r){
+ if(r.error)return '<svg class="plot" viewBox="0 0 290 138" role="img" aria-label="Performance indisponível"></svg>';
+ const temps=[-20,-15,-10,-5,0,5,10,15,20,25,30,35,40,45,50];
+ const points=temps.map(t=>({t,r:window.OEITables.compute({...v,oat:t,isa:false})})); 
+ const values=points.filter(p=>!p.r.error).map(p=>p.r.main);
+ if(!values.length)return '';
+ const min=Math.min(-10,Math.min(...values),r.main),max=Math.max(60,Math.max(...values),r.main);
+ const x=t=>26+(t+20)/70*254,y=rate=>116-(rate-min)/(max-min)*92;
+ const zero=y(0),fifty=y(50),baseline=Math.min(118,Math.max(18,zero));
+ let d='',active=false;
+ for(const p of points){if(p.r.error){active=false;continue}d+=(active?'L':'M')+x(p.t).toFixed(1)+' '+y(p.r.main).toFixed(1)+' ';active=true}
+ const actualTemp=v.isa?isaTemperature(v.pa):v.oat;
+ const px=x(actualTemp),py=y(r.main),danger=r.main<50;
+ const bandBottom=Math.min(116,Math.max(24,y(min))),bandTop=Math.min(116,Math.max(24,fifty));
+ return '<svg class="plot" viewBox="0 0 290 138" role="img" aria-label="OEI rate of climb versus outside air temperature, zero and 50 ft/min markers">'
+ +'<rect x="26" y="'+bandTop.toFixed(1)+'" width="254" height="'+Math.max(0,bandBottom-bandTop).toFixed(1)+'" fill="#e7b46d" fill-opacity=".06"/>'
+ +'<path class="grid" d="M26 24H280M26 70H280M26 116H280"/>'
+ +'<line x1="26" y1="'+zero.toFixed(1)+'" x2="280" y2="'+zero.toFixed(1)+'" stroke="#e7b46d" stroke-dasharray="4 4" stroke-width="1"/>'
+ +'<line x1="26" y1="'+fifty.toFixed(1)+'" x2="280" y2="'+fifty.toFixed(1)+'" stroke="#91a8b8" stroke-dasharray="2 4" stroke-width=".8"/>'
+ +'<text x="23" y="'+(zero-3).toFixed(1)+'" text-anchor="end" fill="#e7b46d" font-size="8">0</text>'
+ +'<text x="23" y="'+(fifty-3).toFixed(1)+'" text-anchor="end" fill="#91a8b8" font-size="8">50</text>'
+ +'<path d="'+d+'" fill="none" stroke="#56b9ee" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>'
+ +'<circle cx="'+px.toFixed(1)+'" cy="'+py.toFixed(1)+'" r="5" fill="'+(danger?'#e7b46d':'#56b9ee')+'" stroke="#202d39" stroke-width="2"/>'
+ +'<text x="26" y="133" font-size="9" fill="#91a8b8">−20°C</text><text x="280" y="133" text-anchor="end" font-size="9" fill="#91a8b8">50°C</text></svg>';
+}
+function createPlot(id,v,res){if(id==='oei')return oeiPlot(v,res);if(id==='takeoff')return takeoffPlot(v,res);if(id==='goaround')return goAroundPlot(v,res);if(id==='landing'||id==='abnormal')return landingPlot(v,res);if(id==='cruise')return cruisePlot(v,res);if(res.error)return `<svg class="plot" viewBox="0 0 290 138" aria-label="Gráfico indisponível" role="img"></svg>`;
  // Smoothed spline for the live model's response to temperature, sampled at constant PA/mass.
  const T=(id==='climb'||id==='oei')?[-20,-15,-10,-5,0,5,10,15,20,25,30,35,40,45,50]:[-30,-25,-20,-15,-10,-5,0,5,10,15,20,25,30,35,40,45].filter(t=>t<=15-0.0019812*v.pa+35 && t>=-35);
  const usable=T.map(t=>{const r=compute(id,{...v,oat:t,...((id==='climb'||id==='oei')?{isa:false}:{})});return {t,val:r.error?null:r.main,second:r.error?null:r.secondary}}).filter(x=>x.val!=null);
