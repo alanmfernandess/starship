@@ -454,7 +454,13 @@ with sync_playwright() as p:
         assert page.locator('#rw-wind').get_attribute('max')=='20'
         assert page.locator('#rw-slope').get_attribute('step')=='0.5'
         assert 'MAX WEIGHT' in page.locator('#rw-weight').inner_text()
+        page.locator('#rw-surface').click()
+        assert page.locator('.rw-picker').count()==4
+        assert page.locator('.rw-picker').all_inner_texts()==['PAVED · DRY','GRASS · 5 CM','GRASS · 5–10 CM','GRASS · 25 CM']
+        assert page.locator('.rw-picker').evaluate_all("(cards)=>cards.every(c=>c.querySelectorAll('strong').length===1 && c.querySelectorAll('small, .sub').length===0)")
+        page.locator('#rw-back').click()
         page.locator('#rw-takeoff').click()
+        assert page.locator('.rw-picker').evaluate_all("(cards)=>cards.every(c=>c.querySelectorAll('strong').length===1 && c.querySelectorAll('small, .sub').length===0)")
         assert page.locator('button[data-rw-pick="normal"]').count()==1
         assert page.locator('button[data-rw-pick="short"]').count()==1
         page.locator('button[data-rw-pick="short"]').click()
@@ -519,7 +525,7 @@ with sync_playwright() as p:
         assert page.evaluate("window.AeroCalc.inputs.runway.wind")==0
         assert page.locator('html').evaluate('(el)=>el.scrollWidth')<=w
         assert len(errors)==0, errors
-        all_checks+=77
+        all_checks+=83
         ctx.close()
     browser.close()
     print(f'{all_checks} mobile Chromium checks passed at 5 viewport sizes.')
