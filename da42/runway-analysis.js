@@ -23,8 +23,18 @@ function pressureAltitude(elev,qnh){
  return 44330.76923*(1-Math.pow(station/1013.25,1/5.2558797))*3.280839895;
 }
 function effectivePa(v){return v.paMode==='qnh'?pressureAltitude(v.elevation,v.qnh):v.pa}
+/* AFM takeoff grid begins at PA = 0 ft. For sub-sea-level pressure
+ * altitudes derived from valid QNH + field elevation, use the 0 ft
+ * grid as a conservative bound instead of extrapolating below the chart.
+ * Preserve the true (possibly negative) pressure altitude for display.
+ * Direct PA mode still rejects negative entries.
+ */
+function tablePa(v){
+ const pa=effectivePa(v);
+ return v.paMode==='qnh'&&Number.isFinite(pa)&&pa<0?0:pa;
+}
 function modelInput(v,mass){
- return {pa:effectivePa(v),oat:v.oat,mass,wind:v.wind??0,
+ return {pa:tablePa(v),oat:v.oat,mass,wind:v.wind??0,
   procedure:v.procedure||'normal',surface:v.surface||'paved',
   wet:!!v.wet,soft:!!v.soft,slope:v.slope??0,isa:!!v.isa};
 }
@@ -33,7 +43,8 @@ function validate(v){
  if(v.paMode&& !['direct','qnh'].includes(v.paMode))return 'MODO DE PRESSÃO INVÁLIDO';
  if(v.paMode==='qnh'&&(!Number.isFinite(v.elevation)||v.elevation< -1000||v.elevation>10000||
   !Number.isFinite(v.qnh)||v.qnh<870||v.qnh>1085))return 'ELEVAÇÃO / QNH INVÁLIDOS';
- if(!Number.isFinite(effectivePa(v))||effectivePa(v)<0||effectivePa(v)>10000)return 'PRESSURE ALT FORA DAS TABELAS';
+ const pa=effectivePa(v);
+ if(!Number.isFinite(pa)||pa>10000||(v.paMode!=='qnh'&&pa<0))return 'PRESSURE ALT FORA DAS TABELAS';
  if(!Number.isFinite(v.mass)||v.mass<MIN_MASS||v.mass>OPTION_MAX)return 'MASSA FORA DAS TABELAS';
  if(v.maxMass!==STANDARD_MAX&&v.maxMass!==OPTION_MAX)return 'CONFIGURAÇÃO DE MASSA INVÁLIDA';
  const t=root.TakeoffTables;
@@ -84,12 +95,13 @@ function compute(v){
   maximumConfigured:cap,limitedByConfig:tableLimit,
   belowPublishedMinimum:!hasAny,verifiedByDistanceOnly:true,
   massMargin:maxMass===null?null:maxMass-v.mass,pa:effectivePa(v),
+  tablePa:tablePa(v),paBelowChart:v.paMode==='qnh'&&effectivePa(v)<0,
   speed:{...required.speed,vy},
   procedure:v.procedure||'normal',referenceMass:MIN_MASS,
   configurationRequiresSupplement:cap===OPTION_MAX,
   minimumOnlyGrass:v.surface==='grass25',experimental:true};
 }
-const api={MIN_MASS,STANDARD_MAX,OPTION_MAX,pressureAltitude,effectivePa,modelInput,
+const api={MIN_MASS,STANDARD_MAX,OPTION_MAX,pressureAltitude,effectivePa,tablePa,modelInput,
  validate,checkDistance,compute};
 if(typeof module!=='undefined'&&module.exports)module.exports=api;
 root.RunwayAnalysis=api;
