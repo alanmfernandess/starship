@@ -479,23 +479,24 @@ with sync_playwright() as p:
         page.locator('#rw-apply').click()
         assert page.evaluate("window.AeroCalc.inputs.runway.procedure")=='normal'
         page.locator('#analysis-settings').click()
+        assert page.locator('#rw-weight .rw-value').inner_text()=='1900 KG'
         page.locator('#rw-weight').click()
-        assert page.locator('button[data-rw-pick="1999"]').count()==1
+        assert page.locator('.rw-picker').all_inner_texts()==['1900 KG','1999 KG']
+        assert page.locator('#rw-authorize').count()==0
         page.locator('button[data-rw-pick="1999"]').click()
-        assert page.locator('#rw-authorize').count()==1
+        assert page.locator('#rw-weight .rw-value').inner_text()=='1999 KG'
+        assert page.locator('#rw-authorize').count()==0
         assert page.evaluate("window.AeroCalc.inputs.runway.maxMass")==1900
         page.locator('#rw-apply').click()
-        assert 'MÄM 42-678' in page.locator('.rw-error').inner_text()
-        page.locator('#rw-authorize').check()
-        page.locator('#rw-apply').click()
         assert page.evaluate("window.AeroCalc.inputs.runway.maxMass")==1999
-        assert page.evaluate("window.AeroCalc.inputs.runway.mam678") is True
+        assert page.locator('#analysis-settings').inner_text().find('1999 KG')!=-1
         page.locator('#analysis-settings').click()
         page.locator('#rw-weight').click()
         page.locator('button[data-rw-pick="1900"]').click()
         page.locator('#rw-apply').click()
         assert page.evaluate("window.AeroCalc.inputs.runway.maxMass")==1900
         page.locator('#analysis-settings').click()
+        assert page.locator('#rw-weight .rw-value').inner_text()=='1900 KG'
         page.locator('#rw-pressure').click()
         assert page.locator('button[data-rw-pick="qnh"]').count()==1
         page.locator('button[data-rw-pick="qnh"]').click()
