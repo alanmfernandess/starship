@@ -30,7 +30,7 @@ with sync_playwright() as p:
         assert page.locator('#metrics').inner_text().find('1.656')!=-1
         assert page.locator('#metrics').inner_text().find('ZFW')!=-1
         assert page.locator('#metrics').inner_text().find('TOW')!=-1
-        assert '2,35' in page.locator('svg.graph').inner_text()
+        assert '2,35' in page.locator('svg.graph').text_content()
         assert page.locator('html').evaluate('(el)=>el.scrollWidth')<=w
         assert page.locator('svg.graph polygon').count()==1
         count+=8
