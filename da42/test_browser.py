@@ -444,29 +444,82 @@ with sync_playwright() as p:
         assert 'NO TABLE MASS FITS' in page.locator('#banner').inner_text()
         page.locator('input[data-key="length"]').fill('900')
         assert page.locator('#main-result').inner_text()=='1,855'
+        # RUNWAY is a transactional in-sheet dialog: no parent state changes until APPLY.
         page.locator('#analysis-settings').click()
-        assert page.locator('#analysis-procedure').count()==1
-        assert page.locator('#analysis-maxmass').count()==1
-        assert page.locator('#analysis-pressure-mode').count()==1
-        page.locator('#analysis-maxmass').click()
+        assert page.locator('#rw-takeoff').count()==1
+        assert page.locator('#rw-weight').count()==1
+        assert page.locator('#rw-pressure').count()==1
+        assert page.locator('#rw-wind').get_attribute('type')=='range'
+        assert page.locator('#rw-wind').get_attribute('min')=='-10'
+        assert page.locator('#rw-wind').get_attribute('max')=='20'
+        assert page.locator('#rw-slope').get_attribute('step')=='0.5'
+        assert 'MAX WEIGHT' in page.locator('#rw-weight').inner_text()
+        page.locator('#rw-takeoff').click()
+        assert page.locator('button[data-rw-pick="normal"]').count()==1
+        assert page.locator('button[data-rw-pick="short"]').count()==1
+        page.locator('button[data-rw-pick="short"]').click()
+        assert 'SHORT · APP' in page.locator('#rw-takeoff').inner_text()
+        assert page.evaluate("window.AeroCalc.inputs.runway.procedure")=='normal'
+        page.locator('#rw-cancel').click()
+        assert page.evaluate("window.AeroCalc.inputs.runway.procedure")=='normal'
         page.locator('#analysis-settings').click()
-        assert '1999 KG' in page.locator('#analysis-maxmass').inner_text()
-        page.locator('#analysis-maxmass').click()
+        page.locator('#rw-takeoff').click()
+        page.locator('button[data-rw-pick="short"]').click()
+        page.locator('#rw-apply').click()
+        assert page.evaluate("window.AeroCalc.inputs.runway.procedure")=='short'
         page.locator('#analysis-settings').click()
-        page.locator('#analysis-procedure').click()
-        assert page.locator('#main-result').inner_text()=='1,900'
+        page.locator('#rw-takeoff').click()
+        page.locator('button[data-rw-pick="normal"]').click()
+        page.locator('#rw-apply').click()
+        assert page.evaluate("window.AeroCalc.inputs.runway.procedure")=='normal'
         page.locator('#analysis-settings').click()
-        page.locator('#analysis-pressure-mode').click()
-        assert page.locator('#val-pa').get_attribute('readonly') is not None
-        assert page.locator('#main-result').inner_text()=='1,900'
+        page.locator('#rw-weight').click()
+        assert page.locator('button[data-rw-pick="1999"]').count()==1
+        page.locator('button[data-rw-pick="1999"]').click()
+        assert page.locator('#rw-authorize').count()==1
+        assert page.evaluate("window.AeroCalc.inputs.runway.maxMass")==1900
+        page.locator('#rw-apply').click()
+        assert 'MÄM 42-678' in page.locator('.rw-error').inner_text()
+        page.locator('#rw-authorize').check()
+        page.locator('#rw-apply').click()
+        assert page.evaluate("window.AeroCalc.inputs.runway.maxMass")==1999
+        assert page.evaluate("window.AeroCalc.inputs.runway.mam678") is True
         page.locator('#analysis-settings').click()
-        assert page.locator('#analysis-qnh').count()==1
-        assert page.locator('#analysis-elevation').count()==1
-        page.locator('#analysis-pressure-mode').click()
+        page.locator('#rw-weight').click()
+        page.locator('button[data-rw-pick="1900"]').click()
+        page.locator('#rw-apply').click()
+        assert page.evaluate("window.AeroCalc.inputs.runway.maxMass")==1900
+        page.locator('#analysis-settings').click()
+        page.locator('#rw-pressure').click()
+        assert page.locator('button[data-rw-pick="qnh"]').count()==1
+        page.locator('button[data-rw-pick="qnh"]').click()
+        assert page.locator('#rw-elevation').count()==1
+        assert page.locator('#rw-qnh').count()==1
         assert page.locator('#val-pa').get_attribute('readonly') is None
+        page.locator('#rw-apply').click()
+        assert page.locator('#val-pa').get_attribute('readonly') is not None
+        page.locator('#analysis-settings').click()
+        page.locator('#rw-pressure').click()
+        page.locator('button[data-rw-pick="direct"]').click()
+        page.locator('#rw-apply').click()
+        assert page.locator('#val-pa').get_attribute('readonly') is None
+        page.locator('#analysis-settings').click()
+        page.locator('#rw-wind').fill('-5')
+        assert page.evaluate("window.AeroCalc.inputs.runway.wind")==0
+        assert 'TAILWIND' in page.locator('#rw-wind-output').inner_text()
+        page.locator('#rw-cancel').click()
+        assert page.evaluate("window.AeroCalc.inputs.runway.wind")==0
+        page.locator('#analysis-settings').click()
+        page.locator('#rw-wind').fill('12')
+        page.locator('#rw-apply').click()
+        assert page.evaluate("window.AeroCalc.inputs.runway.wind")==12
+        page.locator('#analysis-settings').click()
+        page.locator('#rw-wind').fill('0')
+        page.locator('#rw-apply').click()
+        assert page.evaluate("window.AeroCalc.inputs.runway.wind")==0
         assert page.locator('html').evaluate('(el)=>el.scrollWidth')<=w
         assert len(errors)==0, errors
-        all_checks+=35
+        all_checks+=77
         ctx.close()
     browser.close()
     print(f'{all_checks} mobile Chromium checks passed at 5 viewport sizes.')
