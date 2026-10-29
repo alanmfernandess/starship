@@ -55,8 +55,8 @@ with sync_playwright() as p:
         count+=5
         page.locator('#nav-scenarios').click()
         assert page.locator('.case').count()==6
-        assert '1.656 kg' in page.locator('.sheet').inner_text()
-        assert '1.899 kg' in page.locator('.sheet').inner_text()
+        assert '1.665,5 kg' in page.locator('.sheet').inner_text()
+        assert '1.908,5 kg' in page.locator('.sheet').inner_text()
         assert 'LANDING' not in page.locator('.sheet').inner_text()
         assert 'FUEL FULL' in page.locator('.sheet').inner_text()
         assert 'study cases' not in page.locator('.sheet').inner_text()
