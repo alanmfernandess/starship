@@ -35,7 +35,7 @@ function open(values,render,icon,escape){
    const w=Number(state.wind)||0,fill=Math.max(0,Math.min(100,(w+10)/30*100));
    body=option('takeoff','TAKEOFF',state.procedure==='short'?'SHORT · APP':'NORMAL · UP')+
     option('weight','MAX WEIGHT',state.maxMass===1999?'MÄM 42-678 · 1999 KG':'STANDARD · 1900 KG')+
-    (state.maxMass===1999?'<label class="rw-auth"><input type="checkbox" id="rw-authorize" '+(state.mam678?'checked':'')+'/ ><span>Confirmo que a modificação MÄM 42-678 e as limitações aprovadas de massa/CG são aplicáveis a esta aeronave.</span></label>':'')+
+    (state.maxMass===1999?'<label class="rw-auth"><input type="checkbox" id="rw-authorize" '+(state.mam678?'checked':'')+'/><span>Confirmo que a modificação MÄM 42-678 e as limitações aprovadas de massa/CG são aplicáveis a esta aeronave.</span></label>':'')+
     option('pressure','PRESSURE ALT',state.paMode==='qnh'?'QNH + ELEV':'DIRECT')+
     (state.paMode==='qnh'?'<div class="rw-panel"><label for="rw-elevation">FIELD ELEV · FT</label><input type="number" id="rw-elevation" min="-1000" max="10000" step="1" value="'+escape(state.elevation)+'"/></div>'+
      '<div class="rw-panel"><label for="rw-qnh">QNH · HPA</label><input type="number" id="rw-qnh" min="870" max="1085" step="0.01" value="'+escape(state.qnh)+'"/></div>':'')+
