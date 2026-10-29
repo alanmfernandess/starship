@@ -95,7 +95,7 @@ with sync_playwright() as p:
             if direction=='subida':assert end<start,(w,h,'chart must ascend',start,end)
             elif direction=='descida':assert end>start,(w,h,'chart must descend',start,end)
             else:assert end==start,(w,h,'zero ROC must be level',start,end)
-            assert '1 MIN' in chart.inner_text()
+            assert '1 MIN' in chart.text_content()
             curve=chart.locator('path.vertical-curve')
             assert curve.count()==1,(w,h,'missing Aero UI spline')
             pathdata=curve.get_attribute('d')
