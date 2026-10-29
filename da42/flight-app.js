@@ -69,7 +69,7 @@ function reviewPage(){
  let items= '<section class="tile"><div class="brand"><span class="title">IMPORTED FLIGHT PLAN</span><span class="pill">REVIEW</span></div>'+
  '<div class="status '+(plan.mismatch?'warn':'ok')+'">'+esc(plan.source==='MANUAL'?'MANUAL PLAN':plan.mismatch?'AIRCRAFT MISMATCH · SYNC BLOCKED':'OFP READ SUCCESSFULLY')+'</div></section>'+routeCard();
  items+='<section class="tile"><div class="list-title">CONFIRM FLIGHT DATA</div><div class="review-grid">'+
- inputField('distance','MISSION DISTANCE · NM',plan.distance)+inputField('alternateDistance','ALTERNATE DISTANCE · NM',plan.alternateDistance)+
+ inputField('distance','MISSION DISTANCE · NM',plan.distance)+inputField('alternateDistance','ALTERNATE DIST · NM',plan.alternateDistance)+
  inputField('takeoffWeight','TAKEOFF WEIGHT · KG',plan.takeoffWeight)+inputField('landingWeight','LANDING WEIGHT · KG',plan.landingWeight)+
  inputField('cruiseAltitude','CRUISE ALT · FT',plan.cruiseAltitude)+inputField('tripFuel','TRIP FUEL · KG',plan.tripFuel)+
  '</div>'+row('AIRCRAFT',plan.aircraftName||plan.aircraft)+row('ROUTE',plan.route||'NOT PROVIDED')+
