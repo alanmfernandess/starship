@@ -190,7 +190,7 @@ function render(){
  bind();
 }
 function show(v){view=v;err='';render()}
-function setStatus(message,isError){loading=false;err=isError?message:'';msg=isError?'':message;show('plan')}
+function setStatus(message,isError){loading=false;err=isError?message:'';msg=isError?'':message;view='plan';render()}
 function acceptRaw(raw,source){
  const next=C.normalize(raw);next.source=source;
  plan=next;reviewed=false;confirmVariant=false;
