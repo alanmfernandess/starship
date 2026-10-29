@@ -193,7 +193,7 @@ function sheet(type){
   body=title+(model.ok?model.scenarios.map(c=>'<div class="case"><div class="name">'+c.name+'</div><div class="value"><b>'+format(c.mass,1)+' kg</b><span class="'+(c.cgOK?'good':'error')+'">'+format(c.cg,3)+' m · '+(c.cgOK?'CG OK':'CG OUT')+'</span></div></div>').join(''):'<p class="error">'+model.errors.join(', ')+'</p>');
   if(model.ok)body+='<div class="section-title">LOADED CONDITION</div><div class="case"><div class="value"><span>ZFW</span><b>'+format(model.zeroFuel.mass,0)+' kg</b></div></div><div class="case"><div class="value"><span>TOW</span><b>'+format(model.takeoff.mass,0)+' kg</b></div></div>';
  }
- if(type==='modules')body='<a class="action" href="./index.html">PERFORMANCE MODULES 01–07</a><a class="action" href="./wb.html">08 · WEIGHT &amp; BALANCE</a>';
+ if(type==='modules')body='<a class="action" href="./flight.html">FLIGHT PLAN / SIMBRIEF</a><a class="action" href="./index.html?calculator=1">PERFORMANCE MODULES 01–07</a><a class="action" href="./wb.html">08 · WEIGHT &amp; BALANCE</a>';
  const d=document.createElement('div');d.className='sheet-backdrop';d.innerHTML='<div class="sheet" role="dialog" aria-modal="true" aria-label="'+titles[type]+'"><div class="sheet-head"><h2>'+titles[type]+'</h2><button class="close" aria-label="Fechar">×</button></div>'+body+'</div>';
  el('.phone').appendChild(d);
  d.addEventListener('click',ev=>{if(ev.target===d)d.remove()});
