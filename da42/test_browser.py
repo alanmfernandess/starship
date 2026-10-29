@@ -441,7 +441,7 @@ with sync_playwright() as p:
         page.locator('input[data-key="mass"]').fill('1800')
         page.locator('input[data-key="length"]').fill('600')
         assert page.locator('#main-result').inner_text()=='—'
-        assert 'NO TABLE MASS FITS' in page.locator('#banner').inner_text()
+        assert 'NO TABLE WEIGHT FITS' in page.locator('#banner').inner_text()
         page.locator('input[data-key="length"]').fill('900')
         assert page.locator('#main-result').inner_text()=='1,855'
         # RUNWAY is a transactional in-sheet dialog: no parent state changes until APPLY.
