@@ -73,9 +73,11 @@ label{display:block;font-size:11px;font-weight:600;color:#aabfce;letter-spacing:
 .card-button svg{color:var(--blue);width:21px;flex:none}
 .status{font-size:11px;line-height:1.5;color:#a6bbca}
 .status.ok{color:#93ddb3}.status.warn{color:#ecc37e}
-.review-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
-.review-grid label{font-size:10px}
-.review-grid .text-input{padding:10px;font-size:15px}
+.review-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:10px;row-gap:16px;margin:14px 0}
+.review-grid>div{display:flex;flex-direction:column;min-width:0}
+.review-grid label{display:block;white-space:nowrap;min-height:18px;line-height:18px;margin:0 0 8px;font-size:10px;letter-spacing:-.1px}
+.review-grid .text-input{display:block;width:100%;height:54px;min-height:54px;padding:10px 12px;border-radius:12px;font-size:20px;line-height:1.25;font-variant-numeric:tabular-nums;appearance:textfield;-moz-appearance:textfield}
+.review-grid .text-input::-webkit-outer-spin-button,.review-grid .text-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin:16px 0 12px;border-bottom:1px solid var(--line)}
 .tab{border:0;border-bottom:2px solid transparent;background:transparent;color:#8fa8ba;font-weight:700;font-size:11px;padding:10px 0}
 .tab[aria-selected=true]{color:var(--blue);border-bottom-color:var(--blue)}
@@ -89,7 +91,7 @@ label{display:block;font-size:11px;font-weight:600;color:#aabfce;letter-spacing:
 .nav .icon{width:20px;height:20px}
 .nav.active{color:var(--blue)}
 .disclaimer{text-align:center;color:#8ca3b3;letter-spacing:.2px;font-size:9px;line-height:1.5;margin:15px 0 7px}
-@media(max-width:355px){.sb-import-card{padding:15px 14px 16px}.sb-import-card .text-input{font-size:19px}.content{padding:15px 11px}.metric .value{font-size:22px}.apt{font-size:24px}.primary{padding:10px}.review-grid{gap:8px}}
+@media(max-width:355px){.sb-import-card{padding:15px 14px 16px}.sb-import-card .text-input{font-size:19px}.content{padding:15px 11px}.metric .value{font-size:22px}.apt{font-size:24px}.primary{padding:10px}.review-grid{column-gap:8px;row-gap:14px}.review-grid label{font-size:9px;letter-spacing:-.18px}.review-grid .text-input{font-size:19px;padding:10px}}
 </style></head>
 <body><div id="app"></div>
 <script src="./takeoff-tables.js"></script><script src="./climb-tables.js"></script><script src="./oei-tables.js"></script><script src="./runway-analysis.js"></script><script src="./wb-engine.js"></script><script src="./simbrief-core.js"></script><script src="./flight-app.js"></script>
