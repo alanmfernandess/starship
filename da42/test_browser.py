@@ -454,6 +454,11 @@ with sync_playwright() as p:
         assert page.locator('#rw-wind').get_attribute('max')=='20'
         assert page.locator('#rw-slope').get_attribute('step')=='0.5'
         assert 'MAX WEIGHT' in page.locator('#rw-weight').inner_text()
+        assert page.locator('.runway-ui .rw-note').count()==0
+        assert page.locator('#rw-authorize').count()==0
+        assert page.locator('#rw-weight .rw-value').inner_text()=='1900 KG'
+        assert page.locator('#rw-weight .rw-value').evaluate("(e)=>getComputedStyle(e).whiteSpace")=='nowrap'
+        assert page.locator('#rw-weight .rw-value').evaluate("(e)=>e.scrollWidth<=e.clientWidth")
         page.locator('#rw-surface').click()
         assert page.locator('.rw-picker').count()==4
         assert page.locator('.rw-picker').all_inner_texts()==['PAVED · DRY','GRASS · 5 CM','GRASS · 5–10 CM','GRASS · 25 CM']
@@ -485,6 +490,7 @@ with sync_playwright() as p:
         assert page.locator('#rw-authorize').count()==0
         page.locator('button[data-rw-pick="1999"]').click()
         assert page.locator('#rw-weight .rw-value').inner_text()=='1999 KG'
+        assert page.locator('#rw-weight .rw-value').evaluate("(e)=>e.scrollWidth<=e.clientWidth")
         assert page.locator('#rw-authorize').count()==0
         assert page.evaluate("window.AeroCalc.inputs.runway.maxMass")==1900
         page.locator('#rw-apply').click()
