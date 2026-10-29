@@ -37,6 +37,16 @@ with sync_playwright() as p:
   page.goto(url)
   assert page.locator('.heading').inner_text().find('FLIGHT PLAN')>=0
   assert page.locator('[data-view]').count()==4
+  # SIMBRIEF import card must have exactly ONE input and ONE action.
+  assert page.locator('.sb-import-card').count()==1
+  assert page.locator('.sb-import-card input').count()==1
+  assert page.locator('.sb-import-card button').count()==1
+  assert page.locator('.sb-import-card label').inner_text()=='PILOT ID'
+  assert page.locator('.sb-import-card button').inner_text()=='IMPORT OFP'
+  assert page.locator('.sb-import-card .pill, .sb-import-card .note, .sb-import-card .message').count()==0
+  assert page.locator('#import-file, #open-manual, #review-plan, #ofp-file').count()==0
+  assert page.locator('.disclaimer').count()==0
+  assert page.locator('.sb-import-card .primary').evaluate("(e)=>Math.abs(e.getBoundingClientRect().width-e.previousElementSibling.getBoundingClientRect().width)<2")
   assert page.locator('html').evaluate('(e)=>e.scrollWidth')<=w
   page.locator('#pilot-id').fill('123456')
   page.locator('#import-ofp').click()
