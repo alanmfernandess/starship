@@ -58,10 +58,8 @@ function inputField(key,label,value,step){
  return '<div><label for="field-'+esc(key)+'">'+esc(label)+'</label><input class="text-input" id="field-'+esc(key)+'" data-review="'+esc(key)+'" type="number" inputmode="decimal" step="'+(step||'any')+'" value="'+(typeof value==='number'?value:'')+'" placeholder="—"></div>';
 }
 function planPage(){
- return '<section class="tile sb-import-card" aria-label="SimBrief">'+
-  '<h2 class="sb-import-title">SIMBRIEF</h2>'+
-  '<label for="pilot-id">PILOT ID</label>'+
-  '<input id="pilot-id" class="text-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="7" placeholder="1234567" value="'+esc(pilotId)+'" autocomplete="off" aria-required="true">'+
+ return '<section class="tile sb-import-card" aria-label="Import flight plan">'+
+  '<input id="pilot-id" class="text-input" type="text" aria-label="Pilot ID" inputmode="numeric" pattern="[0-9]*" maxlength="7" placeholder="PILOT ID" value="'+esc(pilotId)+'" autocomplete="off" aria-required="true">'+
   '<button id="import-ofp" class="primary" type="button" '+(loading?'disabled aria-busy="true"':'')+'>'+(loading?'IMPORTING…':'IMPORT OFP')+'</button>'+
   (err?'<p class="message warn" role="alert">'+esc(err)+'</p>':'')+
   '</section>';
@@ -176,7 +174,7 @@ function morePage(){
 function heading(){
  const names={plan:['FLIGHT PLAN','SIMBRIEF'],review:['IMPORTED FLIGHT PLAN','REVIEW'],summary:['PERFORMANCE OVERVIEW','AERO UI'],comparison:['OFP COMPARISON','SUMMARY'],modules:['PERFORMANCE MODULES','AERO UI'],more:['PREFERENCES','AERO UI']};
  const d=names[view]||names.plan;
- return '<div class="heading"><span>'+d[0]+'</span><span class="accent">'+d[1]+'</span></div>';
+ return view==='plan'?'':'<div class="heading"><span>'+d[0]+'</span><span class="accent">'+d[1]+'</span></div>';
 }
 function render(){
  const page=view==='plan'?planPage():view==='review'?reviewPage():view==='summary'?summaryPage():view==='comparison'?comparisonPage():view==='modules'?modulesPage():morePage();
