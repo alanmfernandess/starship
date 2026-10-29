@@ -57,5 +57,5 @@ const html=fs.readFileSync(__dirname+'/flight.html','utf8');
 for(const script of ['simbrief-core.js','flight-app.js','takeoff-tables.js','wb-engine.js'])assert.ok(html.includes('./'+script));
 const index=fs.readFileSync(__dirname+'/index.html','utf8');
 assert.ok(index.includes('./flight.html'));
-assert.ok(index.includes('calculator=1'));
+assert.ok(fs.readFileSync(__dirname+'/flight-app.js','utf8').includes('calculator=1'));
 console.log('PASS SimBrief core, KGS/LBS, weather, alternate, compatibility, conservative mapping and app syntax');
