@@ -70,16 +70,16 @@
  * NOT independently validated at off-example conditions. Not approved for flight.
  */
 const MODELS={
- takeoff:{label:'TAKEOFF',panel:'TAKEOFF DISTANCE',metric:'GROUND ROLL',unit:'m',metricUnit:'m',fields:[{k:'pa',name:'PRESSURE ALT',u:'ft'},{k:'oat',name:'OAT',u:'°C'},{k:'mass',name:'T/O MASS',u:'kg'},{k:'wind',name:'HEADWIND',u:'kt'}],defaults:{pa:0,oat:15,mass:1800,wind:10,procedure:'normal',isa:false,surface:'paved',wet:false,soft:false,slope:0}},
- climb:{label:'CLIMB',panel:'RATE OF CLIMB',metric:'VERTICAL SPEED',unit:'ft/min',metricUnit:'m/s',fields:[{k:'pa',name:'PRESSURE ALT',u:'ft'},{k:'oat',name:'OAT',u:'°C'},{k:'mass',name:'FLIGHT MASS',u:'kg'},{k:'power',name:'POWER',u:'%',fixed:true}],defaults:{pa:0,oat:15,mass:1800,power:92,flaps:'up',isa:false}},
- oei:{label:'ONE ENGINE CLIMB / DESCENT',panel:'RATE OF CLIMB',metric:'VERTICAL SPEED',unit:'ft/min',metricUnit:'m/s',fields:[{k:'pa',name:'PRESSURE ALT',u:'ft'},{k:'oat',name:'OAT',u:'°C'},{k:'mass',name:'FLIGHT MASS',u:'kg'},{k:'power',name:'ENGINE POWER',u:'%',fixed:true}],defaults:{pa:0,oat:15,mass:1800,power:92,isa:false}},
+ takeoff:{label:'TAKEOFF',panel:'TAKEOFF DISTANCE',metric:'GROUND ROLL',unit:'m',metricUnit:'m',fields:[{k:'pa',name:'PRESSURE ALT',u:'ft'},{k:'oat',name:'OAT',u:'°C'},{k:'mass',name:'T/O WEIGHT',u:'kg'},{k:'wind',name:'HEADWIND',u:'kt'}],defaults:{pa:0,oat:15,mass:1800,wind:10,procedure:'normal',isa:false,surface:'paved',wet:false,soft:false,slope:0}},
+ climb:{label:'CLIMB',panel:'RATE OF CLIMB',metric:'VERTICAL SPEED',unit:'ft/min',metricUnit:'m/s',fields:[{k:'pa',name:'PRESSURE ALT',u:'ft'},{k:'oat',name:'OAT',u:'°C'},{k:'mass',name:'FLIGHT WEIGHT',u:'kg'},{k:'power',name:'POWER',u:'%',fixed:true}],defaults:{pa:0,oat:15,mass:1800,power:92,flaps:'up',isa:false}},
+ oei:{label:'ONE ENGINE CLIMB / DESCENT',panel:'RATE OF CLIMB',metric:'VERTICAL SPEED',unit:'ft/min',metricUnit:'m/s',fields:[{k:'pa',name:'PRESSURE ALT',u:'ft'},{k:'oat',name:'OAT',u:'°C'},{k:'mass',name:'FLIGHT WEIGHT',u:'kg'},{k:'power',name:'ENGINE POWER',u:'%',fixed:true}],defaults:{pa:0,oat:15,mass:1800,power:92,isa:false}},
  cruise:{label:'CRUISING',panel:'TRUE AIRSPEED',metric:'ISA DEVIATION',unit:'KTAS',metricUnit:'°C',fields:[{k:'pa',name:'PRESSURE ALT',u:'ft'},{k:'oat',name:'OAT',u:'°C'},{k:'load',name:'ENGINE LOAD',u:'%'},{k:'engines',name:'ENGINES',u:'',fixed:true,fixedValue:2}],defaults:{pa:10000,oat:-5,load:80,engines:2}},
- landing:{label:'LANDING',panel:'LANDING DISTANCE',metric:'GROUND ROLL',unit:'m',metricUnit:'m',fields:[{k:'pa',name:'PRESSURE ALT',u:'ft'},{k:'oat',name:'OAT',u:'°C'},{k:'mass',name:'LDG MASS',u:'kg'},{k:'wind',name:'HEADWIND',u:'kt'}],defaults:{pa:0,oat:15,mass:1800,wind:10,isa:false,surface:'paved',wet:false,soft:false,slope:0}},
- abnormal:{label:'ABNORMAL LANDING',panel:'LANDING DISTANCE',metric:'GROUND ROLL',unit:'m',metricUnit:'m',fields:[{k:'pa',name:'PRESSURE ALT',u:'ft'},{k:'oat',name:'OAT',u:'°C'},{k:'mass',name:'LDG MASS',u:'kg'},{k:'wind',name:'HEADWIND',u:'kt'}],defaults:{pa:0,oat:15,mass:1800,wind:10,isa:false,surface:'paved',wet:false,soft:false,slope:0}},
- goaround:{label:'GO-AROUND',panel:'RATE OF CLIMB',metric:'VERTICAL SPEED',unit:'ft/min',metricUnit:'m/s',fields:[{k:'pa',name:'PRESSURE ALT',u:'ft'},{k:'oat',name:'OAT',u:'°C'},{k:'mass',name:'LANDING MASS',u:'kg'},{k:'speed',name:'VREF',u:'KIAS',fixed:true}],defaults:{pa:0,oat:15,mass:1900,isa:true}},
- timeclimb:{label:'TIME TO CLIMB',panel:'TIME TO CLIMB',metric:'FUEL TO CLIMB',unit:'min',metricUnit:'US gal',fields:[{k:'start',name:'DEPARTURE ALT',u:'ft'},{k:'target',name:'TARGET ALT',u:'ft'},{k:'mass',name:'CLIMB MASS',u:'kg'},{k:'oat',name:'OAT · DEP',u:'°C'}],defaults:{start:2000,target:16000,mass:1900,oat:11}},
- cruiseperf:{label:'CRUISE',panel:'TRUE AIRSPEED',metric:'FUEL FLOW',unit:'KTAS',metricUnit:'US gal/h',fields:[{k:'pa',name:'PRESSURE ALT',u:'ft'},{k:'oat',name:'OAT',u:'°C'},{k:'load',name:'ENGINE POWER',u:'%'},{k:'mass',name:'FLIGHT MASS',u:'kg',fixed:true,fixedValue:'1,999'}],defaults:{pa:10000,oat:-5,load:75,mass:1999,reduced:false}},
- runway:{label:'RUNWAY ANALYSIS',panel:'MAX TAKEOFF WEIGHT',metric:'RUNWAY MARGIN',unit:'kg',metricUnit:'m',fields:[{k:'pa',name:'PRESSURE ALT',u:'ft'},{k:'oat',name:'OAT',u:'°C'},{k:'mass',name:'T/O MASS',u:'kg'},{k:'length',name:'TORA',u:'m'}],defaults:{pa:2000,oat:25,mass:1800,length:900,wind:0,procedure:'normal',surface:'paved',wet:false,soft:false,slope:0,maxMass:1900,paMode:'direct',elevation:2000,qnh:1013.25,isa:false}}
+ landing:{label:'LANDING',panel:'LANDING DISTANCE',metric:'GROUND ROLL',unit:'m',metricUnit:'m',fields:[{k:'pa',name:'PRESSURE ALT',u:'ft'},{k:'oat',name:'OAT',u:'°C'},{k:'mass',name:'LDG WEIGHT',u:'kg'},{k:'wind',name:'HEADWIND',u:'kt'}],defaults:{pa:0,oat:15,mass:1800,wind:10,isa:false,surface:'paved',wet:false,soft:false,slope:0}},
+ abnormal:{label:'ABNORMAL LANDING',panel:'LANDING DISTANCE',metric:'GROUND ROLL',unit:'m',metricUnit:'m',fields:[{k:'pa',name:'PRESSURE ALT',u:'ft'},{k:'oat',name:'OAT',u:'°C'},{k:'mass',name:'LDG WEIGHT',u:'kg'},{k:'wind',name:'HEADWIND',u:'kt'}],defaults:{pa:0,oat:15,mass:1800,wind:10,isa:false,surface:'paved',wet:false,soft:false,slope:0}},
+ goaround:{label:'GO-AROUND',panel:'RATE OF CLIMB',metric:'VERTICAL SPEED',unit:'ft/min',metricUnit:'m/s',fields:[{k:'pa',name:'PRESSURE ALT',u:'ft'},{k:'oat',name:'OAT',u:'°C'},{k:'mass',name:'LANDING WEIGHT',u:'kg'},{k:'speed',name:'VREF',u:'KIAS',fixed:true}],defaults:{pa:0,oat:15,mass:1900,isa:true}},
+ timeclimb:{label:'TIME TO CLIMB',panel:'TIME TO CLIMB',metric:'FUEL TO CLIMB',unit:'min',metricUnit:'US gal',fields:[{k:'start',name:'DEPARTURE ALT',u:'ft'},{k:'target',name:'TARGET ALT',u:'ft'},{k:'mass',name:'CLIMB WEIGHT',u:'kg'},{k:'oat',name:'OAT · DEP',u:'°C'}],defaults:{start:2000,target:16000,mass:1900,oat:11}},
+ cruiseperf:{label:'CRUISE',panel:'TRUE AIRSPEED',metric:'FUEL FLOW',unit:'KTAS',metricUnit:'US gal/h',fields:[{k:'pa',name:'PRESSURE ALT',u:'ft'},{k:'oat',name:'OAT',u:'°C'},{k:'load',name:'ENGINE POWER',u:'%'},{k:'mass',name:'FLIGHT WEIGHT',u:'kg',fixed:true,fixedValue:'1,999'}],defaults:{pa:10000,oat:-5,load:75,mass:1999,reduced:false}},
+ runway:{label:'RUNWAY ANALYSIS',panel:'MAX TAKEOFF WEIGHT',metric:'RUNWAY MARGIN',unit:'kg',metricUnit:'m',fields:[{k:'pa',name:'PRESSURE ALT',u:'ft'},{k:'oat',name:'OAT',u:'°C'},{k:'mass',name:'T/O WEIGHT',u:'kg'},{k:'length',name:'TORA',u:'m'}],defaults:{pa:2000,oat:25,mass:1800,length:900,wind:0,procedure:'normal',surface:'paved',wet:false,soft:false,slope:0,maxMass:1900,paMode:'direct',elevation:2000,qnh:1013.25,isa:false}}
 };
 const el=s=>document.querySelector(s),escapeHTML=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const persisted=(()=>{try{return JSON.parse(localStorage.getItem('aero-ui-da42-v1'))||{}}catch{return {}}})();
@@ -276,7 +276,7 @@ function limits(id,v){
  const n=NOMOGRAMS[id];if(v.pa<0||v.pa>n.pa.at(-1))return 'ALTITUDE FORA DO GRÁFICO';
  if(v.oat< -35||v.oat>50)return 'OAT FORA DO GRÁFICO';
  if(v.oat>isaMax(v.pa)+1e-5)return 'FORA DA CURVA ISA +35';
- if(v.mass<1500||v.mass>1900)return 'MASSA FORA DO GRÁFICO';
+ if(v.mass<1500||v.mass>1900)return 'WEIGHT FORA DO GRÁFICO';
  if((id==='takeoff'||id==='landing'||id==='abnormal')&&(!Number.isFinite(v.wind)||v.wind < -10||v.wind >20))return 'VENTO FORA DO GRÁFICO';
  return null;
 }
@@ -307,15 +307,15 @@ function icon(name){const paths={menu:'<path d="M4 7h16M4 12h12M4 17h8"/>',slide
 function bannerFor(id,v,r){
  if(r.error)return r.error;
  if((id==='landing'||id==='abnormal')&&v.surface==='grass25')return 'GRASS >10 CM · +25% MÍNIMO · NÃO USAR EM VOO';
- if(id==='runway')return (r.status==='DISTANCE SUFFICIENT'?'DISTANCE SUFFICIENT':r.status==='INSUFFICIENT DISTANCE'?'INSUFFICIENT DISTANCE':r.status==='MASS LIMIT EXCEEDED'?'AIRCRAFT MASS LIMIT EXCEEDED':'NO TABLE MASS FITS')+(r.paBelowChart?' · PA < 0: 0 FT TABLE':' · DISTANCE ONLY')+' · NOT FOR FLIGHT';
+ if(id==='runway')return (r.status==='DISTANCE SUFFICIENT'?'DISTANCE SUFFICIENT':r.status==='INSUFFICIENT DISTANCE'?'INSUFFICIENT DISTANCE':r.status==='MASS LIMIT EXCEEDED'?'AIRCRAFT WEIGHT LIMIT EXCEEDED':'NO TABLE WEIGHT FITS')+(r.paBelowChart?' · PA < 0: 0 FT TABLE':' · DISTANCE ONLY')+' · NOT FOR FLIGHT';
  if(id==='takeoff')return (v.procedure==='short'?'SHORT · FLAPS APP · VR 76 / V50 82 KIAS':'NORMAL · FLAPS UP · VR 80 / V50 85 KIAS')+' · NOT FOR FLIGHT';
  if(id==='climb')return (v.flaps==='app'?'FLAPS APP · VY 85 KIAS':v.mass>1900?'FLAPS UP · VY 92 KIAS':'FLAPS UP · VY 90 KIAS')+' · BOTH 92% · GEAR UP';
  if(id==='oei')return r.main<0?'ROC NEGATIVO · DESCIDA':r.main<50?'ROC < 50 FT/MIN · AFM CAUTION':'OEI · VYSE 85 KIAS · FLAPS UP · GEAR UP';
  if(id==='timeclimb')return 'FLAPS UP · BOTH 92% · GEAR UP · ZERO WIND';
  if(id==='cruiseperf')return r.configReduced?'FLAPS UP · GEAR UP · OÄM −2%':'FLAPS UP · GEAR UP · 1999 KG';
  if(id==='goaround')return 'LDG · BOTH MAX · GEAR EXTENDED · VREF '+r.vref+' KIAS'+(v.mass>1900?' · MÄM 42-678':'');
- if(id==='abnormal')return v.mass>1805?'FLAPS UP / APP · VREF '+r.vref+' KIAS · MASSA > 1805 KG · PROCEDIMENTO ANORMAL':'FLAPS UP / APP · VREF '+r.vref+' KIAS · BOTH IDLE · NÃO USAR EM VOO';
- if(id==='landing'&&v.mass>1805)return 'FLAPS LDG · VREF '+r.vref+' KIAS · MASSA > 1805 KG · PROCEDIMENTO ANORMAL';
+ if(id==='abnormal')return v.mass>1805?'FLAPS UP / APP · VREF '+r.vref+' KIAS · WEIGHT > 1805 KG · PROCEDIMENTO ANORMAL':'FLAPS UP / APP · VREF '+r.vref+' KIAS · BOTH IDLE · NÃO USAR EM VOO';
+ if(id==='landing'&&v.mass>1805)return 'FLAPS LDG · VREF '+r.vref+' KIAS · WEIGHT > 1805 KG · PROCEDIMENTO ANORMAL';
  return 'DIGITALIZAÇÃO EXPERIMENTAL · NÃO UTILIZAR EM VOO';
 }
 function landingPlot(v,r){
