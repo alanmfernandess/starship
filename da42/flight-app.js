@@ -5,7 +5,7 @@
 'use strict';
 const C=window.SimBriefCore,storageKey='aero-ui-da42-v1',flightKey='aero-ui-flight-plan-v1',idKey='aero-ui-simbrief-id-v1';
 const root=document.getElementById('app');
-let view='plan',compareTab='fuel',pilotId='',plan=null,reviewed=false,loading=false,err='',msg='',confirmVariant=false,manual=false;
+let view='plan',compareTab='fuel',pilotId='',plan=null,reviewed=false,loading=false,err='',confirmVariant=false;
 const icons={
  menu:'M4 7h16M4 12h12M4 17h8',settings:'M4 6h16M4 12h16M4 18h16',next:'m9 5 7 7-7 7',
  plan:'M3 3h18v18H3zM7 8h10M7 12h10M7 16h6',summary:'M4 20V11M10 20V5M16 20v-9M22 20V8',
@@ -58,19 +58,13 @@ function inputField(key,label,value,step){
  return '<div><label for="field-'+esc(key)+'">'+esc(label)+'</label><input class="text-input" id="field-'+esc(key)+'" data-review="'+esc(key)+'" type="number" inputmode="decimal" step="'+(step||'any')+'" value="'+(typeof value==='number'?value:'')+'" placeholder="—"></div>';
 }
 function planPage(){
- let main='<section class="tile"><div class="brand"><strong>SIMBRIEF</strong><span class="pill">IMPORT OFP</span></div>'+
-  '<label for="pilot-id">PILOT ID · NUMBERS</label><div class="form-line"><input id="pilot-id" class="text-input" inputmode="numeric" maxlength="7" placeholder="1234567" value="'+esc(pilotId)+'" autocomplete="off">'+
-  '<button id="import-ofp" class="primary" type="button" '+(loading?'disabled':'')+'>'+ (loading?'IMPORTING…':'IMPORT OFP')+'</button></div>'+
-  '<p class="message '+(err?'warn':'')+'" role="status">'+esc(err||msg||'Busca o último OFP do SimBrief usando o Pilot ID informado.')+'</p>'+
-  '<div class="action-row"><button type="button" class="secondary" id="import-file">IMPORT JSON FILE</button><button type="button" id="open-manual" class="secondary">MANUAL ENTRY</button></div>'+
-  '<input type="file" accept=".json,application/json" id="ofp-file" style="display:none" aria-label="Arquivo OFP JSON"></section>';
- if(plan)main+=routeCard()+'<button id="review-plan" type="button" class="primary stretch">REVIEW FLIGHT PLAN '+icon('next')+'</button>';
- if(manual)main+='<section class="tile"><div class="list-title">MANUAL FLIGHT PLAN</div>'+
-  '<div class="review-grid"><div><label for="man-origin">ORIGIN · ICAO</label><input class="text-input" id="man-origin" maxlength="4" placeholder="SBGR"></div><div><label for="man-dest">DESTINATION · ICAO</label><input class="text-input" id="man-dest" maxlength="4" placeholder="SBFL"></div>'+
-  '<div><label for="man-alt">ALTERNATE · ICAO</label><input class="text-input" id="man-alt" maxlength="4" placeholder="SBNF"></div><div><label for="man-distance">MISSION DISTANCE · NM</label><input class="text-input" id="man-distance" type="number" min="0" placeholder="420"></div>'+
-  '</div><button class="primary stretch" id="save-manual">CREATE MANUAL PLAN</button></section>';
- main+='<div class="note">OFP = dados de planejamento. O Aero UI recalcula performance com suas próprias tabelas e exige confirmação dos parâmetros ausentes. Nenhum dado é sincronizado sem revisão.</div>';
- return main;
+ return '<section class="tile sb-import-card" aria-label="SimBrief">'+
+  '<h2 class="sb-import-title">SIMBRIEF</h2>'+
+  '<label for="pilot-id">PILOT ID</label>'+
+  '<input id="pilot-id" class="text-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="7" placeholder="1234567" value="'+esc(pilotId)+'" autocomplete="off" aria-required="true">'+
+  '<button id="import-ofp" class="primary" type="button" '+(loading?'disabled aria-busy="true"':'')+'>'+(loading?'IMPORTING…':'IMPORT OFP')+'</button>'+
+  (err?'<p class="message warn" role="alert">'+esc(err)+'</p>':'')+
+  '</section>';
 }
 function reviewPage(){
  if(!plan)return planPage();
@@ -187,13 +181,13 @@ function heading(){
 function render(){
  const page=view==='plan'?planPage():view==='review'?reviewPage():view==='summary'?summaryPage():view==='comparison'?comparisonPage():view==='modules'?modulesPage():morePage();
  root.innerHTML='<div class="phone"><header class="topbar"><button id="back-or-menu" aria-label="Open menu">'+icon('menu')+'</button><h1>DA42 NG</h1><button id="open-more" aria-label="Settings">'+icon('settings')+'</button></header>'+
- '<main class="content" id="scroll-content">'+heading()+page+'<p class="disclaimer">EXPERIMENTAL PERFORMANCE · NOT FOR FLIGHT</p></main>'+
+ '<main class="content" id="scroll-content">'+heading()+page+(view==='plan'?'':'<p class="disclaimer">EXPERIMENTAL PERFORMANCE · NOT FOR FLIGHT</p>')+'</main>'+
  '<nav class="bottom" aria-label="Main navigation">'+[['plan','PLAN'],['summary','SUMMARY'],['modules','MODULES'],['more','MORE']].map(([k,label])=>
  '<button type="button" class="nav '+((view===k||view==='review'&&k==='plan'||view==='comparison'&&k==='summary')?'active':'')+'" data-view="'+k+'" aria-label="'+label+'">'+icon(k)+'<span>'+label+'</span></button>').join('')+'</nav></div>';
  bind();
 }
 function show(v){view=v;err='';render()}
-function setStatus(message,isError){loading=false;err=isError?message:'';msg=isError?'':message;view='plan';render()}
+function setStatus(message,isError){loading=false;err=isError?message:'';view='plan';render()}
 function acceptRaw(raw,source){
  const next=C.normalize(raw);next.source=source;
  plan=next;reviewed=false;confirmVariant=false;
@@ -203,7 +197,7 @@ function acceptRaw(raw,source){
 async function importPilot(){
  const id=pilotId.trim();
  if(!/^\d{1,7}$/.test(id)){setStatus('Pilot ID deve conter de 1 a 7 dígitos.',true);return}
- loading=true;err='';msg='Consultando o último OFP…';render();
+ loading=true;err='';render();
  try{
   const url='https://www.simbrief.com/api/xml.fetcher.php?userid='+encodeURIComponent(id)+'&client=aero-ui-da42&json=v2';
   const response=await fetch(url,{mode:'cors',headers:{Accept:'application/json'},cache:'no-store'});
@@ -212,22 +206,11 @@ async function importPilot(){
   acceptRaw(raw,'SIMBRIEF');
   try{localStorage.setItem(idKey,id)}catch{}
  }catch(e){
-  const message=e instanceof TypeError?'O navegador não conseguiu acessar o SimBrief (rede/CORS). Exporte o OFP em JSON e use IMPORT JSON FILE.':'Falha na importação: '+String(e.message||e);
+  const message=e instanceof TypeError?'SIMBRIEF INDISPONÍVEL · REDE / CORS':'IMPORT FAILED · '+String(e.message||e);
   setStatus(message,true);
  }finally{loading=false}
 }
-function createManual(){
- const g=id=>document.getElementById(id)?.value.trim()||'';
- const origin=g('man-origin').toUpperCase(),dest=g('man-dest').toUpperCase(),alt=g('man-alt').toUpperCase();
- const distance=C.val(g('man-distance'));
- if(!/^[A-Z0-9]{4}$/.test(origin)||!/^[A-Z0-9]{4}$/.test(dest)||distance===null||distance<0){
-  setStatus('Informe origem, destino (ICAO) e distância válida.',true);manual=true;return;
- }
- const raw={fetch:{status:'Success'},params:{units:'KGS'},aircraft:{icao_code:'DA42',name:'Diamond DA42 NG'},
- origin:{icao_code:origin},destination:{icao_code:dest},alternates:{alternate:alt?{icao_code:alt}:{}},
- general:{route_distance:distance},fuel:{},weights:{},weather:{},times:{}};
- acceptRaw(raw,'MANUAL');
-}
+
 function applyPlan(){
  if(!plan)return;
  if(plan.mismatch){err='Aeronave incompatível. Importe um OFP DA42 NG ou use entrada manual.';render();return}
@@ -254,17 +237,6 @@ function bind(){
   pilot.onkeydown=e=>{if(e.key==='Enter')importPilot()};
  }
  const importButton=root.querySelector('#import-ofp');if(importButton)importButton.onclick=importPilot;
- const fileBtn=root.querySelector('#import-file'),fileInput=root.querySelector('#ofp-file');
- if(fileBtn)fileBtn.onclick=()=>fileInput.click();
- if(fileInput)fileInput.onchange=async()=>{
-  const file=fileInput.files?.[0];if(!file)return;
-  if(file.size>8*1024*1024){setStatus('Arquivo OFP excede o limite de 8 MB.',true);return}
-  try{acceptRaw(JSON.parse(await file.text()),'SIMBRIEF JSON FILE')}
-  catch(e){setStatus('JSON inválido: '+String(e.message||e),true)}
- };
- const man=root.querySelector('#open-manual');if(man)man.onclick=()=>{manual=!manual;render()};
- const save=root.querySelector('#save-manual');if(save)save.onclick=createManual;
- const review=root.querySelector('#review-plan');if(review)review.onclick=()=>show('review');
  const back=root.querySelector('#back-plan');if(back)back.onclick=()=>show('plan');
  root.querySelectorAll('[data-review]').forEach(inp=>inp.onchange=()=>{
   const key=inp.dataset.review;const n=C.val(inp.value.trim());
@@ -281,7 +253,7 @@ function bind(){
  const backSum=root.querySelector('#back-summary');if(backSum)backSum.onclick=()=>show('summary');
  root.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{compareTab=b.dataset.tab;render()});
  const clear=root.querySelector('#clear-plan');if(clear)clear.onclick=()=>{
-  plan=null;reviewed=false;confirmVariant=false;manual=false;msg='';err='';
+  plan=null;reviewed=false;confirmVariant=false;err='';
   try{sessionStorage.removeItem(flightKey)}catch{}
   show('plan');
  };
