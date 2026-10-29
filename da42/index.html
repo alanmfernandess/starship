@@ -581,7 +581,45 @@ function render(){const m=MODELS[current],v=inputs[current],r=compute(current,v)
   inp.addEventListener('blur',()=>{const value=displayValue();if(Number.isFinite(value))inp.value=fmt(value,(current==='cruise'||current==='cruiseperf')&&inp.dataset.key==='oat'&&cruiseTempMode==='isa'?1:0)});
  });persist();
 }
-function refresh(){const v=inputs[current],m=MODELS[current],r=compute(current,v);el('#main-result').textContent=r.error?'—':fmt(current==='timeclimb'?r.main:(current==='takeoff'||current==='landing'||current==='abnormal')?r.main:Math.round(r.main),current==='timeclimb'?1:0);el('#main-result').classList.toggle('negative',!r.error&&r.main<0);el('#result-name').textContent=r.primaryLabel||m.panel;el('#secondary-result').textContent=r.error?'—':(current==='takeoff'||current==='landing'||current==='abnormal')?fmt(r.secondary)+' m':current==='goaround'?fmt(r.secondary,2)+' m/s':current==='cruise'?fmt(Math.abs(r.secondary)<.5?0:r.secondary)+' °C':current==='timeclimb'?fmt(r.secondary,1)+' US gal':current==='cruiseperf'?fmt(r.secondary,1)+' US gal/h':current==='runway'?fmt(r.remaining,1)+' m':verticalFmt(r.secondary)+' m/s';el('#secondary-result').classList.toggle('negative',!r.error&&current!=='cruise'&&current!=='cruiseperf'&&r.secondary<0);if(current==='timeclimb')el('#distance-result').textContent=r.error?'—':fmt(r.distance,1)+' NM';if(current==='goaround'){const fixed=el('.field.readonly .power-value');if(fixed)fixed.textContent=window.GoAroundTables.vrefFor(v.mass);const extra=el('.secondary-extra');if(extra){extra.style.display=r.error||r.angle===null?'none':'';if(!r.error&&r.angle!==null)extra.querySelector('strong').textContent=fmt(r.angle,1)+'°'}}el('#plot-area').innerHTML=createPlot(current,v,r);el('#banner').textContent=bannerFor(current,v,r);el('#banner').classList.toggle('error',!!r.error);el('#banner').classList.toggle('warning',!r.error&&((current==='oei'&&r.caution)||((current==='landing'||current==='abnormal'||current==='goaround')&&v.mass>1805)))}
+function refresh(){
+ const v=inputs[current],m=MODELS[current],r=compute(current,v);
+ const output=r.error||(current==='runway'&&r.main===null)?'—':
+  fmt(current==='timeclimb'?r.main:(current==='takeoff'||current==='landing'||current==='abnormal')?r.main:Math.round(r.main),current==='timeclimb'?1:0);
+ el('#main-result').textContent=output;
+ el('#main-result').classList.toggle('negative',!r.error&&r.main<0);
+ el('#result-name').textContent=r.primaryLabel||m.panel;
+ const secondary=r.error?'—':(current==='takeoff'||current==='landing'||current==='abnormal')?fmt(r.secondary)+' m':
+  current==='goaround'?fmt(r.secondary,2)+' m/s':
+  current==='cruise'?fmt(Math.abs(r.secondary)<.5?0:r.secondary)+' °C':
+  current==='timeclimb'?fmt(r.secondary,1)+' US gal':
+  current==='cruiseperf'?fmt(r.secondary,1)+' US gal/h':
+  current==='runway'?fmt(r.remaining,1)+' m':verticalFmt(r.secondary)+' m/s';
+ el('#secondary-result').textContent=secondary;
+ el('#secondary-result').classList.toggle('negative',!r.error&&current!=='cruise'&&current!=='cruiseperf'&&r.secondary<0);
+ if(current==='timeclimb')el('#distance-result').textContent=r.error?'—':fmt(r.distance,1)+' NM';
+ if(current==='runway'){
+  el('#runway-required').textContent=r.error?'—':fmt(Math.ceil(r.required))+' m';
+  el('#runway-ground').textContent=r.error?'—':fmt(Math.ceil(r.ground))+' m';
+  const speeds=el('.runway-speeds');
+  if(speeds)speeds.innerHTML='<span><small>VR</small>'+(r.error?'—':fmt(r.speed.vr))+' KIAS</span>'+
+   '<span><small>V50</small>'+(r.error?'—':fmt(r.speed.v50))+' KIAS</span>'+
+   '<span><small>VY</small>'+(r.error?'—':fmt(r.speed.vy))+' KIAS</span>';
+ }
+ if(current==='goaround'){
+  const fixed=el('.field.readonly .power-value');if(fixed)fixed.textContent=window.GoAroundTables.vrefFor(v.mass);
+  const extra=el('.secondary-extra');
+  if(extra){extra.style.display=r.error||r.angle===null?'none':'';
+   if(!r.error&&r.angle!==null)extra.querySelector('strong').textContent=fmt(r.angle,1)+'°'}
+ }
+ el('#plot-area').innerHTML=createPlot(current,v,r);
+ el('#banner').textContent=bannerFor(current,v,r);
+ el('#banner').classList.toggle('error',!!r.error);
+ el('#banner').classList.toggle('warning',!r.error&&(
+  (current==='oei'&&r.caution)||
+  ((current==='landing'||current==='abnormal'||current==='goaround')&&v.mass>1805)||
+  (current==='runway'&&r.status!=='DISTANCE SUFFICIENT')));
+}
+
 function showSheet(type){const main=el('.phone'),title={modules:'PERFORMANCE',settings:'PREFERÊNCIAS',chart:'SENSIBILIDADE',history:'HISTÓRICO',runway:'RUNWAY'}[type]||'';const v=inputs[current];const r=compute(current,v);let content='';
  if(type==='modules'){
   const names={
