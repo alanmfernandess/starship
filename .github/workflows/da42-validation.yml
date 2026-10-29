@@ -38,10 +38,10 @@ jobs:
         run: |
           python -m pip install playwright
           python -m playwright install --with-deps chromium
-      - name: "Mobile UI: ten performance modules including Runway Analysis / MATOW"
-        run: python test_browser.py
       - name: Flight Plan / SimBrief mobile UI regression
         run: python test_flight_browser.py
+      - name: "Mobile UI: ten performance modules including Runway Analysis / MATOW"
+        run: python test_browser.py
 
   weight-and-balance-ui:
     runs-on: ubuntu-latest
