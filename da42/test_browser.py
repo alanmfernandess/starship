@@ -496,7 +496,7 @@ with sync_playwright() as p:
         assert page.evaluate("window.AeroCalc.inputs.runway.maxMass")==1900
         page.locator('#rw-apply').click()
         assert page.evaluate("window.AeroCalc.inputs.runway.maxMass")==1999
-        assert page.locator('#analysis-settings').inner_text().find('1999 KG')!=-1
+        assert '1,999 KG' in page.locator('#analysis-settings').inner_text()
         page.locator('#analysis-settings').click()
         page.locator('#rw-weight').click()
         page.locator('button[data-rw-pick="1900"]').click()
