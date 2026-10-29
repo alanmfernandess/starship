@@ -30,7 +30,7 @@ button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus
 .entry input:focus{outline:0}.field:focus-within{box-shadow:inset 0 0 0 1px var(--blue)}
 .unit{font-size:15px;color:#89a6b9;white-space:nowrap;flex:none}
 .open-load{width:100%;background:var(--tile);border:0;border-radius:16px;padding:15px;min-height:70px;margin-bottom:clamp(12px,2dvh,24px);display:flex;align-items:center;justify-content:space-between;text-align:left;color:var(--txt)}
-.open-load .main{display:block;font-size:13px;font-weight:500;color:#b3c4d0;letter-spacing:.15px}.open-load .sub{display:block;font-size:11px;color:var(--label);margin-top:8px}
+.open-load .main{display:block;font-size:13px;font-weight:600;color:var(--txt);letter-spacing:.15px}
 .optimize-row{display:flex;gap:9px;margin:-7px 0 clamp(12px,2dvh,22px);align-items:stretch}
 .optimize-button{flex:1;min-height:46px;border:1px solid #40738f;border-radius:13px;color:#8dd2ff;background:#203a4c;font-weight:600;letter-spacing:.4px;font-size:13px}
 .optimize-button:active{background:#2b5069}
@@ -117,13 +117,12 @@ function envelope(){
 }
 function content(){
  const sc=model.ok?model.statuses:{};
- const fuelText=model.ok?format(model.fuel.usableTotal,1)+' kg':'—';
  const metrics=model.ok?'<div class="metrics"><div class="metric"><label>ZFW</label><b>'+format(model.zeroFuel.mass,0)+' kg</b></div><div class="metric"><label>TOW</label><b>'+format(model.takeoff.mass,0)+' kg</b></div></div>':'<div class="metrics"><div class="metric"><label>CHECK INPUTS</label><b>—</b></div></div>';
  const massState=model.ok?(sc.massOK?'MASS WITHIN LIMITS':'MASS LIMIT EXCEEDED'):'CHECK INPUTS';
  return '<div class="phone"><header class="topbar"><button class="icon-btn" id="menu" aria-label="Abrir módulos">'+icon('menu')+'</button><h1>DA42 NG</h1><button class="icon-btn" id="settings" aria-label="Configurações da aeronave">'+icon('settings')+'</button></header>'+
  '<main class="scroller" id="scroller"><div class="module-heading"><span>WEIGHT &amp; BALANCE</span><span class="accent">CG ENVELOPE</span></div>'+
  '<div class="fields">'+card('pilot','PILOT')+card('copilot','COPILOT')+card('pax1','PASSENGER 1')+card('pax2','PASSENGER 2')+'</div>'+
- '<button class="open-load" id="edit-load"><span><span class="main">BAGGAGE &amp; FUEL</span><span class="sub" id="fuel-summary">'+fuelText+'</span></span>'+icon('next')+'</button>'+
+ '<button class="open-load" id="edit-load" aria-label="BAGGAGE &amp; FUEL"><span class="main">BAGGAGE &amp; FUEL</span>'+icon('next')+'</button>'+
  '<div class="optimize-row"><button id="optimize" class="optimize-button" type="button">OTIMIZAR</button>'+(optimizeMessage?'<span id="optimize-status" class="optimize-feedback" role="alert">'+esc(optimizeMessage)+'</span>':'')+'</div>'+
  '<section class="result" aria-live="polite"><div id="envelope">'+envelope()+'</div><div class="legend"><span><i class="dot" style="background:#e7b46d"></i>ZFW</span><span><i class="dot" style="background:#56b9ee"></i>TOW</span></div>'+
  '<div id="mass-check" class="standalone-status '+(sc.massOK?'':'bad')+'">'+(model.ok?massState:'—')+'</div><div id="metrics">'+metrics+'</div>'+
@@ -152,7 +151,6 @@ function recalc(){
  model=E.calculate(profile);
  const set=(s,v)=>{const e=el(s);if(e)e.innerHTML=v};
  set('#envelope',envelope());
- set('#fuel-summary',model.ok?format(model.fuel.usableTotal,1)+' kg':'—');
  set('#mass-check','<span class="'+(model.ok?(model.statuses.massOK?'good':'error'):'error')+'">'+(model.ok?(model.statuses.massOK?'MASS WITHIN LIMITS':'MASS LIMIT EXCEEDED'):'CHECK INPUTS')+'</span>');
  set('#metrics',model.ok?'<div class="metrics"><div class="metric"><label>ZFW</label><b>'+format(model.zeroFuel.mass,0)+' kg</b></div><div class="metric"><label>TOW</label><b>'+format(model.takeoff.mass,0)+' kg</b></div></div>':'');
  const notice=el('#notice');if(notice){notice.textContent=model.ok?'NOT FOR FLIGHT':model.errors.join(' · ');notice.classList.toggle('bad',!model.ok||!model.statuses.massOK||!model.statuses.cgOK)}
