@@ -35,6 +35,8 @@
 .slope-slider::-moz-range-thumb{background:#56b9ee;width:16px;height:16px;border-radius:50%;border:3px solid #202d39;box-shadow:0 0 0 1px #56b9ee}
 .slope-slider:focus-visible{outline:2px solid #56b9ee;outline-offset:2px;border-radius:12px}
 .slope-limits{display:flex;justify-content:space-between;color:#91a8b8;font-size:11px;margin:1px 0 0}
+.analysis-setting{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 13px;margin:6px 0;background:#202d39;border-radius:10px;color:var(--txt);font-size:12px;font-weight:600;letter-spacing:.2px}
+.analysis-setting input{font:inherit;color:var(--txt);background:#15232e;border:1px solid #466779;border-radius:7px;padding:8px;width:104px;text-align:right;min-width:0}
 .runway-speeds{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px}
 .runway-speeds span{background:#202d39;border-radius:9px;padding:9px 5px;text-align:center;min-width:0;color:var(--txt);font-variant-numeric:tabular-nums;font-size:14px}
 .runway-speeds small{display:block;color:var(--label);font-size:10px;font-weight:600;letter-spacing:.5px;margin-bottom:2px}
@@ -620,7 +622,7 @@ function refresh(){
   (current==='runway'&&r.status!=='DISTANCE SUFFICIENT')));
 }
 
-function showSheet(type){const main=el('.phone'),title={modules:'PERFORMANCE',settings:'PREFERÊNCIAS',chart:'SENSIBILIDADE',history:'HISTÓRICO',runway:'RUNWAY'}[type]||'';const v=inputs[current];const r=compute(current,v);let content='';
+function showSheet(type){const main=el('.phone'),title={modules:'PERFORMANCE',settings:'PREFERÊNCIAS',chart:'SENSIBILIDADE',history:'HISTÓRICO',runway:'RUNWAY',runwayanalysis:'RUNWAY'}[type]||'';const v=inputs[current];const r=compute(current,v);let content='';
  if(type==='modules'){
   const names={
    takeoff:'TAKEOFF',
@@ -657,10 +659,40 @@ function showSheet(type){const main=el('.phone'),title={modules:'PERFORMANCE',se
  '<div class="slope-control"><div class="slope-head"><label for="runway-slope">DOWNHILL SLOPE</label><output id="slope-value" for="runway-slope">'+String(Number(v.slope||0)).replace('.',',')+'%</output></div>'+
  '<input id="runway-slope" class="slope-slider" type="range" min="0" max="5" step="0.5" value="'+escapeHTML(v.slope||0)+'" style="--fill:'+((v.slope||0)/5*100)+'%" aria-label="DOWNHILL SLOPE (%)"/>'+
  '<div class="slope-limits"><span>0%</span><span>5%</span></div></div>';
+ if(type==='runwayanalysis'&&current==='runway')content=
+ '<button class="option" id="analysis-procedure"><strong>TAKEOFF</strong> · '+(v.procedure==='short'?'SHORT · APP':'NORMAL · UP')+'</button>'+
+ '<button class="option" id="analysis-maxmass"><strong>MAX MASS</strong> · '+(v.maxMass===1999?'MÄM 42-678 · 1999 KG':'STANDARD · 1900 KG')+'</button>'+
+ '<button class="option" id="analysis-pressure-mode"><strong>PRESSURE ALT</strong> · '+(v.paMode==='qnh'?'QNH + ELEV':'DIRECT')+'</button>'+
+ (v.paMode==='qnh'?
+ '<div class="analysis-setting"><label for="analysis-elevation">FIELD ELEV · FT</label><input type="number" id="analysis-elevation" value="'+escapeHTML(v.elevation)+'" min="-1000" max="10000" step="1"/></div>'+
+ '<div class="analysis-setting"><label for="analysis-qnh">QNH · HPA</label><input type="number" id="analysis-qnh" value="'+escapeHTML(v.qnh)+'" min="870" max="1085" step="0.01"/></div>':'')+
+ '<div class="analysis-setting"><label for="analysis-wind">HEADWIND · KT</label><input type="number" id="analysis-wind" min="-10" max="20" step="1" value="'+escapeHTML(v.wind||0)+'"/></div>'+
+ [['paved','PAVED · DRY'],['grass5','GRASS · 5 CM'],['grass10','GRASS · 5–10 CM'],['grass25','GRASS · 25 CM']].map(([key,label])=>
+ '<button class="option '+((v.surface||'paved')===key?'selected':'')+'" data-surface="'+key+'">'+label+' '+((v.surface||'paved')===key?'✓':'')+'</button>').join('')+
+ '<button class="option" id="runway-wet">WET GRASS · '+(v.wet?'ON':'OFF')+'</button>'+
+ '<button class="option" id="runway-soft">SOFT GROUND · '+(v.soft?'ON':'OFF')+'</button>'+
+ '<div class="slope-control"><div class="slope-head"><label for="runway-slope">UPHILL SLOPE</label><output id="slope-value" for="runway-slope">'+String(Number(v.slope||0)).replace('.',',')+'%</output></div>'+
+ '<input id="runway-slope" class="slope-slider" type="range" min="0" max="5" step="0.5" value="'+escapeHTML(v.slope||0)+'" style="--fill:'+((v.slope||0)/5*100)+'%" aria-label="UPHILL SLOPE (%)"/>'+
+ '<div class="slope-limits"><span>0%</span><span>5%</span></div></div>'+
+ '<small>50 FT DISTANCE ≤ TORA · ZERO CLEARWAY CREDIT · CG NOT VERIFIED</small>';
  if(type==='history')content=history.length?history.map(h=>`<button class="option" data-restore="${h.id}"><span><strong>${escapeHTML(h.name)} · ${escapeHTML(h.result)}</strong><span class="sub">${escapeHTML(h.when)} · ${escapeHTML(h.in)}</span></span>${icon('next')}</button>`).join(''):'<p class="history-empty">Nenhum cálculo salvo.</p>';
  if(type==='chart')content=`<div style="background:#202d39;border-radius:17px;padding:15px"><div class="mini">${escapeHTML(MODELS[current].panel)}</div><div style="font-size:31px;margin:12px 0 6px">${r.error?'—':fmt(r.main,current==='timeclimb'?1:0)} <span style="color:#9cb1bf;font-size:16px">${MODELS[current].unit}</span></div>${createPlot(current,v,r)}</div><small>${current==='goaround'?'AFM §5.3.12 · ROC TABULADA · NOT FOR FLIGHT':current==='timeclimb'?'AFM §5.3.9 · ISA · ZERO WIND · NOT FOR FLIGHT':current==='cruiseperf'?'AFM §5.3.10 · 1999 KG · NOT FOR FLIGHT':'Curvas derivadas da digitalização gráfica preliminar. Sem autorização para uso operacional.'}</small><button class="small-action" id="save">SALVAR CÁLCULO NO HISTÓRICO</button>`;
- const d=document.createElement('div');d.className='sheet-backdrop';d.innerHTML=`<div class="sheet" role="dialog" aria-modal="true" aria-label="${title}"><div class="sheet-header"><h2>${title}</h2><button class="close" aria-label="Fechar">×</button></div>${content}</div>`;main.appendChild(d);d.addEventListener('click',e=>{if(e.target===d)d.remove()});d.querySelector('.close').onclick=()=>d.remove();d.querySelectorAll('[data-surface]').forEach(b=>b.onclick=()=>{v.surface=b.dataset.surface;if(v.surface==='paved'){v.soft=false;if(current==='takeoff')v.wet=false}d.remove();render()});
- const wetButton=d.querySelector('#runway-wet');if(wetButton)wetButton.onclick=()=>{v.wet=!v.wet;if(v.wet&&v.surface==='paved'&&current==='takeoff')v.surface='grass5';d.remove();render()};
+ const d=document.createElement('div');d.className='sheet-backdrop';d.innerHTML=`<div class="sheet" role="dialog" aria-modal="true" aria-label="${title}"><div class="sheet-header"><h2>${title}</h2><button class="close" aria-label="Fechar">×</button></div>${content}</div>`;main.appendChild(d);d.addEventListener('click',e=>{if(e.target===d)d.remove()});d.querySelector('.close').onclick=()=>d.remove();
+ if(type==='runwayanalysis'&&current==='runway'){
+  const reconfigure=(selector,fn)=>{const b=d.querySelector(selector);if(b)b.onclick=()=>{fn();d.remove();render()}};
+  reconfigure('#analysis-procedure',()=>{v.procedure=v.procedure==='short'?'normal':'short'});
+  reconfigure('#analysis-maxmass',()=>{
+   v.maxMass=v.maxMass===1900?1999:1900;
+   v.mam678=v.maxMass===1999;
+  });
+  reconfigure('#analysis-pressure-mode',()=>{v.paMode=v.paMode==='qnh'?'direct':'qnh'});
+  for(const [selector,key] of [['#analysis-wind','wind'],['#analysis-qnh','qnh'],['#analysis-elevation','elevation']]){
+   const field=d.querySelector(selector);
+   if(field)field.onchange=()=>{const x=field.value.trim();v[key]=x===''?NaN:Number(x);d.remove();render()};
+  }
+ }
+ d.querySelectorAll('[data-surface]').forEach(b=>b.onclick=()=>{v.surface=b.dataset.surface;if(v.surface==='paved'){v.soft=false;if(current==='takeoff'||current==='runway')v.wet=false}d.remove();render()});
+ const wetButton=d.querySelector('#runway-wet');if(wetButton)wetButton.onclick=()=>{v.wet=!v.wet;if(v.wet&&v.surface==='paved'&&(current==='takeoff'||current==='runway'))v.surface='grass5';d.remove();render()};
  const softButton=d.querySelector('#runway-soft');if(softButton)softButton.onclick=()=>{v.soft=!v.soft;if(v.soft&&v.surface==='paved')v.surface='grass5';d.remove();render()};
  const slopeInput=d.querySelector('#runway-slope');if(slopeInput)slopeInput.oninput=()=>{
   v.slope=Number(slopeInput.value);
