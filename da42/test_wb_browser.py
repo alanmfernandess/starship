@@ -24,7 +24,7 @@ with sync_playwright() as p:
         assert page.locator('.line').count()==0
         assert 'ZFW' in page.locator('.legend').inner_text()
         assert 'TOW' in page.locator('.legend').inner_text()
-        assert 'MASS WITHIN LIMITS' in page.locator('#mass-check').inner_text()
+        assert 'WEIGHT WITHIN LIMITS' in page.locator('#mass-check').inner_text()
         assert page.locator('input[data-wb]').count()==4
         assert page.locator('#metrics').inner_text().find('1.899')!=-1
         assert page.locator('#metrics').inner_text().find('1.656')!=-1
@@ -35,9 +35,9 @@ with sync_playwright() as p:
         assert page.locator('svg.graph polygon').count()==1
         count+=8
         page.locator('input[data-wb="pilot"]').fill('110')
-        assert 'MASS LIMIT EXCEEDED' in page.locator('#mass-check').inner_text()
+        assert 'WEIGHT LIMIT EXCEEDED' in page.locator('#mass-check').inner_text()
         page.locator('input[data-wb="pilot"]').fill('80')
-        assert 'MASS WITHIN LIMITS' in page.locator('#mass-check').inner_text()
+        assert 'WEIGHT WITHIN LIMITS' in page.locator('#mass-check').inner_text()
         count+=2
         assert page.locator('#edit-load').inner_text().strip()=='BAGGAGE & FUEL'
         assert page.locator('#edit-load .sub').count()==0
@@ -77,7 +77,7 @@ with sync_playwright() as p:
         assert page.evaluate("WBApp.optimizedMode") is True
         assert page.evaluate("WBApp.model.statuses.cgOK && WBApp.model.statuses.massOK && WBApp.model.statuses.scenariosOK") is True
         assert page.locator('#envelope svg circle').count()==2
-        assert page.locator('#mass-check').inner_text().find('MASS WITHIN LIMITS')!=-1
+        assert page.locator('#mass-check').inner_text().find('WEIGHT WITHIN LIMITS')!=-1
         assert page.locator('input[data-wb="pilot"]').get_attribute('readonly') is not None
         assert page.locator('input[data-wb="pax1"]').get_attribute('readonly') is not None
         assert page.locator('input[data-wb="copilot"]').get_attribute('readonly') is not None
