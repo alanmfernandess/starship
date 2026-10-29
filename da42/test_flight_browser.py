@@ -35,13 +35,14 @@ with sync_playwright() as p:
                  headers={'access-control-allow-origin':'*'})
   page.route('**/xml.fetcher.php**',fulfill)
   page.goto(url)
-  assert page.locator('.heading').inner_text().find('FLIGHT PLAN')>=0
+  assert page.locator('.heading').count()==0
   assert page.locator('[data-view]').count()==4
   # SIMBRIEF import card must have exactly ONE input and ONE action.
   assert page.locator('.sb-import-card').count()==1
   assert page.locator('.sb-import-card input').count()==1
   assert page.locator('.sb-import-card button').count()==1
-  assert page.locator('.sb-import-card label').inner_text()=='PILOT ID'
+  assert page.locator('.sb-import-card h2, .sb-import-card label').count()==0
+  assert page.locator('#pilot-id').get_attribute('aria-label')=='Pilot ID'
   assert page.locator('.sb-import-card button').inner_text()=='IMPORT OFP'
   assert page.locator('.sb-import-card .pill, .sb-import-card .note, .sb-import-card .message').count()==0
   assert page.locator('#import-file, #open-manual, #review-plan, #ofp-file').count()==0
