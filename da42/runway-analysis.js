@@ -4,8 +4,9 @@
  * field analysis, accelerate-stop calculation or obstacle assessment.
  * Conservative assumption: TORA itself must exceed BOTH takeoff ground
  * roll and the table's distance over 50 ft; NO clearway/TODA credit.
- * Mass ceiling 1900 kg unless the operator EXPLICITLY selects the
- * MÄM 42-678 1999kg configuration (requires approved W&B/supplement).
+ * Mass ceiling 1900 kg unless 1999 kg is explicitly selected.
+ * The 1999 kg option remains subject to the applicable MÄM 42-678 approved
+ * supplement and aircraft-specific W&B/CG limitations; selection is not approval.
  */
 (function(root){
 'use strict';
@@ -35,7 +36,6 @@ function validate(v){
  if(!Number.isFinite(effectivePa(v))||effectivePa(v)<0||effectivePa(v)>10000)return 'PRESSURE ALT FORA DAS TABELAS';
  if(!Number.isFinite(v.mass)||v.mass<MIN_MASS||v.mass>OPTION_MAX)return 'MASSA FORA DAS TABELAS';
  if(v.maxMass!==STANDARD_MAX&&v.maxMass!==OPTION_MAX)return 'CONFIGURAÇÃO DE MASSA INVÁLIDA';
- if(v.maxMass===OPTION_MAX&&!v.mam678)return 'MÄM 42-678 NÃO CONFIRMADA';
  const t=root.TakeoffTables;
  if(!t||typeof t.compute!=='function')return 'TABELA TAKEOFF INDISPONÍVEL';
  const source=t.validate(modelInput(v,v.mass));
