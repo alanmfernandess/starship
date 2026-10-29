@@ -73,11 +73,12 @@ with sync_playwright() as p:
             'ABNORMAL LANDING',
             'GO-AROUND',
             'TIME · FUEL · DISTANCE TO CLIMB',
-            'CRUISE PERFORMANCE'
+            'CRUISE PERFORMANCE',
+            'RUNWAY ANALYSIS'
         ]
         assert page.locator('.sheet button[data-module] strong').all_inner_texts()==expected_modules
         assert page.locator('.sheet a.option[href="./wb.html"] strong').inner_text()=='WEIGHT & BALANCE'
-        assert page.locator('.sheet .option').count()==10
+        assert page.locator('.sheet .option').count()==11
         assert page.locator('.sheet .option .sub').count()==0
         assert page.locator('.sheet .option').evaluate_all("(xs)=>xs.every(x=>x.querySelectorAll('strong').length===1)")
         assert page.locator('html').evaluate('(el)=>el.scrollWidth')<=w
@@ -421,6 +422,51 @@ with sync_playwright() as p:
         assert page.locator('html').evaluate('(el)=>el.scrollWidth')<=w
         assert len(errors)==0,errors
         all_checks+=29
+        # Runway Analysis — inverse distance-limited takeoff mass.
+        page.locator('#menu').click()
+        page.locator('button[data-module="runway"]').click()
+        assert page.locator('.field').count()==4
+        assert page.locator('#main-result').inner_text()=='1,855'
+        assert page.locator('#secondary-result').inner_text()=='37.5 m'
+        assert page.locator('#runway-required').inner_text()=='863 m'
+        assert page.locator('#runway-ground').inner_text()=='533 m'
+        assert page.locator('#plot-area path.runway-distance-curve').count()==1
+        assert ' C' in page.locator('#plot-area path.runway-distance-curve').get_attribute('d')
+        assert page.locator('.runway-speeds').inner_text().count('KIAS')==3
+        assert 'DISTANCE SUFFICIENT' in page.locator('#banner').inner_text()
+        page.locator('input[data-key="mass"]').fill('1900')
+        assert page.locator('#main-result').inner_text()=='1,855'
+        assert page.locator('#secondary-result').inner_text()=='-30.0 m'
+        assert 'INSUFFICIENT DISTANCE' in page.locator('#banner').inner_text()
+        page.locator('input[data-key="mass"]').fill('1800')
+        page.locator('input[data-key="length"]').fill('600')
+        assert page.locator('#main-result').inner_text()=='—'
+        assert 'NO TABLE MASS FITS' in page.locator('#banner').inner_text()
+        page.locator('input[data-key="length"]').fill('900')
+        assert page.locator('#main-result').inner_text()=='1,855'
+        page.locator('#analysis-settings').click()
+        assert page.locator('#analysis-procedure').count()==1
+        assert page.locator('#analysis-maxmass').count()==1
+        assert page.locator('#analysis-pressure-mode').count()==1
+        page.locator('#analysis-maxmass').click()
+        page.locator('#analysis-settings').click()
+        assert '1999 KG' in page.locator('#analysis-maxmass').inner_text()
+        page.locator('#analysis-maxmass').click()
+        page.locator('#analysis-settings').click()
+        page.locator('#analysis-procedure').click()
+        assert page.locator('#main-result').inner_text()=='1,900'
+        page.locator('#analysis-settings').click()
+        page.locator('#analysis-pressure-mode').click()
+        assert page.locator('#val-pa').get_attribute('readonly') is not None
+        assert page.locator('#main-result').inner_text()=='1,900'
+        page.locator('#analysis-settings').click()
+        assert page.locator('#analysis-qnh').count()==1
+        assert page.locator('#analysis-elevation').count()==1
+        page.locator('#analysis-pressure-mode').click()
+        assert page.locator('#val-pa').get_attribute('readonly') is None
+        assert page.locator('html').evaluate('(el)=>el.scrollWidth')<=w
+        assert len(errors)==0, errors
+        all_checks+=35
         ctx.close()
     browser.close()
     print(f'{all_checks} mobile Chromium checks passed at 5 viewport sizes.')
