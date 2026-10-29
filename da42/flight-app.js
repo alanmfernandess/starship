@@ -34,7 +34,10 @@ function hints(){
  if(!plan)return [];
  const p=C.proposedInputs(plan,getAppInputs().inputs||{});
  const messages=[...p.warnings];
- if(!wbResult())messages.push('WEIGHT & BALANCE não configurado para esta aeronave. Comparação de CG pendente.');
+ const wb=wbResult();
+ if(!wb)messages.push('WEIGHT & BALANCE não configurado para esta aeronave. Comparação de CG pendente.');
+ else if(wb.ok&&typeof plan.takeoffWeight==='number'&&Math.abs(wb.takeoff.mass-plan.takeoffWeight)>1)
+  messages.push('TAKEOFF WEIGHT diverge do perfil WEIGHT & BALANCE. Verifique a carga e o combustível por tanque.');
  return messages;
 }
 function performance(){
@@ -98,9 +101,9 @@ function weatherRows(){
 function summaryPage(){
  if(!plan)return '<div class="note">Importe um OFP ou preencha o plano manualmente antes de visualizar o resumo.</div><button id="go-plan" class="primary stretch">IMPORT FLIGHT PLAN</button>';
  const p=performance(),wb=wbResult(),warnings=hints();
- const takeoff=wb?.ok?wb.takeoff.mass:null;
+ const takeoff=getAppInputs().inputs?.takeoff?.mass??plan.takeoffWeight;
  let body=routeCard();
- body+='<div class="metrics">'+metric('TAKEOFF WEIGHT',takeoff??plan.takeoffWeight,'KG',takeoff!==null?'WEIGHT & BALANCE':'SIMBRIEF / PLAN')+
+ body+='<div class="metrics">'+metric('TAKEOFF WEIGHT',takeoff,'KG',reviewed?'AERO UI INPUT / OFP':'SIMBRIEF / PLAN')+
  metric('TRIP FUEL',plan.tripFuel,'KG',plan.source==='MANUAL'?'MANUAL':'SIMBRIEF OFP')+
  metric('LANDING WEIGHT',plan.landingWeight,'KG','SIMBRIEF / PLAN')+
  metric('TAKEOFF DIST',p&&!p.error?p.main:null,'M',p&&!p.error?'AERO UI · REVIEW WIND':'REVIEW INPUTS')+'</div>';
