@@ -62,7 +62,7 @@
 </style>
 </head>
 <body><div id="app"></div>
-<script src="./takeoff-tables.js"></script><script src="./climb-tables.js"></script><script src="./oei-tables.js"></script><script src="./time-to-climb.js"></script><script src="./cruise-performance.js"></script><script src="./landing-tables.js"></script><script src="./goaround-tables.js"></script><script src="./runway-analysis.js"></script><script>
+<script src="./takeoff-tables.js"></script><script src="./climb-tables.js"></script><script src="./oei-tables.js"></script><script src="./time-to-climb.js"></script><script src="./cruise-performance.js"></script><script src="./landing-tables.js"></script><script src="./goaround-tables.js"></script><script src="./runway-analysis.js"></script><script src="./runway-ui.js"></script><script>
 'use strict';
 /**
  * Aero UI 1.0 — Prototype / engineering demonstration only.
@@ -622,7 +622,7 @@ function refresh(){
   (current==='runway'&&r.status!=='DISTANCE SUFFICIENT')));
 }
 
-function showSheet(type){const main=el('.phone'),title={modules:'PERFORMANCE',settings:'PREFERÊNCIAS',chart:'SENSIBILIDADE',history:'HISTÓRICO',runway:'RUNWAY',runwayanalysis:'RUNWAY'}[type]||'';const v=inputs[current];const r=compute(current,v);let content='';
+function showSheet(type){if(type==='runwayanalysis'&&current==='runway')return window.RunwayUI.open(inputs.runway,render,icon,escapeHTML);const main=el('.phone'),title={modules:'PERFORMANCE',settings:'PREFERÊNCIAS',chart:'SENSIBILIDADE',history:'HISTÓRICO',runway:'RUNWAY',runwayanalysis:'RUNWAY'}[type]||'';const v=inputs[current];const r=compute(current,v);let content='';
  if(type==='modules'){
   const names={
    takeoff:'TAKEOFF',
