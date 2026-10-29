@@ -1,9 +1,9 @@
 {
   "name": "da42ng",
-  "version": "0.18.1",
+  "version": "0.19.0",
   "private": true,
   "description": "Experimental DA42 NG performance nomogram digitization; not for flight",
   "scripts": {
-    "test": "node test.cjs && node validate_cruise.cjs && node validate_grid.cjs && node validate_landing.cjs && node validate_modules67.cjs && node validate_wb.cjs && node validate_optimizer.cjs && node validate_takeoff_tables.cjs && node validate_climb_tables.cjs && node validate_oei_tables.cjs && node validate_vertical_plots.cjs && node validate_time_to_climb.cjs && node validate_cruise_performance.cjs && node validate_landing_tables.cjs && node validate_goaround_tables.cjs"
+    "test": "node test.cjs && node validate_cruise.cjs && node validate_grid.cjs && node validate_landing.cjs && node validate_modules67.cjs && node validate_wb.cjs && node validate_optimizer.cjs && node validate_takeoff_tables.cjs && node validate_climb_tables.cjs && node validate_oei_tables.cjs && node validate_vertical_plots.cjs && node validate_time_to_climb.cjs && node validate_cruise_performance.cjs && node validate_landing_tables.cjs && node validate_goaround_tables.cjs && node validate_runway_analysis.cjs"
   }
 }
