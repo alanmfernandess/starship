@@ -511,6 +511,26 @@ with sync_playwright() as p:
         assert page.locator('#val-pa').get_attribute('readonly') is None
         page.locator('#rw-apply').click()
         assert page.locator('#val-pa').get_attribute('readonly') is not None
+        # QNH above standard at sea level: negative PA is physically valid.
+        page.locator('#analysis-settings').click()
+        page.locator('#rw-elevation').fill('0')
+        page.locator('#rw-qnh').fill('1030')
+        page.locator('#rw-apply').click()
+        assert page.locator('#main-result').inner_text()!='—'
+        assert page.locator('#val-pa').input_value().startswith('-')
+        assert '0 FT TABLE' in page.locator('#banner').inner_text()
+        assert page.evaluate("window.AeroCalc.compute('runway',window.AeroCalc.inputs.runway).paBelowChart") is True
+        assert page.evaluate("window.AeroCalc.compute('runway',window.AeroCalc.inputs.runway).tablePa")==0
+        page.locator('#analysis-settings').click()
+        page.locator('#rw-qnh').fill('1000')
+        page.locator('#rw-apply').click()
+        assert page.locator('#main-result').inner_text()!='—'
+        assert float(page.locator('#val-pa').input_value().replace(',',''))>0
+        assert '0 FT TABLE' not in page.locator('#banner').inner_text()
+        page.locator('#analysis-settings').click()
+        page.locator('#rw-qnh').fill('1013.25')
+        page.locator('#rw-apply').click()
+        assert page.locator('#main-result').inner_text()!='—'
         page.locator('#analysis-settings').click()
         page.locator('#rw-pressure').click()
         page.locator('button[data-rw-pick="direct"]').click()
@@ -532,7 +552,7 @@ with sync_playwright() as p:
         assert page.evaluate("window.AeroCalc.inputs.runway.wind")==0
         assert page.locator('html').evaluate('(el)=>el.scrollWidth')<=w
         assert len(errors)==0, errors
-        all_checks+=83
+        all_checks+=93
         ctx.close()
     browser.close()
     print(f'{all_checks} mobile Chromium checks passed at 5 viewport sizes.')
