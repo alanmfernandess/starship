@@ -472,12 +472,11 @@ function runwayAnalysisPlot(v,r){
  if(r.error)return '<svg class="plot" viewBox="0 0 290 138" role="img" aria-label="Pista não validada"></svg>';
  const e=window.RunwayAnalysis,engine=window.TakeoffTables,upper=v.maxMass;
  let points=[];
- for(let m=1700;m<=upper;m+=(upper-1700)/16){
+ for(let i=0;i<=16;i++){
+  const m=1700+(upper-1700)*i/16;
   const result=engine.compute(e.modelInput(v,m));
   points.push(result.error?null:{mass:m,dist:result.main});
  }
- const endResult=engine.compute(e.modelInput(v,upper));
- points.push(endResult.error?null:{mass:upper,dist:endResult.main});
  const values=points.filter(x=>x).map(x=>x.dist).concat([v.length,r.required]);
  if(values.length<2)return '';
  const lowest=Math.min(...values),highest=Math.max(...values),pad=Math.max(20,(highest-lowest)*.13);
@@ -505,7 +504,8 @@ function runwayAnalysisPlot(v,r){
   segment=[];
  };
  for(const p of points){if(!p){flush();continue}segment.push(p)}flush();
- const yy=y(v.length),marker=r.maxMass===null?'':('<circle cx="'+x(r.maxMass).toFixed(2)+'" cy="'+y(v.length).toFixed(2)+'" r="4.5" stroke="#202d39" stroke-width="2" fill="#e7b46d"/>');
+ const yy=y(v.length),maxPoint=r.maxMass===null?null:engine.compute(e.modelInput(v,r.maxMass));
+ const marker=r.maxMass===null?'':('<circle cx="'+x(r.maxMass).toFixed(2)+'" cy="'+y(r.limitedByConfig?maxPoint.main:v.length).toFixed(2)+'" r="4.5" stroke="#202d39" stroke-width="2" fill="#e7b46d"/>');
  const vm=v.mass<=upper?'<circle cx="'+x(v.mass).toFixed(2)+'" cy="'+y(r.required).toFixed(2)+'" r="4.5" stroke="#202d39" stroke-width="2" fill="'+(r.meets?'#56b9ee':'#e7b46d')+'"/>':'';
  return '<svg class="plot runway-analysis-plot" viewBox="0 0 290 138" role="img" aria-label="Distância necessária sobre 50 pés em função da massa e TORA disponível" data-runway-max="'+(r.maxMass??'')+'" data-required="'+r.required+'">'
  +'<path class="grid" d="M18 24H272M18 68H272M18 112H272"/>'
