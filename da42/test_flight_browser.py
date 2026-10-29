@@ -57,6 +57,17 @@ with sync_playwright() as p:
   assert 'SBNF' in page.locator('.route-foot').inner_text()
   assert page.locator('#field-distance').input_value()=='420'
   assert page.locator('#field-takeoffWeight').input_value()=='1850'
+  assert page.locator('label[for="field-alternateDistance"]').inner_text()=='ALTERNATE DIST · NM'
+  # All 2-column review rows must align at their top/bottom across phone sizes.
+  for left,right in [('distance','alternateDistance'),('takeoffWeight','landingWeight'),('cruiseAltitude','tripFuel')]:
+   a=page.locator('#field-'+left).bounding_box()
+   b=page.locator('#field-'+right).bounding_box()
+   assert abs(a['y']-b['y'])<1, (w,h,left,right,'vertical misalignment',a,b)
+   assert abs(a['height']-b['height'])<1, (w,h,left,right,'unequal heights',a,b)
+   assert abs(a['width']-b['width'])<1, (w,h,left,right,'unequal widths',a,b)
+  assert page.locator('.review-grid label').evaluate_all("(labels)=>labels.every(e=>e.scrollWidth<=e.clientWidth+1 && getComputedStyle(e).whiteSpace==='nowrap')")
+  assert page.locator('#field-alternateDistance').evaluate("(e)=>getComputedStyle(e).appearance==='textfield'")
+
   assert 'QNH' in page.locator('.tile').all_inner_texts()[-2] or page.get_by_text('ORIGIN QNH').count()==1
   assert page.locator('#variant-confirm').count()==0
   page.locator('#confirm-plan').click()
