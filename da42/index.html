@@ -57,7 +57,7 @@
 </style>
 </head>
 <body><div id="app"></div>
-<script src="./takeoff-tables.js"></script><script src="./climb-tables.js"></script><script src="./oei-tables.js"></script><script src="./time-to-climb.js"></script><script src="./cruise-performance.js"></script><script src="./landing-tables.js"></script><script src="./goaround-tables.js"></script><script>
+<script src="./takeoff-tables.js"></script><script src="./climb-tables.js"></script><script src="./oei-tables.js"></script><script src="./time-to-climb.js"></script><script src="./cruise-performance.js"></script><script src="./landing-tables.js"></script><script src="./goaround-tables.js"></script><script src="./runway-analysis.js"></script><script>
 'use strict';
 /**
  * Aero UI 1.0 — Prototype / engineering demonstration only.
@@ -73,7 +73,8 @@ const MODELS={
  abnormal:{label:'ABNORMAL LANDING',panel:'LANDING DISTANCE',metric:'GROUND ROLL',unit:'m',metricUnit:'m',fields:[{k:'pa',name:'PRESSURE ALT',u:'ft'},{k:'oat',name:'OAT',u:'°C'},{k:'mass',name:'LDG MASS',u:'kg'},{k:'wind',name:'HEADWIND',u:'kt'}],defaults:{pa:0,oat:15,mass:1800,wind:10,isa:false,surface:'paved',wet:false,soft:false,slope:0}},
  goaround:{label:'GO-AROUND',panel:'RATE OF CLIMB',metric:'VERTICAL SPEED',unit:'ft/min',metricUnit:'m/s',fields:[{k:'pa',name:'PRESSURE ALT',u:'ft'},{k:'oat',name:'OAT',u:'°C'},{k:'mass',name:'LANDING MASS',u:'kg'},{k:'speed',name:'VREF',u:'KIAS',fixed:true}],defaults:{pa:0,oat:15,mass:1900,isa:true}},
  timeclimb:{label:'TIME TO CLIMB',panel:'TIME TO CLIMB',metric:'FUEL TO CLIMB',unit:'min',metricUnit:'US gal',fields:[{k:'start',name:'DEPARTURE ALT',u:'ft'},{k:'target',name:'TARGET ALT',u:'ft'},{k:'mass',name:'CLIMB MASS',u:'kg'},{k:'oat',name:'OAT · DEP',u:'°C'}],defaults:{start:2000,target:16000,mass:1900,oat:11}},
- cruiseperf:{label:'CRUISE',panel:'TRUE AIRSPEED',metric:'FUEL FLOW',unit:'KTAS',metricUnit:'US gal/h',fields:[{k:'pa',name:'PRESSURE ALT',u:'ft'},{k:'oat',name:'OAT',u:'°C'},{k:'load',name:'ENGINE POWER',u:'%'},{k:'mass',name:'FLIGHT MASS',u:'kg',fixed:true,fixedValue:'1,999'}],defaults:{pa:10000,oat:-5,load:75,mass:1999,reduced:false}}
+ cruiseperf:{label:'CRUISE',panel:'TRUE AIRSPEED',metric:'FUEL FLOW',unit:'KTAS',metricUnit:'US gal/h',fields:[{k:'pa',name:'PRESSURE ALT',u:'ft'},{k:'oat',name:'OAT',u:'°C'},{k:'load',name:'ENGINE POWER',u:'%'},{k:'mass',name:'FLIGHT MASS',u:'kg',fixed:true,fixedValue:'1,999'}],defaults:{pa:10000,oat:-5,load:75,mass:1999,reduced:false}},
+ runway:{label:'RUNWAY ANALYSIS',panel:'MAX TAKEOFF WEIGHT',metric:'RUNWAY MARGIN',unit:'kg',metricUnit:'m',fields:[{k:'pa',name:'PRESSURE ALT',u:'ft'},{k:'oat',name:'OAT',u:'°C'},{k:'mass',name:'T/O MASS',u:'kg'},{k:'length',name:'TORA',u:'m'}],defaults:{pa:2000,oat:25,mass:1800,length:900,wind:0,procedure:'normal',surface:'paved',wet:false,soft:false,slope:0,maxMass:1900,mam678:false,paMode:'direct',elevation:2000,qnh:1013.25,isa:false}}
 };
 const el=s=>document.querySelector(s),escapeHTML=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const persisted=(()=>{try{return JSON.parse(localStorage.getItem('aero-ui-da42-v1'))||{}}catch{return {}}})();
@@ -258,6 +259,7 @@ function calibrate(){// Anchor the plotted ordinate to the published example, no
 calibrate();
 function limits(id,v){
  if(id==='takeoff')return window.TakeoffTables.validate(v);
+ if(id==='runway')return window.RunwayAnalysis.validate(v);
  if(id==='climb')return window.ClimbTables.validate(v);
  if(id==='oei')return window.OEITables.validate(v);
  if(id==='timeclimb')return window.TimeToClimb.validate(v);
@@ -273,7 +275,7 @@ function limits(id,v){
  if((id==='takeoff'||id==='landing'||id==='abnormal')&&(!Number.isFinite(v.wind)||v.wind < -10||v.wind >20))return 'VENTO FORA DO GRÁFICO';
  return null;
 }
-function compute(id,v){if(id==='takeoff')return window.TakeoffTables.compute(v);if(id==='climb')return window.ClimbTables.compute(v);if(id==='oei')return window.OEITables.compute(v);if(id==='timeclimb')return window.TimeToClimb.compute(v);if(id==='cruiseperf')return window.CruisePerformance.compute(v);if(id==='landing'||id==='abnormal')return window.LandingTables.compute(id,v);if(id==='goaround')return goAroundCompute(v);if(id==='cruise')return cruiseCompute(v);const error=limits(id,v);if(error)return {error};
+function compute(id,v){if(id==='takeoff')return window.TakeoffTables.compute(v);if(id==='runway')return window.RunwayAnalysis.compute(v);if(id==='climb')return window.ClimbTables.compute(v);if(id==='oei')return window.OEITables.compute(v);if(id==='timeclimb')return window.TimeToClimb.compute(v);if(id==='cruiseperf')return window.CruisePerformance.compute(v);if(id==='landing'||id==='abnormal')return window.LandingTables.compute(id,v);if(id==='goaround')return goAroundCompute(v);if(id==='cruise')return cruiseCompute(v);const error=limits(id,v);if(error)return {error};
  try{
  if(id==='abnormal'){
   const raw=abnormalRaw(v),ground=raw.ground+GRAPH_REGISTRATION.abnormal.ground,total=raw.total+GRAPH_REGISTRATION.abnormal.total;
@@ -300,6 +302,7 @@ function icon(name){const paths={menu:'<path d="M4 7h16M4 12h12M4 17h8"/>',slide
 function bannerFor(id,v,r){
  if(r.error)return r.error;
  if((id==='landing'||id==='abnormal')&&v.surface==='grass25')return 'GRASS >10 CM · +25% MÍNIMO · NÃO USAR EM VOO';
+ if(id==='runway')return (r.status==='DISTANCE SUFFICIENT'?'DISTANCE SUFFICIENT':r.status==='INSUFFICIENT DISTANCE'?'INSUFFICIENT DISTANCE':r.status==='MASS LIMIT EXCEEDED'?'AIRCRAFT MASS LIMIT EXCEEDED':'NO TABLE MASS FITS')+' · DISTANCE ONLY · NOT FOR FLIGHT';
  if(id==='takeoff')return (v.procedure==='short'?'SHORT · FLAPS APP · VR 76 / V50 82 KIAS':'NORMAL · FLAPS UP · VR 80 / V50 85 KIAS')+' · NOT FOR FLIGHT';
  if(id==='climb')return (v.flaps==='app'?'FLAPS APP · VY 85 KIAS':v.mass>1900?'FLAPS UP · VY 92 KIAS':'FLAPS UP · VY 90 KIAS')+' · BOTH 92% · GEAR UP';
  if(id==='oei')return r.main<0?'ROC NEGATIVO · DESCIDA':r.main<50?'ROC < 50 FT/MIN · AFM CAUTION':'OEI · VYSE 85 KIAS · FLAPS UP · GEAR UP';
@@ -460,7 +463,7 @@ function cruisePerformancePlot(v,r){
  +'<text x="282" y="134" text-anchor="end" fill="#91a8b8" font-size="9">18000 FT</text>'
  +'</svg>';
 }
-function createPlot(id,v,res){if(id==='timeclimb')return timeToClimbPlot(v,res);if(id==='cruiseperf')return cruisePerformancePlot(v,res);if(id==='climb'||id==='oei')return verticalRatePlot(id,res);if(id==='takeoff')return takeoffPlot(v,res);if(id==='goaround')return goAroundPlot(v,res);if(id==='landing'||id==='abnormal')return landingPlot(v,res);if(id==='cruise')return cruisePlot(v,res);if(res.error)return `<svg class="plot" viewBox="0 0 290 138" aria-label="Gráfico indisponível" role="img"></svg>`;
+function createPlot(id,v,res){if(id==='runway')return runwayAnalysisPlot(v,res);if(id==='timeclimb')return timeToClimbPlot(v,res);if(id==='cruiseperf')return cruisePerformancePlot(v,res);if(id==='climb'||id==='oei')return verticalRatePlot(id,res);if(id==='takeoff')return takeoffPlot(v,res);if(id==='goaround')return goAroundPlot(v,res);if(id==='landing'||id==='abnormal')return landingPlot(v,res);if(id==='cruise')return cruisePlot(v,res);if(res.error)return `<svg class="plot" viewBox="0 0 290 138" aria-label="Gráfico indisponível" role="img"></svg>`;
  // Smoothed spline for the live model's response to temperature, sampled at constant PA/mass.
  const T=(id==='climb'||id==='oei')?[-20,-15,-10,-5,0,5,10,15,20,25,30,35,40,45,50]:[-30,-25,-20,-15,-10,-5,0,5,10,15,20,25,30,35,40,45].filter(t=>t<=15-0.0019812*v.pa+35 && t>=-35);
  const usable=T.map(t=>{const r=compute(id,{...v,oat:t,...((id==='climb'||id==='oei')?{isa:false}:{})});return {t,val:r.error?null:r.main,second:r.error?null:r.secondary}}).filter(x=>x.val!=null);
@@ -537,7 +540,8 @@ function showSheet(type){const main=el('.phone'),title={modules:'PERFORMANCE',se
    abnormal:'ABNORMAL LANDING',
    goaround:'GO-AROUND',
    timeclimb:'TIME · FUEL · DISTANCE TO CLIMB',
-   cruiseperf:'CRUISE PERFORMANCE'
+   cruiseperf:'CRUISE PERFORMANCE',
+   runway:'RUNWAY ANALYSIS'
   };
   const weightBalance='<a class="option" href="./wb.html" style="text-decoration:none"><span><strong>WEIGHT &amp; BALANCE</strong></span>'+icon('next')+'</a>';
   content=Object.entries(MODELS).map(([k,m])=>
@@ -574,7 +578,7 @@ function showSheet(type){const main=el('.phone'),title={modules:'PERFORMANCE',se
   refresh();persist();
  };
  d.querySelectorAll('[data-module]').forEach(b=>b.onclick=()=>{current=b.dataset.module;d.remove();render()});if(d.querySelector('#reset'))d.querySelector('#reset').onclick=()=>{inputs[current]={...MODELS[current].defaults};d.remove();render()};if(d.querySelector('#save'))d.querySelector('#save').onclick=()=>{const val=compute(current,v);if(val.error)return;history.unshift({id:Date.now(),name:MODELS[current].label,result:`${fmt(val.main,current==='timeclimb'?1:0)} ${MODELS[current].unit}`,when:new Date().toLocaleString('pt-BR'),in:current==='goaround'?`${fmt(v.mass)} kg · ISA / MSL · 84 KIAS`:current==='timeclimb'?`${fmt(v.start)} → ${fmt(v.target)} ft · ${fmt(v.oat)} °C · ${fmt(v.mass)} kg`:`${fmt(v.pa)} ft · ${fmt(v.oat)} °C · ${(current==='cruise'||current==='cruiseperf')?fmt(v.load)+'%':fmt(v.mass)+' kg'}`,module:current,values:{...v}});history=history.slice(0,20);persist();d.remove()};d.querySelectorAll('[data-restore]').forEach(b=>b.onclick=()=>{const h=history.find(z=>String(z.id)===b.dataset.restore);if(!h)return;current=h.module;inputs[current]={...h.values};d.remove();render()});}
-window.AeroCalc={MODELS,GO_AROUND_ENGINE:window.GoAroundTables,LANDING_TABLE_ENGINE:window.LandingTables,CRUISE_PERFORMANCE_ENGINE:window.CruisePerformance,TIME_CLIMB_ENGINE:window.TimeToClimb,OEI_TABLES:window.OEITables.TABLES,OEI_ENGINE:window.OEITables,CLIMB_TABLES:window.ClimbTables.TABLES,CLIMB_ENGINE:window.ClimbTables,TAKEOFF_TABLES:window.TakeoffTables.TABLES,TAKEOFF_ENGINE:window.TakeoffTables,NOMOGRAMS,CRUISE_CHART,LANDING_CHART,ABNORMAL_CHART,GO_AROUND_PUBLISHED,GRAPH_REGISTRATION,limits,compute,showSheet,get current(){return current},get cruiseTempMode(){return cruiseTempMode},get inputs(){return inputs},isaTemperature,cruiseDeviation};
+window.AeroCalc={MODELS,RUNWAY_ANALYSIS_ENGINE:window.RunwayAnalysis,GO_AROUND_ENGINE:window.GoAroundTables,LANDING_TABLE_ENGINE:window.LandingTables,CRUISE_PERFORMANCE_ENGINE:window.CruisePerformance,TIME_CLIMB_ENGINE:window.TimeToClimb,OEI_TABLES:window.OEITables.TABLES,OEI_ENGINE:window.OEITables,CLIMB_TABLES:window.ClimbTables.TABLES,CLIMB_ENGINE:window.ClimbTables,TAKEOFF_TABLES:window.TakeoffTables.TABLES,TAKEOFF_ENGINE:window.TakeoffTables,NOMOGRAMS,CRUISE_CHART,LANDING_CHART,ABNORMAL_CHART,GO_AROUND_PUBLISHED,GRAPH_REGISTRATION,limits,compute,showSheet,get current(){return current},get cruiseTempMode(){return cruiseTempMode},get inputs(){return inputs},isaTemperature,cruiseDeviation};
 render();if('serviceWorker' in navigator&&location.protocol==='https:')window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 </script>
 </body>
