@@ -26,6 +26,32 @@ near(R.pressureAltitude(2000,1013.25),2000);
 assert.ok(R.pressureAltitude(2000,1003.25)>2000);
 const qnh=R.compute({...base,paMode:'qnh',elevation:2000,qnh:1013.25});
 assert.equal(qnh.maxMass,1855);near(qnh.pa,2000);
+// A high QNH at low-elevation airports produces a VALID negative pressure
+// altitude. Use the lowest AFM grid (0 ft), not an unsupported extrapolation.
+const seaLevelDirect=R.compute({...base,pa:0});
+let qnhCases=0;
+for(const elevation of [0,1000,2000]){
+ for(const setting of [970,990,1000,1010,1013.25,1014,1020,1030,1050,1085]){
+  const config={...base,paMode:'qnh',elevation,qnh:setting};
+  const raw=R.pressureAltitude(elevation,setting),calculated=R.compute(config);
+  assert.ok(Number.isFinite(raw),JSON.stringify(config));
+  assert.equal(calculated.error,undefined,JSON.stringify(config));
+  near(calculated.pa,raw);
+  near(calculated.tablePa,Math.max(0,raw));
+  assert.equal(calculated.paBelowChart,raw<0,JSON.stringify(config));
+  assert.equal(calculated.error,undefined);
+  if(raw<0){
+   assert.equal(R.modelInput(config,1800).pa,0);
+   near(calculated.required,seaLevelDirect.required);
+   near(calculated.ground,seaLevelDirect.ground);
+  }
+  qnhCases++;
+ }
+}
+assert.ok(R.pressureAltitude(0,1030)<0);
+assert.equal(R.compute({...base,paMode:'direct',pa:-200}).error,'PRESSURE ALT FORA DAS TABELAS');
+assert.equal(R.compute({...base,paMode:'qnh',elevation:10000,qnh:870}).error,'PRESSURE ALT FORA DAS TABELAS');
+
 for(const bad of [
  {length:0},{length:-10},{length:5001},{pa:-1},{pa:10001},
  {mass:1699},{mass:2000},{oat:-1},{oat:51},{wind:21},{wind:-11},
@@ -68,4 +94,4 @@ assert.ok(markup.includes('id="runway-ground">533 m'));
 assert.ok(markup.includes('class="runway-distance-curve"'));
 assert.ok(markup.includes('id="analysis-settings"'));
 assert.ok(markup.includes('80 KIAS')&&markup.includes('85 KIAS')&&markup.includes('90 KIAS'));
-console.log('PASS runway analysis: 1855kg, 1900/1999 configs, QNH and '+valid+' monotonic runway cases.');
+console.log('PASS runway analysis: 1855kg, 1900/1999 configs, '+qnhCases+' QNH/elevation cases and '+valid+' monotonic runway cases.');
