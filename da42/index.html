@@ -35,6 +35,9 @@
 .slope-slider::-moz-range-thumb{background:#56b9ee;width:16px;height:16px;border-radius:50%;border:3px solid #202d39;box-shadow:0 0 0 1px #56b9ee}
 .slope-slider:focus-visible{outline:2px solid #56b9ee;outline-offset:2px;border-radius:12px}
 .slope-limits{display:flex;justify-content:space-between;color:#91a8b8;font-size:11px;margin:1px 0 0}
+.runway-speeds{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px}
+.runway-speeds span{background:#202d39;border-radius:9px;padding:9px 5px;text-align:center;min-width:0;color:var(--txt);font-variant-numeric:tabular-nums;font-size:14px}
+.runway-speeds small{display:block;color:var(--label);font-size:10px;font-weight:600;letter-spacing:.5px;margin-bottom:2px}
 .climb-options{margin:-5px 0 12px;display:flex}.climb-options .takeoff-option{flex:1}
 .takeoff-options{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:-5px 0 12px}.takeoff-option{background:#202d39;border:1px solid #344652;color:#9bc8e4;border-radius:11px;padding:10px 7px;font-size:11px;min-height:39px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .temperature-head{display:block;min-width:0}
@@ -461,6 +464,54 @@ function cruisePerformancePlot(v,r){
  +'<circle class="dot" cx="'+mx.toFixed(1)+'" cy="'+my.toFixed(1)+'" r="4.5"/>'
  +'<text x="8" y="134" fill="#91a8b8" font-size="9">2000 FT</text>'
  +'<text x="282" y="134" text-anchor="end" fill="#91a8b8" font-size="9">18000 FT</text>'
+ +'</svg>';
+}
+function runwayAnalysisPlot(v,r){
+ if(r.error)return '<svg class="plot" viewBox="0 0 290 138" role="img" aria-label="Pista não validada"></svg>';
+ const e=window.RunwayAnalysis,engine=window.TakeoffTables,upper=v.maxMass;
+ let points=[];
+ for(let m=1700;m<=upper;m+=(upper-1700)/16){
+  const result=engine.compute(e.modelInput(v,m));
+  points.push(result.error?null:{mass:m,dist:result.main});
+ }
+ const endResult=engine.compute(e.modelInput(v,upper));
+ points.push(endResult.error?null:{mass:upper,dist:endResult.main});
+ const values=points.filter(x=>x).map(x=>x.dist).concat([v.length,r.required]);
+ if(values.length<2)return '';
+ const lowest=Math.min(...values),highest=Math.max(...values),pad=Math.max(20,(highest-lowest)*.13);
+ const bottom=Math.max(1,lowest-pad),top=highest+pad,span=top-bottom;
+ const x=mass=>18+(mass-1700)*254/(upper-1700);
+ const y=d=>112-(d-bottom)*86/span;
+ let currentPath='',segment=[];
+ const flush=()=>{
+  if(segment.length>=2){
+   let path='M'+x(segment[0].mass).toFixed(2)+' '+y(segment[0].dist).toFixed(2);
+   for(let i=0;i<segment.length-1;i++){
+    const a=segment[i],b=segment[i+1],px=x(a.mass),qx=x(b.mass),py=y(a.dist),qy=y(b.dist),dx=qx-px;
+    const prv=segment[Math.max(0,i-1)],nxt=segment[Math.min(segment.length-1,i+2)];
+    const local=(qy-py)/dx;
+    let left=(qy-y(prv.dist))/(qx-x(prv.mass)||1),right=(y(nxt.dist)-py)/(x(nxt.mass)-px||1);
+    if(local===0){left=0;right=0}
+    else{left=Math.sign(local)*Math.min(Math.abs(left),Math.abs(local)*2);
+         right=Math.sign(local)*Math.min(Math.abs(right),Math.abs(local)*2)}
+    path+=' C'+(px+dx/3).toFixed(2)+' '+(py+left*dx/3).toFixed(2)+
+     ' '+(qx-dx/3).toFixed(2)+' '+(qy-right*dx/3).toFixed(2)+
+     ' '+qx.toFixed(2)+' '+qy.toFixed(2);
+   }
+   currentPath+='<path class="runway-distance-curve" d="'+path+'" stroke="#56b9ee" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>';
+  }
+  segment=[];
+ };
+ for(const p of points){if(!p){flush();continue}segment.push(p)}flush();
+ const yy=y(v.length),marker=r.maxMass===null?'':('<circle cx="'+x(r.maxMass).toFixed(2)+'" cy="'+y(v.length).toFixed(2)+'" r="4.5" stroke="#202d39" stroke-width="2" fill="#e7b46d"/>');
+ const vm=v.mass<=upper?'<circle cx="'+x(v.mass).toFixed(2)+'" cy="'+y(r.required).toFixed(2)+'" r="4.5" stroke="#202d39" stroke-width="2" fill="'+(r.meets?'#56b9ee':'#e7b46d')+'"/>':'';
+ return '<svg class="plot runway-analysis-plot" viewBox="0 0 290 138" role="img" aria-label="Distância necessária sobre 50 pés em função da massa e TORA disponível" data-runway-max="'+(r.maxMass??'')+'" data-required="'+r.required+'">'
+ +'<path class="grid" d="M18 24H272M18 68H272M18 112H272"/>'
+ +'<path class="runway-tora-line" d="M18 '+yy.toFixed(2)+' H272" fill="none" stroke="#e7b46d" stroke-width="1.4" stroke-dasharray="5 4"/>'
+ +currentPath+marker+vm
+ +'<text x="18" y="14" font-size="9" fill="#e7b46d">TORA '+fmt(v.length)+' M</text>'
+ +'<text x="18" y="134" font-size="9" fill="#91a8b8">1700 KG</text>'
+ +'<text x="272" y="134" font-size="9" text-anchor="end" fill="#91a8b8">'+fmt(upper)+' KG</text>'
  +'</svg>';
 }
 function createPlot(id,v,res){if(id==='runway')return runwayAnalysisPlot(v,res);if(id==='timeclimb')return timeToClimbPlot(v,res);if(id==='cruiseperf')return cruisePerformancePlot(v,res);if(id==='climb'||id==='oei')return verticalRatePlot(id,res);if(id==='takeoff')return takeoffPlot(v,res);if(id==='goaround')return goAroundPlot(v,res);if(id==='landing'||id==='abnormal')return landingPlot(v,res);if(id==='cruise')return cruisePlot(v,res);if(res.error)return `<svg class="plot" viewBox="0 0 290 138" aria-label="Gráfico indisponível" role="img"></svg>`;
