@@ -83,7 +83,7 @@ const MODELS={
 };
 const el=s=>document.querySelector(s),escapeHTML=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const persisted=(()=>{try{return JSON.parse(localStorage.getItem('aero-ui-da42-v1'))||{}}catch{return {}}})();
-let current=Object.prototype.hasOwnProperty.call(MODELS,persisted.current)?persisted.current:'takeoff';let inputs={};for(const id in MODELS)inputs[id]={...MODELS[id].defaults,...(persisted.inputs&&persisted.inputs[id]||{})};if(persisted.inputs&&persisted.inputs.goaround&&!Object.prototype.hasOwnProperty.call(persisted.inputs.goaround,'oat')){inputs.goaround.isa=true;delete inputs.goaround.speed;}let history=Array.isArray(persisted.history)?persisted.history.slice(0,20):[];
+let current=Object.prototype.hasOwnProperty.call(MODELS,persisted.current)?persisted.current:'takeoff';const requestedModule=(location.search||'').match(/[?&]module=([a-z]+)/);if(requestedModule&&Object.prototype.hasOwnProperty.call(MODELS,requestedModule[1]))current=requestedModule[1];let inputs={};for(const id in MODELS)inputs[id]={...MODELS[id].defaults,...(persisted.inputs&&persisted.inputs[id]||{})};if(persisted.inputs&&persisted.inputs.goaround&&!Object.prototype.hasOwnProperty.call(persisted.inputs.goaround,'oat')){inputs.goaround.isa=true;delete inputs.goaround.speed;}let history=Array.isArray(persisted.history)?persisted.history.slice(0,20):[];
 let cruiseTempMode=persisted.cruiseTempMode==='isa'?'isa':'oat';
 function persist(){try{localStorage.setItem('aero-ui-da42-v1',JSON.stringify({current,inputs,history,cruiseTempMode}))}catch{}}
 /**
@@ -637,7 +637,8 @@ function showSheet(type){if(type==='runwayanalysis'&&current==='runway')return w
    runway:'RUNWAY ANALYSIS'
   };
   const weightBalance='<a class="option" href="./wb.html" style="text-decoration:none"><span><strong>WEIGHT &amp; BALANCE</strong></span>'+icon('next')+'</a>';
-  content=Object.entries(MODELS).map(([k,m])=>
+   const flightPlan='<a class="option" href="./flight.html" style="text-decoration:none"><strong>FLIGHT PLAN / SIMBRIEF</strong>'+icon('next')+'</a>';
+  content=flightPlan+Object.entries(MODELS).map(([k,m])=>
    (k==='timeclimb'?weightBalance:'')+
    `<button class="option ${current===k?'selected':''}" data-module="${k}"><span><strong>${escapeHTML(names[k]||m.label)}</strong></span>${current===k?icon('check'):icon('next')}</button>`
   ).join('');
@@ -675,5 +676,6 @@ function showSheet(type){if(type==='runwayanalysis'&&current==='runway')return w
 window.AeroCalc={MODELS,RUNWAY_ANALYSIS_ENGINE:window.RunwayAnalysis,GO_AROUND_ENGINE:window.GoAroundTables,LANDING_TABLE_ENGINE:window.LandingTables,CRUISE_PERFORMANCE_ENGINE:window.CruisePerformance,TIME_CLIMB_ENGINE:window.TimeToClimb,OEI_TABLES:window.OEITables?.TABLES,OEI_ENGINE:window.OEITables,CLIMB_TABLES:window.ClimbTables?.TABLES,CLIMB_ENGINE:window.ClimbTables,TAKEOFF_TABLES:window.TakeoffTables?.TABLES,TAKEOFF_ENGINE:window.TakeoffTables,NOMOGRAMS,CRUISE_CHART,LANDING_CHART,ABNORMAL_CHART,GO_AROUND_PUBLISHED,GRAPH_REGISTRATION,limits,compute,showSheet,get current(){return current},get cruiseTempMode(){return cruiseTempMode},get inputs(){return inputs},isaTemperature,cruiseDeviation};
 render();if('serviceWorker' in navigator&&location.protocol==='https:')window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 </script>
+<script>if(location.protocol==='https:'&&!/[?&](calculator|module)=/.test(location.search||'')){location.replace('./flight.html')}</script>
 </body>
 </html>
