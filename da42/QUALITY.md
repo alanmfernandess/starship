@@ -135,3 +135,13 @@
 - Exact reference MSL/ISA: 690 / 547 / 454 ft/min (1700/1900/1999kg); 1805kg table interpolation ≈614.925 ft/min and official angle 4.3°.
 - Strict 1999kg applicability note for MÄM 42-678; non-flight educational model.
 - Regression via `validate_goaround_tables.cjs`, `validate_modules67.cjs` and five viewport `test_browser.py`.
+
+## v0.19.0 — Runway Analysis (distance-only MATOW)
+
+- Adds 10th performance module, 4 Aero UI inputs (PA, OAT, TOW, TORA), separate options for wind, procedure, surface, uphill slope, QNH/field elevation, and 1900/1999kg aircraft profile.
+- Uses existing official AFM §5.3.6 takeoff table engine for both ground roll and distance to 50 ft. Conservative assumption: TORA must contain the full 50-ft distance as well as the ground roll, no clearway/TODA credit.
+- Distance-limited mass inverse solver: 1700kg lower table boundary; 1900kg default maximum; opt-in 1999kg MÄM 42-678 reference, requiring approved aircraft W&B/CG. Binary search with conservative integer-kg floor and independent feasibility recheck, no extrapolation or invented below-table answers.
+- Four distinct statuses for runway distance fit, insufficient distance, mass-configuration limit exceedance, or no published mass fitting. Main result max runway-limited weight, secondary remaining TORA, extra required 50-ft distance and ground roll, dynamic VR/V50/VY.
+- Graph plots the AFM's required takeoff distance as a monotone smooth curve vs mass with fixed TORA threshold; no implied extra engine or obstacle performance.
+- QNH/field elevation conversion uses ISA barometric equation, PA must stay within published takeoff table. Validation includes default exact reference 1855kg/900m at PA2000ft/OAT25°C and inverted mass check, with 5 viewport browser tests.
+- Not an operational authorization or certified MATOW. Not for flight.
