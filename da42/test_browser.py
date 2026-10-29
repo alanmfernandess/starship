@@ -504,17 +504,17 @@ with sync_playwright() as p:
         page.locator('#rw-apply').click()
         assert page.locator('#val-pa').get_attribute('readonly') is None
         page.locator('#analysis-settings').click()
-        page.locator('#rw-wind').fill('-5')
+        page.locator('#rw-wind').evaluate("el => { el.value='-5'; el.dispatchEvent(new Event('input',{bubbles:true})) }")
         assert page.evaluate("window.AeroCalc.inputs.runway.wind")==0
         assert 'TAILWIND' in page.locator('#rw-wind-output').inner_text()
         page.locator('#rw-cancel').click()
         assert page.evaluate("window.AeroCalc.inputs.runway.wind")==0
         page.locator('#analysis-settings').click()
-        page.locator('#rw-wind').fill('12')
+        page.locator('#rw-wind').evaluate("el => { el.value='12'; el.dispatchEvent(new Event('input',{bubbles:true})) }")
         page.locator('#rw-apply').click()
         assert page.evaluate("window.AeroCalc.inputs.runway.wind")==12
         page.locator('#analysis-settings').click()
-        page.locator('#rw-wind').fill('0')
+        page.locator('#rw-wind').evaluate("el => { el.value='0'; el.dispatchEvent(new Event('input',{bubbles:true})) }")
         page.locator('#rw-apply').click()
         assert page.evaluate("window.AeroCalc.inputs.runway.wind")==0
         assert page.locator('html').evaluate('(el)=>el.scrollWidth')<=w
