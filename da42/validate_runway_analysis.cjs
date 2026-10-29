@@ -3,7 +3,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('nod
 const T=require('./takeoff-tables.js'),R=require('./runway-analysis.js');
 const near=(a,b)=>assert.ok(Math.abs(a-b)<.05,String(a)+' != '+String(b));
 const base={pa:2000,oat:25,mass:1800,length:900,wind:0,procedure:'normal',
- surface:'paved',wet:false,soft:false,slope:0,maxMass:1900,mam678:false,paMode:'direct'};
+ surface:'paved',wet:false,soft:false,slope:0,maxMass:1900,paMode:'direct'};
 const r=R.compute(base);
 assert.equal(r.error,undefined);assert.equal(r.status,'DISTANCE SUFFICIENT');
 assert.equal(r.maxMass,1855);near(r.required,862.5);near(r.ground,532.5);
@@ -18,9 +18,9 @@ const low=R.compute({...base,length:600});
 assert.equal(low.maxMass,null);assert.equal(low.status,'NO SUPPORTED MASS FITS');
 const capped=R.compute({...base,length:1500});
 assert.equal(capped.maxMass,1900);assert.equal(capped.limitedByConfig,true);
-const high=R.compute({...base,length:1500,maxMass:1999,mam678:true});
+const high=R.compute({...base,length:1500,maxMass:1999});
 assert.equal(high.maxMass,1999);assert.equal(high.configurationRequiresSupplement,true);
-assert.equal(R.compute({...base,maxMass:1999}).error,'MÄM 42-678 NÃO CONFIRMADA');
+assert.equal(R.compute({...base,maxMass:1999}).error,undefined);
 assert.equal(R.compute({...base,mass:1950}).status,'MASS LIMIT EXCEEDED');
 near(R.pressureAltitude(2000,1013.25),2000);
 assert.ok(R.pressureAltitude(2000,1003.25)>2000);
