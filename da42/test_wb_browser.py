@@ -39,6 +39,8 @@ with sync_playwright() as p:
         page.locator('input[data-wb="pilot"]').fill('80')
         assert 'MASS WITHIN LIMITS' in page.locator('#mass-check').inner_text()
         count+=2
+        assert page.locator('#edit-load').inner_text().strip()=='BAGGAGE & FUEL'
+        assert page.locator('#edit-load .sub').count()==0
         page.locator('#edit-load').click()
         assert page.locator('.sheet-row input').count()==8
         assert page.locator('[data-wb^="landing"]').count()==0
