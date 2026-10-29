@@ -21,7 +21,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Validate AFM takeoff, climb, OEI, time/fuel/distance and 1999kg cruise performance
+      - name: Validate AFM tables, runway-limited takeoff mass, and Weight & Balance
         run: npm test
 
   mobile-ui-validation:
@@ -38,7 +38,7 @@ jobs:
         run: |
           python -m pip install playwright
           python -m playwright install --with-deps chromium
-      - name: Mobile UI: nine performance modules, AFM cruise and climb trip metrics
+      - name: Mobile UI: ten performance modules including Runway Analysis / MATOW
         run: python test_browser.py
 
   weight-and-balance-ui:
