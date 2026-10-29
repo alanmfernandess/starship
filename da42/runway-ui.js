@@ -47,7 +47,6 @@ function open(values,render,icon,escape){
     '<div class="slope-control"><div class="slope-head"><label for="rw-slope">UPHILL SLOPE</label><output id="rw-slope-output" for="rw-slope">'+String(Number(state.slope||0)).replace('.',',')+'%</output></div>'+
     '<input id="rw-slope" class="slope-slider" type="range" min="0" max="5" step="0.5" value="'+escape(state.slope||0)+'" style="--fill:'+Number(state.slope||0)*20+'%" aria-label="Aclive de pista em percentual"/>'+
     '<div class="slope-limits"><span>0%</span><span>5%</span></div></div>'+
-    '<p class="rw-note">50 FT DISTANCE ≤ TORA · ZERO CLEARWAY CREDIT · CG NOT VERIFIED · NOT FOR FLIGHT</p>'+
     (error?'<p class="rw-error" role="alert">'+escape(error)+'</p>':'')+
     '<div class="rw-footer"><button type="button" id="rw-cancel" class="rw-cancel">CANCEL</button><button type="button" id="rw-apply" class="rw-apply">APPLY</button></div>';
   }else{
