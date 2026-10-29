@@ -96,7 +96,7 @@ const profilesInputs=[
  ['nose','NOSE BAGGAGE','kg'],['cabin','CABIN BAGGAGE','kg'],['extension','EXTENSION','kg'],
  ['deice','DE-ICING FLUID','kg'],['mainL','MAIN LEFT','kg'],['mainR','MAIN RIGHT','kg'],
  ['auxL','AUX LEFT','kg'],['auxR','AUX RIGHT','kg'],
- ['emptyMass','EMPTY MASS','kg'],['emptyMoment','EMPTY MOMENT','kg·m']
+ ['emptyMass','EMPTY WEIGHT','kg'],['emptyMoment','EMPTY MOMENT','kg·m']
 ];
 function card(key,label){
  const v=profile[key];
@@ -118,7 +118,7 @@ function envelope(){
 function content(){
  const sc=model.ok?model.statuses:{};
  const metrics=model.ok?'<div class="metrics"><div class="metric"><label>ZFW</label><b>'+format(model.zeroFuel.mass,0)+' kg</b></div><div class="metric"><label>TOW</label><b>'+format(model.takeoff.mass,0)+' kg</b></div></div>':'<div class="metrics"><div class="metric"><label>CHECK INPUTS</label><b>—</b></div></div>';
- const massState=model.ok?(sc.massOK?'MASS WITHIN LIMITS':'MASS LIMIT EXCEEDED'):'CHECK INPUTS';
+ const massState=model.ok?(sc.massOK?'WEIGHT WITHIN LIMITS':'WEIGHT LIMIT EXCEEDED'):'CHECK INPUTS';
  return '<div class="phone"><header class="topbar"><button class="icon-btn" id="menu" aria-label="Abrir módulos">'+icon('menu')+'</button><h1>DA42 NG</h1><button class="icon-btn" id="settings" aria-label="Configurações da aeronave">'+icon('settings')+'</button></header>'+
  '<main class="scroller" id="scroller"><div class="module-heading"><span>WEIGHT &amp; BALANCE</span><span class="accent">CG ENVELOPE</span></div>'+
  '<div class="fields">'+card('pilot','PILOT')+card('copilot','COPILOT')+card('pax1','PASSENGER 1')+card('pax2','PASSENGER 2')+'</div>'+
@@ -151,7 +151,7 @@ function recalc(){
  model=E.calculate(profile);
  const set=(s,v)=>{const e=el(s);if(e)e.innerHTML=v};
  set('#envelope',envelope());
- set('#mass-check','<span class="'+(model.ok?(model.statuses.massOK?'good':'error'):'error')+'">'+(model.ok?(model.statuses.massOK?'MASS WITHIN LIMITS':'MASS LIMIT EXCEEDED'):'CHECK INPUTS')+'</span>');
+ set('#mass-check','<span class="'+(model.ok?(model.statuses.massOK?'good':'error'):'error')+'">'+(model.ok?(model.statuses.massOK?'WEIGHT WITHIN LIMITS':'WEIGHT LIMIT EXCEEDED'):'CHECK INPUTS')+'</span>');
  set('#metrics',model.ok?'<div class="metrics"><div class="metric"><label>ZFW</label><b>'+format(model.zeroFuel.mass,0)+' kg</b></div><div class="metric"><label>TOW</label><b>'+format(model.takeoff.mass,0)+' kg</b></div></div>':'');
  const notice=el('#notice');if(notice){notice.textContent=model.ok?'NOT FOR FLIGHT':model.errors.join(' · ');notice.classList.toggle('bad',!model.ok||!model.statuses.massOK||!model.statuses.cgOK)}
  const optStatus=el('#optimize-status');if(optStatus)optStatus.textContent=optimizeMessage;
@@ -172,7 +172,7 @@ function sheet(type){
  const sections={
   load:[
    ['BAGGAGE',['nose','cabin','extension']],
-   ['FUEL · USEABLE MASS',['mainL','mainR','auxL','auxR']],
+   ['FUEL · USEABLE WEIGHT',['mainL','mainR','auxL','auxR']],
    ['DE-ICING',['deice']]
   ],
   settings:[['EMPTY AIRCRAFT',['emptyMass','emptyMoment']]]
