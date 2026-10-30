@@ -141,7 +141,8 @@ with sync_playwright() as p:
   page.locator('[data-tab="weight"]').click()
   assert 'TAKEOFF WEIGHT' in page.locator('.tile').last.inner_text()
   page.locator('[data-view="modules"]').click()
-  assert page.locator('a[href*="module=runway"]').count()==1
+  assert page.locator('a[href*="module=runway"]').count()==0
+  assert page.locator('a[href*="module=takeoff"]').count()==1
   assert page.locator('a[href="./wb.html"]').count()==1
   assert page.locator('.note').count()==0
   assert 'Os módulos abaixo' not in page.locator('main').inner_text()
@@ -170,10 +171,14 @@ with sync_playwright() as p:
   assert page.evaluate("JSON.parse(localStorage.getItem('aero-ui-da42-v1')).inputs.runway.slopeVerified") is True
   assert page.evaluate("JSON.parse(localStorage.getItem('aero-ui-da42-v1')).inputs.runway.surfaceVerified") is False
   page.locator('[data-view="modules"]').click()
-  page.locator('a[href*="module=runway"]').click()
+  page.locator('a[href*="module=takeoff"]').click()
   page.wait_for_function("() => !!window.AeroCalc?.inputs?.runway")
   assert page.evaluate("window.AeroCalc.inputs.runway.runwayId")=='10R'
   assert page.evaluate("window.AeroCalc.compute('runway',window.AeroCalc.inputs.runway).error")=='RUNWAY SURFACE REQUIRED'
+  # A runway-data gap must not suppress the standalone AFM takeoff distance.
+  assert page.locator('#main-result').inner_text()!='—'
+  assert page.locator('#runway-margin').inner_text()=='—'
+  assert page.locator('#runway-max-weight').inner_text()=='—'
   page.locator('#analysis-settings').click()
   assert 'RUNWAY · 10R' in page.locator('.rw-context').inner_text()
   assert page.locator('#rw-wind-output').inner_text().startswith('+9 KT')
@@ -182,6 +187,8 @@ with sync_playwright() as p:
   page.locator('#rw-save-back').click()
   assert page.evaluate("window.AeroCalc.inputs.runway.surfaceVerified") is True
   assert page.evaluate("window.AeroCalc.compute('runway',window.AeroCalc.inputs.runway).error")==None
+  assert page.locator('#runway-margin').inner_text()!='—'
+  assert page.locator('#runway-max-weight').inner_text()!='—'
   # Import a different OFP without TLR: clear previous runway inputs.
   page.locator('#menu').click()
   page.locator('.sheet a.option[href="./flight.html"]').click()
