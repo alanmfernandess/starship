@@ -32,6 +32,11 @@ with sync_playwright() as p:
         assert page.locator('#metrics').inner_text().find('TOW')!=-1
         assert '2,35' in page.locator('svg.graph').text_content()
         assert page.locator('html').evaluate('(el)=>el.scrollWidth')<=w
+        # Minimal PERFORMANCE menu: three consistent destinations.
+        page.locator('#menu').click()
+        assert page.locator('.sheet a.action').all_inner_texts()==['FLIGHT PLAN','PERFORMANCE','WEIGHT & BALANCE']
+        assert [x.split('/')[-1] for x in page.locator('.sheet a.action').evaluate_all("(xs)=>xs.map(a=>a.getAttribute('href'))")]==['flight.html','index.html?calculator=1','wb.html']
+        page.locator('.close').click()
         assert page.locator('svg.graph polygon').count()==1
         count+=8
         page.locator('input[data-wb="pilot"]').fill('110')
