@@ -179,8 +179,7 @@ function modulesPage(){
  ['GO-AROUND PERFORMANCE','./index.html?calculator=1&module=goaround'],
  ['TIME TO CLIMB','./index.html?calculator=1&module=timeclimb']
  ];
- return '<div class="note">Os módulos abaixo utilizam os motores originais do Aero UI. Condições importadas são sincronizadas após confirmação; revise sempre os demais parâmetros.</div>'+
- modules.map(([name,url])=>'<a class="card-button" href="'+url+'"><span>'+esc(name)+'</span>'+icon('next')+'</a>').join('');
+ return modules.map(([name,url])=>'<a class="card-button" href="'+url+'"><span>'+esc(name)+'</span>'+icon('next')+'</a>').join('');
 }
 function morePage(){
  return '<section class="tile"><div class="list-title">AERO UI · MASTER DESIGN 1.0</div>'+
@@ -259,9 +258,9 @@ function applyPlan(navigate=true){
  return true;
 }
 function bind(){
- root.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>show(b.dataset.view));
+ root.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>show(b.dataset.view==='plan'&&plan?(reviewed?'summary':'review'):b.dataset.view));
  const more=root.querySelector('#open-more');if(more)more.onclick=()=>show('more');
- const menu=root.querySelector('#back-or-menu');if(menu)menu.onclick=()=>show(view==='review'?'plan':view==='comparison'?'summary':'modules');
+ const menu=root.querySelector('#back-or-menu');if(menu)menu.onclick=()=>show(view==='review'&&plan?(reviewed?'summary':'review'):view==='comparison'?'summary':'modules');
  const pilot=root.querySelector('#pilot-id');if(pilot){
   pilot.oninput=()=>{pilotId=pilot.value.replace(/\D/g,'').slice(0,7);pilot.value=pilotId};
   pilot.onkeydown=e=>{if(e.key==='Enter')importPilot()};
@@ -299,6 +298,8 @@ try{
   reviewed=stored.aircraft==='DA42'&&!stored.mismatch&&sessionStorage.getItem(flightKey+'-synced')==='1';
  }
 }catch{}
+// Returning from Performance/W&B resumes the imported OFP summary.
+if(plan)view=reviewed?'summary':'review';
 window.AeroFlight={get plan(){return plan},get view(){return view},normalize:C.normalize,acceptRaw,applyPlan,get performance(){return performance()}};
 render();
 if('serviceWorker' in navigator&&location.protocol==='https:')window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
