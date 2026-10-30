@@ -377,6 +377,7 @@ function inputFmt(v,n=0){if(!Number.isFinite(v))return '';return new Intl.Number
 function normalizeNumericEntry(text){
  const raw=String(text).replace(/\s/g,'');
  if(!raw.includes(','))return raw;
+ if(raw.includes('.'))return raw.lastIndexOf('.')>raw.lastIndexOf(',')?raw.replaceAll(',',''):raw.replaceAll('.','').replaceAll(',','.');
  // Previously displayed en-US group separators must retain their magnitude;
  // decimal commas from mobile keyboards are normalized to a period.
  return /^[+-]?\d{1,3}(,\d{3})+$/.test(raw)?raw.replaceAll(',',''):raw.replaceAll(',','.');
