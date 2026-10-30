@@ -374,6 +374,13 @@ function fmt(v,n=0){if(!Number.isFinite(v))return '—';return new Intl.NumberFo
 // Numeric entry fields never use thousands separators: 10000 / 1999.
 // Result cards may retain readable grouping without changing calculation values.
 function inputFmt(v,n=0){if(!Number.isFinite(v))return '';return new Intl.NumberFormat('en-US',{useGrouping:false,maximumFractionDigits:n,minimumFractionDigits:n}).format(v)}
+function normalizeNumericEntry(text){
+ const raw=String(text).replace(/\s/g,'');
+ if(!raw.includes(','))return raw;
+ // Previously displayed en-US group separators must retain their magnitude;
+ // decimal commas from mobile keyboards are normalized to a period.
+ return /^[+-]?\d{1,3}(,\d{3})+$/.test(raw)?raw.replaceAll(',',''):raw.replaceAll(',','.');
+}
 function icon(name){const paths={clipboard:'<rect x="5" y="4" width="14" height="18" rx="2"/><path d="M9 3h6v4H9zM9 12h6M9 16h6"/>',
 scale:'<path d="M12 3v18M7 21h10M5 7h14M5 7l-3 6h6L5 7zM19 7l-3 6h6L19 7z"/>',
 planeTakeoff:'<path d="M2 19h20M5 15l5-2-2.5-5 2-1 5 4 4.2-1.4a2 2 0 0 1 2.6 1.6L4 17z"/>',
@@ -687,7 +694,8 @@ function render(){const m=MODELS[current],v=inputs[current],r=compute(activeModu
   const displayValue=()=>(current==='cruise'||current==='cruiseperf')&&inp.dataset.key==='oat'&&cruiseTempMode==='isa'?(current==='cruiseperf'?inputs[current].oat-window.CruisePerformance.isaAt(inputs[current].pa):cruiseDeviation(inputs[current])):(current==='takeoff'||current==='climb'||current==='oei'||current==='landing'||current==='abnormal'||current==='goaround')&&inp.dataset.key==='oat'&&inputs[current].isa?(current==='landing'||current==='abnormal'?window.LandingTables.isaAt(inputs[current].pa):current==='goaround'?window.GoAroundTables.isaAt(inputs[current].pa):isaTemperature(inputs[current].pa)):inputs[current][inp.dataset.key];
   inp.addEventListener('focus',()=>{const value=displayValue();if(Number.isFinite(value))inp.value=String(Number(value.toFixed(3)));inp.select()});
   inp.addEventListener('input',e=>{
-   const key=inp.dataset.key,raw=e.target.value.replaceAll(' ','').replaceAll(',','.');
+   const key=inp.dataset.key,raw=normalizeNumericEntry(e.target.value);
+   if(e.target.value!==raw)e.target.value=raw;
    if((current==='takeoff'||current==='climb'||current==='oei'||current==='landing'||current==='abnormal'||current==='goaround')&&key==='oat'&&inputs[current].isa)return;
    const next=raw===''?NaN:Number(raw);
    if((current==='cruise'||current==='cruiseperf')&&cruiseTempMode==='isa'&&key==='pa'){
