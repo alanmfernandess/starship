@@ -20,7 +20,9 @@ const a=f('abnormal',example);
 assert.ok(Math.abs(a.main-761.4285714285714)<1e-9);
 assert.ok(Math.abs(a.secondary-452.67857142857144)<1e-9);
 assert.ok(ab.html.includes('TOTAL 761 m')&&ab.html.includes('TOUCHDOWN'));
-assert.ok(ab.html.includes('id="landing-runway"')&&ab.html.includes('id="abnormal-isa-toggle"'));
+assert.equal(ab.api.current,'landing');
+assert.ok(ab.html.includes('id="landing-runway"')&&ab.html.includes('id="landing-isa-toggle"'));
+assert.ok(ab.html.includes('id="landing-mode-abnormal"')&&ab.html.includes('aria-pressed="true"'));
 assert.equal((ab.html.match(/class="field /g)||[]).length,4);
 let valid=0,rejected=0;
 for(const pa of [0,2000,4000,6000,8000,10000])
