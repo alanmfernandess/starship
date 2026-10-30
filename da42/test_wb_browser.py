@@ -26,6 +26,11 @@ with sync_playwright() as p:
         assert 'TOW' in page.locator('.legend').inner_text()
         assert 'WEIGHT WITHIN LIMITS' in page.locator('#mass-check').inner_text()
         assert page.locator('input[data-wb]').count()==4
+        assert all(',' not in v for v in page.locator('input[data-wb]').evaluate_all("(xs)=>xs.map(x=>x.value)"))
+        assert page.locator('.field .entry').evaluate_all("""(entries)=>entries.every(e=>{
+          const a=e.querySelector('input'),b=e.querySelector('.unit');
+          return !a||!b||a.getBoundingClientRect().right<=b.getBoundingClientRect().left+1;
+        })""")
         assert page.locator('#metrics').inner_text().find('1.899')!=-1
         assert page.locator('#metrics').inner_text().find('1.656')!=-1
         assert page.locator('#metrics').inner_text().find('ZFW')!=-1
@@ -69,7 +74,8 @@ with sync_playwright() as p:
         page.locator('#nav-settings').click()
         assert page.locator('input[data-wb="emptyMass"]').count()==1
         assert page.locator('input[data-wb="emptyMoment"]').count()==1
-        assert page.locator('input[data-wb="emptyMass"]').input_value()=='1.450,0'
+        assert page.locator('input[data-wb="emptyMass"]').input_value()=='1450.0'
+        assert page.locator('input[data-wb="emptyMoment"]').input_value().find(',')<0
         page.locator('input[data-wb="emptyMass"]').fill('1470')
         assert page.locator('#notice').inner_text()=='NOT FOR FLIGHT'
         page.locator('#reset-example').click()
