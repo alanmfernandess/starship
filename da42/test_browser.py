@@ -70,18 +70,14 @@ with sync_playwright() as p:
         page.locator('#menu').click()
         expected_modules=[
             'TAKEOFF PERFORMANCE',
-            'CLIMB',
-            'ONE ENGINE CLIMB / DESCENT',
-            'CRUISE',
-            'LANDING',
-            'ABNORMAL LANDING',
-            'GO-AROUND',
-            'TIME · FUEL · DISTANCE TO CLIMB',
-            'CRUISE PERFORMANCE'
+            'CLIMB PERFORMANCE',
+            'CRUISE PERFORMANCE',
+            'LANDING PERFORMANCE',
+            'GO-AROUND PERFORMANCE'
         ]
         assert page.locator('.sheet button[data-module] strong').all_inner_texts()==expected_modules
         assert page.locator('.sheet a.option[href="./wb.html"] strong').inner_text()=='WEIGHT & BALANCE'
-        assert page.locator('.sheet .option').count()==11
+        assert page.locator('.sheet .option').count()==7
         assert page.locator('.sheet a.option[href="./flight.html"] strong').inner_text()=='FLIGHT PLAN'
         assert page.locator('.sheet .option .sub').count()==0
         assert page.locator('.sheet .option').evaluate_all("(xs)=>xs.every(x=>x.querySelectorAll('strong').length===1)")
@@ -136,8 +132,10 @@ with sync_playwright() as p:
         page.locator('input[data-key="mass"]').fill('1900')
         assert page.locator('#main-result').inner_text()=='1,070'
         all_checks+=25
-        page.locator('#menu').click()
-        page.locator('button[data-module="oei"]').click()
+        page.evaluate("() => Object.assign(window.AeroCalc.inputs.climb,{pa:0,oat:15,mass:1800,isa:false,flaps:'up'})")
+        page.locator('#climb-mode-oei').click()
+        assert page.locator('.oei-note').count()==1
+        assert page.locator('.climb-profile').count()==0
         assert page.locator('#main-result').inner_text()=='211'
         assert page.locator('#secondary-result').inner_text()=='1.07 m/s'
         verify_vertical_graph('subida')
@@ -160,14 +158,14 @@ with sync_playwright() as p:
             });
         }""")
         assert typography[0]==typography[1],(w,h,'engine power font mismatch',typography)
-        assert page.locator('#oei-isa-toggle').inner_text()=='ISA'
+        assert page.locator('#climb-isa-toggle').inner_text()=='ISA'
         def verify_cards_aligned():
             pa=page.locator('#val-pa').bounding_box()
             oat=page.locator('#val-oat').bounding_box()
             pa_label=page.locator('label[for="val-pa"]').bounding_box()
             oat_label=page.locator('label[for="val-oat"]').bounding_box()
             oat_card=page.locator('#val-oat').locator('xpath=../..').bounding_box()
-            isa_button=page.locator('#oei-isa-toggle').bounding_box()
+            isa_button=page.locator('#climb-isa-toggle').bounding_box()
             assert abs(pa['y']-oat['y'])<=2, (w,h,'numeric input misalignment',pa,oat)
             assert abs(pa_label['y']-oat_label['y'])<=2, (w,h,'label misalignment',pa_label,oat_label)
             assert isa_button['x']>=oat_card['x'] and isa_button['x']+isa_button['width']<=oat_card['x']+oat_card['width'],(w,h,'ISA toggle outside OAT card')
@@ -175,8 +173,8 @@ with sync_playwright() as p:
         assert 'VYSE 85 KIAS' in page.locator('#banner').inner_text()
         page.locator('input[data-key="mass"]').fill('1999')
         assert page.locator('#main-result').inner_text()=='138'
-        page.locator('#oei-isa-toggle').click()
-        assert page.locator('#oei-isa-toggle').inner_text()=='OAT'
+        page.locator('#climb-isa-toggle').click()
+        assert page.locator('#climb-isa-toggle').inner_text()=='OAT'
         assert page.locator('input[data-key="oat"]').get_attribute('readonly') is not None
         verify_cards_aligned()
         assert page.locator('#main-result').inner_text()=='140'
@@ -185,9 +183,9 @@ with sync_playwright() as p:
         assert page.locator('#result-name').inner_text()=='RATE OF DESCENT'
         assert page.locator('#secondary-result').inner_text().startswith('-')
         verify_vertical_graph('descida')
-        assert 'NEGATIVO' in page.locator('#banner').inner_text()
+        assert 'NEGATIVE ROC' in page.locator('#banner').inner_text()
         page.locator('input[data-key="pa"]').fill('4000')
-        page.locator('#oei-isa-toggle').click()
+        page.locator('#climb-isa-toggle').click()
         page.locator('input[data-key="oat"]').fill('50')
         assert page.locator('#main-result').inner_text()=='0'
         verify_vertical_graph('altitude constante')
@@ -203,58 +201,13 @@ with sync_playwright() as p:
         page.locator('input[data-key="oat"]').fill('10')
         assert page.locator('#main-result').inner_text()=='180'
         all_checks+=39
+        page.locator('#climb-mode-both').click()
+        assert page.locator('.oei-note').count()==0
+        assert page.locator('.climb-profile').count()==1
         page.locator('#menu').click()
-        page.locator('button[data-module="cruise"]').click()
-        assert page.locator('#main-result').inner_text()=='164'
-        assert page.locator('#secondary-result').inner_text()=='0 °C'
-        assert page.locator('.field.readonly .power-value').inner_text()=='2'
-        cruise_fonts=page.evaluate("""() => {
-            const input=getComputedStyle(document.querySelector('#val-load'));
-            const fixed=getComputedStyle(document.querySelector('.field.readonly .power-value'));
-            return [input.fontSize,input.fontWeight,input.lineHeight,input.letterSpacing,fixed.fontSize,fixed.fontWeight,fixed.lineHeight,fixed.letterSpacing];
-        }""")
-        assert cruise_fonts[:4]==cruise_fonts[4:],(w,h,'fixed-field typography drift',cruise_fonts)
-        assert page.locator('input[data-key="load"]').count()==1
-        assert page.locator('html').evaluate('(el)=>el.scrollWidth')<=w
-        page.locator('input[data-key="load"]').fill('92')
-        assert int(page.locator('#main-result').inner_text()) > 164
-        # Cruise-only ΔISA/OAT mode. Keep deviation fixed when PA changes.
-        page.locator('input[data-key="load"]').fill('80')
-        assert page.locator('#temp-mode-toggle').inner_text()=='ΔISA'
-        page.locator('#temp-mode-toggle').click()
-        assert page.locator('#temp-mode-toggle').inner_text()=='OAT'
-        page.locator('input[data-key="oat"]').fill('0')
-        assert page.locator('#secondary-result').inner_text()=='0 °C'
-        assert page.locator('#main-result').inner_text()=='164'
-        page.locator('input[data-key="oat"]').fill('10')
-        assert page.locator('#secondary-result').inner_text()=='10 °C'
-        page.locator('input[data-key="pa"]').fill('8000')
-        assert page.locator('#secondary-result').inner_text()=='10 °C'
-        page.locator('input[data-key="pa"]').fill('18000')
-        assert page.locator('#secondary-result').inner_text()=='10 °C'
-        assert page.locator('#main-result').inner_text()!='—',page.locator('#banner').inner_text()
-        page.locator('input[data-key="load"]').fill('92')
-        assert page.locator('#main-result').inner_text()!='—'
-        page.locator('input[data-key="oat"]').fill('-10')
-        assert page.locator('#main-result').inner_text()!='—'
-        page.locator('input[data-key="oat"]').fill('30')
-        assert page.locator('#main-result').inner_text()!='—'
-        page.locator('input[data-key="oat"]').fill('31')
-        assert page.locator('#main-result').inner_text()=='—'
-        page.locator('input[data-key="oat"]').fill('10')
-        page.locator('input[data-key="pa"]').fill('18001')
-        assert page.locator('#main-result').inner_text()=='—'
-        page.locator('input[data-key="pa"]').fill('18000')
-        assert page.locator('#main-result').inner_text()!='—'
-        page.locator('#temp-mode-toggle').click()
-        assert page.locator('#temp-mode-toggle').inner_text()=='ΔISA'
-        page.locator('#temp-mode-toggle').click()
-        assert page.locator('input[data-key="oat"]').input_value()=='10.0'
-        page.locator('#temp-mode-toggle').click()
-        page.locator('input[data-key="oat"]').fill('30')
-        assert page.locator('#main-result').inner_text()=='—'
-        assert len(errors)==0,errors
-        all_checks+=28
+        assert page.locator('button[data-module="cruise"]').count()==0
+        page.locator('.sheet .close').click()
+        all_checks+=5
         # Landing: same four-card Aero UI, proportional airborne + ground-roll chart.
         # AFM §5.3.11: Landing 4 cards, ISA and runway corrections.
         page.locator('#menu').click()
