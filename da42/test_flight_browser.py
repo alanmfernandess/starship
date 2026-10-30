@@ -51,7 +51,14 @@ with sync_playwright() as p:
   assert page.locator('html').evaluate('(e)=>e.scrollWidth')<=w
   page.locator('#pilot-id').fill('123456')
   page.locator('#import-ofp').click()
-  page.locator('#confirm-plan').wait_for(timeout=15000)
+  page.locator('.heading').get_by_text('PERFORMANCE OVERVIEW').wait_for(timeout=15000)
+  assert page.locator('#confirm-plan, #back-plan, #variant-confirm').count()==0
+  assert page.evaluate("JSON.parse(localStorage.getItem('aero-ui-da42-v1')).inputs.takeoff.mass")==1850
+  assert page.locator('.metric').count()==4
+  page.locator('#open-review').click()
+  assert page.locator('.heading').inner_text().find('IMPORTED FLIGHT PLAN')>=0
+  assert page.locator('.list-title').first.inner_text()=='FLIGHT DATA'
+  assert page.locator('#confirm-plan, #back-plan, #variant-confirm').count()==0
   assert 'SBGR' in page.locator('.route').inner_text()
   assert 'SBFL' in page.locator('.route').inner_text()
   plane=page.locator('.route .plane-line .icon')
@@ -77,9 +84,15 @@ with sync_playwright() as p:
   assert page.locator('#field-alternateDistance').evaluate("(e)=>getComputedStyle(e).appearance==='textfield'")
 
   assert 'QNH' in page.locator('.tile').all_inner_texts()[-2] or page.get_by_text('ORIGIN QNH').count()==1
-  assert page.locator('#variant-confirm').count()==0
+  assert page.locator('#variant-confirm, #confirm-plan, #back-plan').count()==0
   assert 'CONFIRM DA42 NG' not in page.locator('main').inner_text()
-  page.locator('#confirm-plan').click()
+  # Editing a reviewed value immediately updates performance inputs.
+  page.locator('#field-takeoffWeight').fill('1845')
+  page.locator('#field-takeoffWeight').press('Tab')
+  assert page.evaluate("JSON.parse(localStorage.getItem('aero-ui-da42-v1')).inputs.takeoff.mass")==1845
+  page.locator('#field-takeoffWeight').fill('1850')
+  page.locator('#field-takeoffWeight').press('Tab')
+  page.locator('[data-view="summary"]').click()
   assert page.locator('.heading').inner_text().find('PERFORMANCE OVERVIEW')>=0
   assert page.locator('.metric').count()==4
   assert page.locator('.metric').nth(1).inner_text().find('120')!=-1
@@ -100,18 +113,17 @@ with sync_playwright() as p:
   generic=json.loads(json.dumps(payload))
   generic['aircraft']['name']='Diamond DA42'
   page.evaluate("(data)=>window.AeroFlight.acceptRaw(data,'SIMBRIEF')",generic)
-  assert page.locator('#variant-confirm').count()==0
+  assert page.locator('#variant-confirm, #confirm-plan, #back-plan').count()==0
   assert 'CONFIRM DA42 NG' not in page.locator('main').inner_text()
-  assert page.locator('#confirm-plan').is_enabled()
-  page.locator('#confirm-plan').click()
   assert 'PERFORMANCE OVERVIEW' in page.locator('.heading').inner_text()
   # A different aircraft is still blocked automatically.
   mismatch=json.loads(json.dumps(payload))
   mismatch['aircraft']['icao_code']='B738'
   page.evaluate("(data)=>window.AeroFlight.acceptRaw(data,'SIMBRIEF')",mismatch)
-  assert page.locator('#variant-confirm').count()==0
+  assert page.locator('#variant-confirm, #confirm-plan, #back-plan').count()==0
   assert 'AIRCRAFT MISMATCH' in page.locator('.status').inner_text()
-  assert page.locator('#confirm-plan').is_disabled()
+  assert 'IMPORTED FLIGHT PLAN' in page.locator('.heading').inner_text()
+  assert page.evaluate("JSON.parse(localStorage.getItem('aero-ui-da42-v1')).inputs.takeoff.mass")==1850
   assert not errors,errors
   context.close()
  browser.close()
