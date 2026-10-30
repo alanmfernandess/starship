@@ -31,6 +31,7 @@ assert.equal(proposed.inputs.runway.qnh,1025);
 assert.equal(proposed.inputs.takeoff.oat,28);
 assert.equal(proposed.inputs.landing.mass,1730);
 assert.equal(proposed.inputs.cruiseperf.pa,10000);
+assert.equal(proposed.inputs.climb.profileTarget,10000);
 assert.equal(proposed.inputs.takeoff.wind,null); // unknown wind clears stale headwind
 assert.equal(p.runway.identifier,'10R');
 assert.equal(p.runway.tora,null);
