@@ -164,7 +164,7 @@ function comparisonPage(){
   comp('WIND',o.windDir===null?null:o.windDir+'°/'+o.windSpeed+' KT',null,'');
   body+='<p class="sub">METAR/TAF são registros do OFP. Não representam meteorologia atualizada.</p>';
  }
- body+='</section><button class="secondary stretch" id="back-summary">BACK TO SUMMARY</button>';
+ body+='</section>';
  return body;
 }
 function modulesPage(){
@@ -196,13 +196,22 @@ function heading(){
 }
 function render(){
  const page=view==='plan'?planPage():view==='review'?reviewPage():view==='summary'?summaryPage():view==='comparison'?comparisonPage():view==='modules'?modulesPage():morePage();
- root.innerHTML='<div class="phone"><header class="topbar"><button id="back-or-menu" aria-label="Open menu">'+icon('menu')+'</button><h1>DA42 NG</h1><button id="open-more" aria-label="Settings">'+icon('settings')+'</button></header>'+
+ root.innerHTML='<div class="phone"><header class="topbar"><button id="back-or-menu" class="header-back" aria-label="Back" type="button">'+icon('back')+'<span>BACK</span></button><h1>DA42 NG</h1><button id="open-more" aria-label="Settings">'+icon('settings')+'</button></header>'+
  '<main class="content" id="scroll-content">'+heading()+page+(view==='plan'?'':'<p class="disclaimer">EXPERIMENTAL PERFORMANCE · NOT FOR FLIGHT</p>')+'</main>'+
  '<nav class="bottom" aria-label="Main navigation">'+[['plan','PLAN'],['summary','SUMMARY'],['modules','MODULES'],['more','MORE']].map(([k,label])=>
  '<button type="button" class="nav '+((view===k||view==='review'&&k==='plan'||view==='comparison'&&k==='summary')?'active':'')+'" data-view="'+k+'" aria-label="'+label+'">'+icon(k)+'<span>'+label+'</span></button>').join('')+'</nav></div>';
  bind();
 }
 function show(v){view=v;err='';render()}
+function goBack(){
+ // Every editable value is persisted on its input/change event.
+ // Return to the logical parent without resetting the imported OFP.
+ if(view==='comparison'||view==='review')return show(plan&&reviewed?'summary':'modules');
+ if(view==='summary'||view==='plan')return show('modules');
+ if(view==='modules')return show(plan?(reviewed?'summary':'review'):'plan');
+ if(view==='more')return show(plan?(reviewed?'summary':'review'):'modules');
+ return show('modules');
+}
 function setStatus(message,isError){loading=false;err=isError?message:'';view='plan';render()}
 function acceptRaw(raw,source){
  const next=C.normalize(raw);next.source=source;
@@ -260,7 +269,7 @@ function applyPlan(navigate=true){
 function bind(){
  root.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>show(b.dataset.view==='plan'&&plan?(reviewed?'summary':'review'):b.dataset.view));
  const more=root.querySelector('#open-more');if(more)more.onclick=()=>show('more');
- const menu=root.querySelector('#back-or-menu');if(menu)menu.onclick=()=>show(view==='review'&&plan?(reviewed?'summary':'review'):view==='comparison'?'summary':'modules');
+ const back=root.querySelector('#back-or-menu');if(back)back.onclick=goBack;
  const pilot=root.querySelector('#pilot-id');if(pilot){
   pilot.oninput=()=>{pilotId=pilot.value.replace(/\D/g,'').slice(0,7);pilot.value=pilotId};
   pilot.onkeydown=e=>{if(e.key==='Enter')importPilot()};
@@ -282,7 +291,6 @@ function bind(){
  const go=root.querySelector('#go-plan');if(go)go.onclick=()=>show('plan');
  const reviewAgain=root.querySelector('#open-review');if(reviewAgain)reviewAgain.onclick=()=>show('review');
  const compare=root.querySelector('#open-comparison');if(compare)compare.onclick=()=>show('comparison');
- const backSum=root.querySelector('#back-summary');if(backSum)backSum.onclick=()=>show('summary');
  root.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{compareTab=b.dataset.tab;render()});
  const clear=root.querySelector('#clear-plan');if(clear)clear.onclick=()=>{
   plan=null;reviewed=false;err='';
