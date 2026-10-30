@@ -78,7 +78,15 @@
 .secondary strong.negative{color:var(--amber)}
 .banner{margin-top:10px;min-height:13px;color:#7892a3;font-size:9px;text-align:center;letter-spacing:.18px}.banner.error{color:#ffbb9c}.banner.warning{color:#e7b46d}
 .bottom{height:65px;flex:0 0 auto;display:flex;justify-content:space-around;align-items:center;padding:3px 24px 10px;background:var(--bg)}.nav-btn{color:#839bae;background:none;border:0;width:46px;height:47px;display:grid;place-items:center;border-radius:10px}.nav-btn.active{color:var(--blue)}.nav-btn .icon{width:23px;height:23px}
-.sheet-backdrop{position:absolute;inset:0;background:#050b12ab;z-index:4;display:flex;align-items:flex-end}.sheet{width:100%;max-height:79%;overflow:auto;background:#17232e;border-radius:24px 24px 0 0;padding:20px 20px max(24px,env(safe-area-inset-bottom));box-shadow:0 -8px 40px #0003}.sheet-header{display:flex;align-items:center;justify-content:space-between;padding-bottom:16px;border-bottom:1px solid var(--line);margin-bottom:16px}.sheet h2{font-size:18px;margin:0;font-weight:500}.sheet button.close{border:0;background:none;color:#9cb4c3;font-size:11px;font-weight:650;letter-spacing:.35px;padding:7px 1px}.sheet .option{width:100%;min-height:62px;border:none;background:#202d39;color:#ecf5fa;text-align:left;border-radius:14px;padding:12px 15px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:12px}.sheet .option.selected{box-shadow:inset 0 0 0 1px var(--blue)}.sheet .option svg{width:18px;height:18px;color:var(--blue)}.sheet small{color:#a7bdc8;line-height:1.5;font-size:12px;display:block;margin-top:12px}.sheet .mini{font-size:12px;color:#91a9b9}.sheet .disclaimer{margin-top:16px;color:#e2b176;font-size:12px;line-height:1.5}.sheet .history-empty{color:#90a7b7;font-size:12px;margin:20px 0}.sheet .small-action{background:transparent;border:1px solid #415567;border-radius:10px;color:#aec2d0;padding:11px 14px;width:100%;margin-top:10px}
+.sheet-backdrop{position:absolute;inset:0;background:#050b12ab;z-index:4;display:flex;align-items:flex-end}.sheet{width:100%;max-height:79%;overflow:auto;background:#17232e;border-radius:24px 24px 0 0;padding:20px 20px max(24px,env(safe-area-inset-bottom));box-shadow:0 -8px 40px #0003}.sheet-header{display:flex;align-items:center;justify-content:space-between;padding-bottom:16px;border-bottom:1px solid var(--line);margin-bottom:16px}.sheet h2{font-size:18px;margin:0;font-weight:500}.sheet button.close{border:0;background:none;color:#9cb4c3;font-size:11px;font-weight:650;letter-spacing:.35px;padding:7px 1px}.sheet .option{width:100%;min-height:62px;border:none;background:#202d39;color:#ecf5fa;text-align:left;border-radius:14px;padding:12px 15px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:12px}.sheet .option.selected{box-shadow:inset 0 0 0 1px var(--blue)}.sheet .option.menu-option{min-height:68px;gap:13px;padding:12px 14px;display:flex}
+.menu-option .menu-glyph{width:27px;display:flex;justify-content:center;align-items:center;color:var(--blue);flex:none}
+.menu-option .menu-glyph .icon{width:23px;height:23px;stroke-width:1.9}
+.menu-option .menu-copy{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}
+.menu-option .menu-copy strong{font-size:12px;font-weight:650;letter-spacing:.12px;line-height:1.2}
+.menu-option .menu-caption{font-size:10px;color:var(--label);line-height:1.25}
+.menu-option .menu-arrow{flex:none;color:var(--blue)}
+.menu-option .menu-arrow .icon{width:18px;height:18px}
+.sheet .option svg{width:18px;height:18px;color:var(--blue)}.sheet small{color:#a7bdc8;line-height:1.5;font-size:12px;display:block;margin-top:12px}.sheet .mini{font-size:12px;color:#91a9b9}.sheet .disclaimer{margin-top:16px;color:#e2b176;font-size:12px;line-height:1.5}.sheet .history-empty{color:#90a7b7;font-size:12px;margin:20px 0}.sheet .small-action{background:transparent;border:1px solid #415567;border-radius:10px;color:#aec2d0;padding:11px 14px;width:100%;margin-top:10px}
 @media(max-width:355px){.topbar{height:78px;margin:0 17px}.scroller{padding:0 17px 12px}.module-heading{margin-top:22px;margin-bottom:13px}.field{height:87px;padding:13px 12px 9px}.field input,.field.readonly .power-value{font-size:27px}.result{min-height:265px}.plot{height:125px}}
 @media(max-height:730px){.topbar{height:72px;padding-top:17px}.module-heading{margin-top:15px;margin-bottom:12px}.field{height:87px}.fields{margin-bottom:10px}.result{padding-top:14px;min-height:265px}.plot{height:124px}.bottom{height:57px}}
 @media(prefers-reduced-motion:no-preference){.sheet{animation:rise .2s ease-out}@keyframes rise{from{transform:translateY(15px);opacity:.85}to{transform:translateY(0);opacity:1}}}
@@ -361,7 +369,13 @@ function compute(id,v){if(id==='takeoff')return window.TakeoffTables.compute(uni
 }
 function verticalFmt(v){return current==='climb'?fmt(v,1):fmt(Math.trunc(v*100)/100,2)}
 function fmt(v,n=0){if(!Number.isFinite(v))return '—';return new Intl.NumberFormat('en-US',{maximumFractionDigits:n,minimumFractionDigits:n}).format(v)}
-function icon(name){const paths={back:'<path d="m15 5-7 7 7 7"/>',menu:'<path d="M4 7h16M4 12h12M4 17h8"/>',sliders:'<path d="M4 6h8m4 0h4M4 12h3m7 0h6M4 18h10m6 0h0"/><circle cx="14" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="17" cy="18" r="2"/>',calculator:'<rect x="5" y="2.5" width="14" height="19" rx="2"/><path d="M8 7.5h8M8 12h1m3 0h1m3 0h0M8 16h1m3 0h1m3 0h0"/>',chart:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M5 15l4-5 3 3 4-6 3 3"/>',history:'<path d="M3 11a9 9 0 1 1 2.6 6.4M3 4v7h7M12 7v5l3 2"/>',chartUp:'<path d="M3 17v4m4-8v8m4-10v10m4-13v13m4-17v17M2 10l6-5 4 3 8-6m-5 0h5v5"/>',close:'<path d="M5 5l14 14M19 5L5 19"/>',check:'<path d="m5 12 5 5L20 7"/>',next:'<path d="m9 5 7 7-7 7"/>'};return `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">${paths[name]||paths.chart}</svg>`}
+function icon(name){const paths={clipboard:'<rect x="5" y="4" width="14" height="18" rx="2"/><path d="M9 3h6v4H9zM9 12h6M9 16h6"/>',
+scale:'<path d="M12 3v18M7 21h10M5 7h14M5 7l-3 6h6L5 7zM19 7l-3 6h6L19 7z"/>',
+planeTakeoff:'<path d="M2 19h20M5 15l5-2-2.5-5 2-1 5 4 4.2-1.4a2 2 0 0 1 2.6 1.6L4 17z"/>',
+trend:'<path d="M3 17l6-6 4 4 8-8M15 7h6v6"/>',
+gauge:'<path d="M5 17a9 9 0 1 1 14 0M12 14l4-5M7 18h10"/>',
+planeLanding:'<path d="M2 19h20M5 7l5 2 2.5-4 2 1-1 5 6 3a2 2 0 0 1-1 3L4 10z"/>',
+rotate:'<path d="M3 11a9 9 0 1 0 3-6M3 4v7h7"/>',back:'<path d="m15 5-7 7 7 7"/>',menu:'<path d="M4 7h16M4 12h12M4 17h8"/>',sliders:'<path d="M4 6h8m4 0h4M4 12h3m7 0h6M4 18h10m6 0h0"/><circle cx="14" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="17" cy="18" r="2"/>',calculator:'<rect x="5" y="2.5" width="14" height="19" rx="2"/><path d="M8 7.5h8M8 12h1m3 0h1m3 0h0M8 16h1m3 0h1m3 0h0"/>',chart:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M5 15l4-5 3 3 4-6 3 3"/>',history:'<path d="M3 11a9 9 0 1 1 2.6 6.4M3 4v7h7M12 7v5l3 2"/>',chartUp:'<path d="M3 17v4m4-8v8m4-10v10m4-13v13m4-17v17M2 10l6-5 4 3 8-6m-5 0h5v5"/>',close:'<path d="M5 5l14 14M19 5L5 19"/>',check:'<path d="m5 12 5 5L20 7"/>',next:'<path d="m9 5 7 7-7 7"/>'};return `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">${paths[name]||paths.chart}</svg>`}
 
 /* Air distance = AFM total distance over 50 ft minus ground roll.
  * Segments scale proportionally to current calculation; no fixed art.
@@ -740,24 +754,20 @@ function refresh(){
 
 function showSheet(type){if(type==='runwayanalysis'&&(current==='runway'||current==='takeoff'))return window.RunwayUI.open(inputs.takeoff,render,icon,escapeHTML);const main=el('.phone'),title={modules:'PERFORMANCE',settings:'PREFERÊNCIAS',chart:'SENSIBILIDADE',history:'HISTÓRICO',runway:'RUNWAY',runwayanalysis:'RUNWAY'}[type]||'';const v=inputs[current];const r=compute(current,v);let content='';
  if(type==='modules'){
-  const names={
-   takeoff:'TAKEOFF PERFORMANCE',
-   climb:'CLIMB',
-   oei:'ONE ENGINE CLIMB / DESCENT',
-   cruise:'CRUISE',
-   landing:'LANDING',
-   abnormal:'ABNORMAL LANDING',
-   goaround:'GO-AROUND',
-   timeclimb:'TIME · FUEL · DISTANCE TO CLIMB',
-   cruiseperf:'CRUISE PERFORMANCE',
-   runway:'RUNWAY ANALYSIS'
-  };
-  const weightBalance='<a class="option" href="./wb.html" style="text-decoration:none"><span><strong>WEIGHT &amp; BALANCE</strong></span>'+icon('next')+'</a>';
-   const flightPlan='<a class="option" href="./flight.html" style="text-decoration:none"><strong>FLIGHT PLAN</strong>'+icon('next')+'</a>';
-  content=flightPlan+Object.entries(MODELS).filter(([k])=>k!=='runway').map(([k,m])=>
-   (k==='timeclimb'?weightBalance:'')+
-   `<button class="option ${current===k?'selected':''}" data-module="${k}"><span><strong>${escapeHTML(names[k]||m.label)}</strong></span>${current===k?icon('check'):icon('next')}</button>`
-  ).join('');
+  const items=[
+   ['flight','FLIGHT PLAN','SimBrief · OFP','clipboard','./flight.html'],
+   ['wb','WEIGHT & BALANCE','Loading · CG','scale','./wb.html'],
+   ['takeoff','TAKEOFF PERFORMANCE','Distance · Runway','planeTakeoff',''],
+   ['climb','CLIMB PERFORMANCE','Both engines · OEI · Profile','trend',''],
+   ['cruiseperf','CRUISE PERFORMANCE','TAS · Fuel flow','gauge',''],
+   ['landing','LANDING PERFORMANCE','Normal · Abnormal','planeLanding',''],
+   ['goaround','GO-AROUND PERFORMANCE','Climb · VREF','rotate','']
+  ];
+  content=items.map(([k,name,sub,glyph,url])=>{
+   const contents='<span class="menu-glyph">'+icon(glyph)+'</span><span class="menu-copy"><strong>'+escapeHTML(name)+'</strong><span class="menu-caption">'+escapeHTML(sub)+'</span></span><span class="menu-arrow">'+icon('next')+'</span>';
+   return url?'<a class="option menu-option" href="'+url+'">'+contents+'</a>':
+    '<button class="option menu-option '+(current===k?'selected':'')+'" type="button" data-module="'+k+'">'+contents+'</button>';
+  }).join('');
  }
  if(type==='settings')content=`<div class="mini">AERO UI · MASTER DESIGN 1.0</div><small>Parâmetros: gráficos do DA42 NG enviados pelo usuário. Condições Takeoff: procedimento Normal (Flaps UP, Vᴿ 80 KIAS, V₅₀ 85 KIAS) ou Short Field (Flaps APP, Vᴿ 76 KIAS, V₅₀ 82 KIAS), ambos MAX, fatores de vento e pista do AFM §5.3.6; Climb: ambos 92%, trem recolhido, flaps UP (90 ou 92 KIAS conforme massa) / APP (85 KIAS), e motor restante a 92%/85 KIAS no OEI, com motor inoperante embandeirado e assegurado. Cruzeiro: 2 motores, carga 50–92% e ISA −10/+30 °C, até 18.000 ft. Pouso: AFM §5.3.11 tabulado para 1700/1900/1999 kg, flaps LDG, ambos IDLE, VREF 84/86 KIAS; anormal: flaps UP/APP, VREF 86/92 KIAS. Vento, pista e declive conforme as correções da seção. Arremetida: AFM §5.3.12, 1700/1900/1999 kg, 0–10000 ft, OAT −20/+50 °C ou coluna ISA, VREF 84 ou 86 KIAS conforme massa; flaps LDG, trem estendido, ambos MAX.</small><div class="disclaimer">MODELO DE ENGENHARIA PRELIMINAR<br>Takeoff, Climb, OEI, Time/Fuel/Distance to Climb, Cruise Performance e Landing/Abnormal Landing: tabelas AFM §§5.3.6–5.3.12 digitalizadas, incluindo 1.999 kg, com interpolação somente no domínio publicado. A operação a 1.999 kg depende da aplicabilidade da modificação MÄM 42-678 e dos limites de massa/CG correspondentes. Tempo/combustível/distância de subida derivam de diferenças cumulativas ISA, sem combustível de partida/táxi/decolagem e sem correção de vento. Outros cálculos gráficos ainda podem utilizar modelos preliminares. Não utilizar para planejamento, despacho ou execução de voo.</div><button class="small-action" id="reset">RESTAURAR VALORES DE EXEMPLO</button>`;
  if(type==='runway'&&current==='takeoff')content=[
