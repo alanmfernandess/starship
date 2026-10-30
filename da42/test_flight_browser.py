@@ -158,6 +158,36 @@ with sync_playwright() as p:
   assert 'PERFORMANCE OVERVIEW' in page.locator('.heading').inner_text()
   assert page.locator('#pilot-id').count()==0
   assert page.locator('html').evaluate('(e)=>e.scrollWidth')<=w
+  # End-to-end SimBrief TLR runway import: true TORA, calculated
+  # headwind and gradient are applied; unknown surface blocks the answer.
+  tlr=json.loads(json.dumps(payload))
+  tlr['tlr']={'takeoff':{'conditions':{'airport_icao':'SBGR','planned_runway':'10R','surface_condition':'dry'},
+    'runway':[{'identifier':'10R','length':'5000','length_tora':'3000',
+      'true_course':'110','magnetic_course':'109','headwind_component':'9.8','gradient':'1.5'}]}}
+  page.evaluate("(data)=>window.AeroFlight.acceptRaw(data,'SIMBRIEF')",tlr)
+  assert page.evaluate("JSON.parse(localStorage.getItem('aero-ui-da42-v1')).inputs.runway.length")==914.4
+  assert page.evaluate("JSON.parse(localStorage.getItem('aero-ui-da42-v1')).inputs.runway.wind")==9
+  assert page.evaluate("JSON.parse(localStorage.getItem('aero-ui-da42-v1')).inputs.runway.slopeVerified") is True
+  assert page.evaluate("JSON.parse(localStorage.getItem('aero-ui-da42-v1')).inputs.runway.surfaceVerified") is False
+  page.locator('[data-view="modules"]').click()
+  page.locator('a[href*="module=runway"]').click()
+  assert page.evaluate("window.AeroCalc.inputs.runway.runwayId")=='10R'
+  assert page.evaluate("window.AeroCalc.compute('runway',window.AeroCalc.inputs.runway).error")=='RUNWAY SURFACE REQUIRED'
+  page.locator('#analysis-settings').click()
+  assert 'RUNWAY · 10R' in page.locator('.rw-context').inner_text()
+  assert page.locator('#rw-wind-output').inner_text().startswith('+9 KT')
+  page.locator('#rw-surface').click()
+  page.locator('button[data-rw-pick="paved"]').click()
+  page.locator('#rw-save-back').click()
+  assert page.evaluate("window.AeroCalc.inputs.runway.surfaceVerified") is True
+  assert page.evaluate("window.AeroCalc.compute('runway',window.AeroCalc.inputs.runway).error")==None
+  # Import a different OFP without TLR: clear previous runway inputs.
+  page.locator('#menu').click()
+  page.locator('.sheet a.option[href="./flight.html"]').click()
+  page.evaluate("(data)=>window.AeroFlight.acceptRaw(data,'SIMBRIEF')",payload)
+  assert page.evaluate("JSON.parse(localStorage.getItem('aero-ui-da42-v1')).inputs.runway.length")==0
+  assert page.evaluate("JSON.parse(localStorage.getItem('aero-ui-da42-v1')).inputs.runway.toraVerified") is False
+  assert page.evaluate("JSON.parse(localStorage.getItem('aero-ui-da42-v1')).inputs.runway.windVerified") is False
   # Generic DA42 OFPs must not require a manual variant checkbox.
   generic=json.loads(json.dumps(payload))
   generic['aircraft']['name']='Diamond DA42'
