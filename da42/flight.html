@@ -79,6 +79,17 @@ label{display:block;font-size:11px;font-weight:600;color:#aabfce;letter-spacing:
 .review-heading .icon{width:18px;height:18px;color:var(--amber);flex:none}
 .review-line{padding:9px 0;border-bottom:1px solid var(--line);color:#adc1ce;font-size:11px;line-height:1.35;letter-spacing:.05px}
 .review-line:last-child{border-bottom:0}
+/* Reviewed OFP: compact by default; full technical notes available per item. */
+.review-details .review-detail{border-bottom:1px solid var(--line)}
+.review-details .review-detail:last-child{border-bottom:0}
+.review-details .review-line{display:flex;align-items:center;justify-content:space-between;gap:10px;list-style:none;cursor:pointer;min-height:41px;border:0;padding:10px 0;color:#adc1ce;font-size:11px;font-weight:500;letter-spacing:.1px}
+.review-details .review-line::-webkit-details-marker{display:none}
+.review-details .review-line::marker{content:''}
+.review-details .review-line .icon{width:16px;height:16px;flex:none;color:#8eaabd;transition:transform .16s ease}
+.review-details .review-detail[open] .review-line .icon{transform:rotate(90deg)}
+.review-details .review-explanation{margin:0;padding:0 18px 12px 0;color:#9fb5c3;font-size:10px;line-height:1.5;overflow-wrap:anywhere}
+.review-details .review-heading{margin-bottom:5px}
+
 .review-action{width:100%;border:0;border-top:1px solid var(--line);background:transparent;color:#bfd9e8;font-size:11px;font-weight:700;letter-spacing:.3px;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;padding:13px 0 1px;margin-top:5px;min-height:43px}
 .review-action .icon{width:17px;height:17px;color:var(--blue);flex:none}
 .comparison-action{min-height:60px;padding:14px 16px;margin-bottom:0;font-size:12px;letter-spacing:.15px;font-weight:600}
