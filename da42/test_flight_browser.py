@@ -54,6 +54,14 @@ with sync_playwright() as p:
   page.locator('#confirm-plan').wait_for(timeout=15000)
   assert 'SBGR' in page.locator('.route').inner_text()
   assert 'SBFL' in page.locator('.route').inner_text()
+  plane=page.locator('.route .plane-line .icon')
+  assert plane.count()==1
+  # Authentic aircraft silhouette replaces the former 3-stroke placeholder.
+  assert plane.locator('path').get_attribute('d').startswith('M17.8 19.2 16 11')
+  assert plane.evaluate("(e)=>getComputedStyle(e).transform")!='none'
+  center=plane.bounding_box()
+  route=page.locator('.route').bounding_box()
+  assert abs((center['x']+center['width']/2)-(route['x']+route['width']/2))<6, (w,h,'aircraft offset',center,route)
   assert 'SBNF' in page.locator('.route-foot').inner_text()
   assert page.locator('#field-distance').input_value()=='420'
   assert page.locator('#field-takeoffWeight').input_value()=='1850'
