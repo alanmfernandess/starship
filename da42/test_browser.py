@@ -79,7 +79,7 @@ with sync_playwright() as p:
         assert page.locator('.sheet button[data-module] strong').all_inner_texts()==expected_modules
         assert page.locator('.sheet a.option[href="./wb.html"] strong').inner_text()=='WEIGHT & BALANCE'
         assert page.locator('.sheet .option').count()==12
-        assert page.locator('.sheet a.option[href="./flight.html"] strong').inner_text()=='FLIGHT PLAN / SIMBRIEF'
+        assert page.locator('.sheet a.option[href="./flight.html"] strong').inner_text()=='FLIGHT PLAN'
         assert page.locator('.sheet .option .sub').count()==0
         assert page.locator('.sheet .option').evaluate_all("(xs)=>xs.every(x=>x.querySelectorAll('strong').length===1)")
         assert page.locator('html').evaluate('(el)=>el.scrollWidth')<=w
