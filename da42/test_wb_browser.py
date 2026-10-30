@@ -46,6 +46,14 @@ with sync_playwright() as p:
         assert page.locator('.sheet a.action').all_inner_texts()==['FLIGHT PLAN','PERFORMANCE','WEIGHT & BALANCE']
         assert page.locator('.sheet-head .close').count()==0
         assert page.locator('.sheet > .sheet-return').inner_text()=='BACK'
+        assert page.locator('.sheet a.action').count()==3
+        assert page.locator('.sheet').evaluate("""(s)=>{
+            const buttons=[...s.querySelectorAll('a.action'),s.querySelector('.sheet-return')];
+            const props=buttons.map(x=>getComputedStyle(x));
+            const common=['fontFamily','fontSize','fontWeight','borderRadius','backgroundColor','borderTopColor','lineHeight'];
+            return buttons.every(x=>x&&x.getBoundingClientRect().height>=51)
+               &&common.every(k=>props.every(y=>y[k]===props[0][k]));
+        }"""), (w,h,'W&B action and BACK must share design tokens')
         assert [x.split('/')[-1] for x in page.locator('.sheet a.action').evaluate_all("(xs)=>xs.map(a=>a.getAttribute('href'))")]==['flight.html','index.html?calculator=1','wb.html']
         page.locator('.close').click()
         assert page.locator('svg.graph polygon').count()==1

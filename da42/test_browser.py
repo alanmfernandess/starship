@@ -90,6 +90,20 @@ with sync_playwright() as p:
         assert page.locator('.sheet button[data-module] strong').all_inner_texts()==expected_modules
         assert page.locator('.sheet-header .close').count()==0
         assert page.locator('.sheet > .sheet-return').inner_text()=='BACK'
+        assert page.locator('.sheet').evaluate("""(s)=>{
+          const items=[...s.querySelectorAll('.menu-option')],back=s.querySelector('.sheet-return');
+          if(!items.length||!back)return false;
+          const st=getComputedStyle(back);
+          return items.every(item=>{
+            const row=getComputedStyle(item),label=getComputedStyle(item.querySelector('strong'));
+            return row.backgroundColor===st.backgroundColor &&
+              row.borderTopColor===st.borderTopColor &&
+              row.borderRadius===st.borderRadius &&
+              label.fontFamily===st.fontFamily &&
+              label.fontWeight===st.fontWeight &&
+              label.fontSize===st.fontSize;
+          });
+        }"""), (w,h,'Performance menu typography and BACK design')
         assert page.locator('.sheet a.option[href="./wb.html"] strong').inner_text()=='WEIGHT & BALANCE'
         assert page.locator('.sheet .option').count()==7
         assert page.locator('.sheet a.option[href="./flight.html"] strong').inner_text()=='FLIGHT PLAN'

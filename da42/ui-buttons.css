@@ -1,0 +1,108 @@
+/* Aero UI DA42 NG — shared action-button design tokens.
+ * One visual hierarchy across Performance, W&B and Flight Plan.
+ * Smaller tabs, navigation icons, badges and inputs retain their own scale.
+ */
+:root {
+ --aero-action-font:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Arial,sans-serif;
+ --aero-action-font-size:13px;
+ --aero-action-weight:600;
+ --aero-action-radius:13px;
+ --aero-action-min-height:58px;
+ --aero-action-fill:#243c4d;
+ --aero-action-border:#456b80;
+ --aero-action-foreground:#dcebf4;
+}
+.phone button,.phone a{font-family:var(--aero-action-font)}
+/* Standardized typography and geometry of primary-sized actions. */
+.phone .page-back button,
+.phone .sheet .close.sheet-return,
+.phone .sheet .action,
+.phone .sheet a.action,
+.phone .sheet .option,
+.phone .open-load,
+.phone .optimize-row .optimize-button,
+.phone .optimize-row .restore-simulated,
+.phone .card-button,
+.phone .primary,
+.phone .secondary,
+.phone .runway-ui .rw-footer button,
+.phone .sheet .small-action {
+ font-family:var(--aero-action-font);
+ font-size:var(--aero-action-font-size);
+ font-weight:var(--aero-action-weight);
+ line-height:1.25;
+ letter-spacing:.15px;
+ border-radius:var(--aero-action-radius);
+}
+.phone .page-back button,
+.phone .sheet .close.sheet-return,
+.phone .sheet .action,
+.phone .sheet a.action,
+.phone .runway-ui .rw-footer button {
+ min-height:var(--aero-action-min-height);
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ width:100%;
+ padding:12px 14px;
+ background:var(--aero-action-fill);
+ color:var(--aero-action-foreground);
+ border:1px solid var(--aero-action-border);
+ text-align:center;
+ text-decoration:none;
+}
+/* All navigable cards are the same button family, including module choices. */
+.phone .sheet .option,
+.phone .open-load,
+.phone .card-button {
+ background:var(--aero-action-fill);
+ color:var(--aero-action-foreground);
+ border:1px solid var(--aero-action-border);
+}
+.phone .sheet .option{min-height:var(--aero-action-min-height)}
+.phone .sheet .option.menu-option,
+.phone .module-card{min-height:68px}
+.phone .sheet:has(.menu-option) > .sheet-return{min-height:68px}
+.phone .sheet .menu-option .menu-copy strong,
+.phone .sheet .rw-picker strong,
+.phone .open-load .main,
+.phone .module-card .module-copy strong{
+ font-family:var(--aero-action-font);
+ font-size:var(--aero-action-font-size);
+ font-weight:var(--aero-action-weight);
+ letter-spacing:.15px;
+}
+.phone .sheet .option.selected{box-shadow:inset 0 0 0 1px var(--blue)}
+.phone .sheet .option:active,.phone .page-back button:active,
+.phone .sheet .close.sheet-return:active,
+.phone .sheet .action:active,.phone .sheet a.action:active,
+.phone .open-load:active,.phone .card-button:active{background:#2c4b60}
+/* Primary and secondary actions preserve their meaning through color only. */
+.phone .optimize-row .optimize-button,
+.phone .optimize-row .restore-simulated{
+ min-height:var(--aero-action-min-height);
+ font-size:var(--aero-action-font-size);
+ font-weight:var(--aero-action-weight);
+ border-radius:var(--aero-action-radius);
+}
+.phone .optimize-row .optimize-button{background:#203a4c}
+.phone .optimize-row .restore-simulated{background:#182b38}
+.phone .loading-source,
+.phone .tab,.phone .takeoff-option,
+.phone .check-link,.phone .check-confirm{
+ font-family:var(--aero-action-font);
+ font-weight:var(--aero-action-weight);
+}
+/* Back CTA is not an extra-heavy secondary visual heading. */
+.phone .page-back button,.phone .sheet .close.sheet-return,
+.phone .runway-ui .rw-footer button{font-size:var(--aero-action-font-size);font-weight:var(--aero-action-weight)}
+.phone :is(button,a):focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+@media(max-height:730px){
+ .phone .page-back button,.phone .sheet .close.sheet-return,
+ .phone .sheet .action,.phone .sheet a.action,
+ .phone .runway-ui .rw-footer button{min-height:51px}
+}
+@media(max-width:355px){
+ .phone .optimize-row .optimize-button,
+ .phone .optimize-row .restore-simulated{font-size:11px;letter-spacing:0}
+}

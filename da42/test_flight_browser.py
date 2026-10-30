@@ -39,6 +39,11 @@ with sync_playwright() as p:
   assert page.locator('.topbar #back-or-menu').count()==0
   assert page.locator('.content > .page-back #back-or-menu').count()==1
   assert page.locator('#back-or-menu').inner_text()=='BACK'
+  assert page.locator('.page-back button').evaluate("""(b)=>{
+     const s=getComputedStyle(b);
+     return s.fontSize==='13px' && s.fontWeight==='600' &&
+       s.borderRadius==='13px' && s.fontFamily.includes('Arial');
+  }""")
   assert page.locator('[data-view]').count()==4
   # SIMBRIEF import card must have exactly ONE input and ONE action.
   assert page.locator('.sb-import-card').count()==1
