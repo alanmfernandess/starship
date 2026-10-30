@@ -70,6 +70,7 @@ with sync_playwright() as p:
 
   assert 'QNH' in page.locator('.tile').all_inner_texts()[-2] or page.get_by_text('ORIGIN QNH').count()==1
   assert page.locator('#variant-confirm').count()==0
+  assert 'CONFIRM DA42 NG' not in page.locator('main').inner_text()
   page.locator('#confirm-plan').click()
   assert page.locator('.heading').inner_text().find('PERFORMANCE OVERVIEW')>=0
   assert page.locator('.metric').count()==4
@@ -87,6 +88,22 @@ with sync_playwright() as p:
   page.locator('[data-view="plan"]').click()
   assert page.locator('#import-ofp').count()==1
   assert page.locator('html').evaluate('(e)=>e.scrollWidth')<=w
+  # Generic DA42 OFPs must not require a manual variant checkbox.
+  generic=json.loads(json.dumps(payload))
+  generic['aircraft']['name']='Diamond DA42'
+  page.evaluate("(data)=>window.AeroFlight.acceptRaw(data,'SIMBRIEF')",generic)
+  assert page.locator('#variant-confirm').count()==0
+  assert 'CONFIRM DA42 NG' not in page.locator('main').inner_text()
+  assert page.locator('#confirm-plan').is_enabled()
+  page.locator('#confirm-plan').click()
+  assert 'PERFORMANCE OVERVIEW' in page.locator('.heading').inner_text()
+  # A different aircraft is still blocked automatically.
+  mismatch=json.loads(json.dumps(payload))
+  mismatch['aircraft']['icao_code']='B738'
+  page.evaluate("(data)=>window.AeroFlight.acceptRaw(data,'SIMBRIEF')",mismatch)
+  assert page.locator('#variant-confirm').count()==0
+  assert 'AIRCRAFT MISMATCH' in page.locator('.status').inner_text()
+  assert page.locator('#confirm-plan').is_disabled()
   assert not errors,errors
   context.close()
  browser.close()
