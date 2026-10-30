@@ -31,7 +31,7 @@ assert.equal(proposed.inputs.runway.qnh,1025);
 assert.equal(proposed.inputs.takeoff.oat,28);
 assert.equal(proposed.inputs.landing.mass,1730);
 assert.equal(proposed.inputs.cruiseperf.pa,10000);
-assert.equal(proposed.inputs.takeoff.wind,undefined); // no implied true/magnetic variation
+assert.equal(proposed.inputs.takeoff.wind,null); // unknown wind clears stale headwind
 assert.equal(p.runway.identifier,'10R');
 assert.equal(p.runway.tora,null);
 assert.equal(proposed.inputs.runway.length,0);
@@ -60,6 +60,7 @@ assert.equal(ready.inputs.runway.length,914.4);
 assert.equal(ready.inputs.runway.toraVerified,true);
 assert.equal(ready.inputs.runway.wind,9);
 assert.equal(ready.inputs.runway.windVerified,true);
+assert.equal(ready.inputs.takeoff.wind,9);
 assert.equal(ready.inputs.runway.slope,1.5);
 assert.equal(ready.inputs.runway.slopeVerified,true);
 assert.equal(ready.inputs.runway.surfaceVerified,false);
