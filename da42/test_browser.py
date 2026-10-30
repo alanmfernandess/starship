@@ -346,6 +346,9 @@ with sync_playwright() as p:
         page.locator('#val-pa').focus()
         page.locator('#val-pa').blur()
         assert page.locator('#val-pa').input_value()=='10000'
+        page.locator('#val-pa').fill('10,000')
+        assert page.locator('#val-pa').input_value()=='10000'
+        assert page.locator('#main-result').inner_text()=='156'
         assert page.locator('.field .entry').evaluate_all("""(rows)=>rows.every(r=>{
           const input=r.querySelector('input');
           const output=r.querySelector('output');
