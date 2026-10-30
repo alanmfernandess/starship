@@ -61,6 +61,8 @@ with sync_playwright() as p:
         page.locator('#rw-save-back').click()
         assert page.locator('#main-result').inner_text()=='638'
         page.locator('input[data-key="mass"]').fill('1999')
+        page.locator('input[data-key="mass"]').blur()
+        assert page.locator('input[data-key="mass"]').input_value()=='1999'
         assert page.locator('#main-result').inner_text()!='—'
         page.locator('input[data-key="mass"]').fill('2000')
         assert page.locator('#main-result').inner_text()=='—'
@@ -336,9 +338,24 @@ with sync_playwright() as p:
         page.locator('button[data-module="cruiseperf"]').click()
         assert page.locator('.field').count()==4
         assert page.locator('input[data-key="mass"]').count()==0
-        assert page.locator('.field.readonly .power-value').inner_text()=='1,999'
+        assert page.locator('.field.readonly .power-value').inner_text()=='1999'
         assert page.locator('#main-result').inner_text()=='156'
         assert page.locator('#secondary-result').inner_text()=='13.0 US gal/h'
+        assert page.locator('#val-pa').input_value()=='10000'
+        assert page.locator('.module-heading .accent').count()==0
+        page.locator('#val-pa').focus()
+        page.locator('#val-pa').blur()
+        assert page.locator('#val-pa').input_value()=='10000'
+        assert page.locator('.field .entry').evaluate_all("""(rows)=>rows.every(r=>{
+          const input=r.querySelector('input');
+          const output=r.querySelector('output');
+          if(!input||!output)return true;
+          const a=input.getBoundingClientRect(),b=output.getBoundingClientRect();
+          const c=document.createElement('canvas').getContext('2d');
+          const st=getComputedStyle(input);c.font=st.font;
+          return a.right<=b.left+1 && c.measureText(input.value).width<=a.width+3;
+        })"""),(w,h,'cruise entry alignment')
+        assert all(',' not in v for v in page.locator('.field input').evaluate_all("(els)=>els.map(e=>e.value)"))
         assert page.locator('#cruise-config').inner_text()=='STANDARD'
         assert page.locator('#plot-area svg.cruise-performance-plot').count()==1
         assert page.locator('#plot-area path.cruise-performance-curve').count()>=1
