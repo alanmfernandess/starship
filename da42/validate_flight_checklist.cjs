@@ -48,11 +48,18 @@ app.inputs.takeoff.wind=9;
 assert.equal(states().weather.status,'review','changed wind invalidates weather acknowledgment');
 // The optimizer creates hypothetical passengers and baggage, so its
 // numerical match must not be interpreted as a verified actual manifest.
-const simulated=Object.fromEntries(build(plan,app,wb,verified,'profile',true).map(x=>[x.id,x]));
-assert.equal(simulated.takeoffWeight.status,'review','optimized simulated load must not validate OFP');
-assert.equal(simulated.cg.status,'verify','simulated CG must not be human-confirmable');
-assert.equal(simulated.cg.manual,false);
-assert.ok(simulated.takeoffWeight.detail.includes('SIMULADO'));
+const simulated=Object.fromEntries(build(plan,app,wb,verified,'profile',true,'optimized').map(x=>[x.id,x]));
+assert.equal(simulated.takeoffWeight.status,'checked','a feasible simulator scenario may be the selected loading');
+assert.equal(simulated.cg.status,'checked','feasible scenario resolves the modeled CG');
+assert.equal(simulated.cg.manual,false,'optimizer does not need extra pilot checkbox');
+const imported=Object.fromEntries(build(plan,app,wb,verified,'profile',false,'simbrief').map(x=>[x.id,x]));
+assert.equal(imported.takeoffWeight.status,'checked','valid OFP TOW is authoritative when SIMBRIEF is active');
+assert.equal(imported.cg.status,'verify','SimBrief OFP does not provide station distribution or CG');
+assert.equal(imported.cg.manual,false);
+app.inputs.takeoff.mass=1850;
+assert.equal(build(plan,app,wb,verified,'profile',false,'simbrief')
+ .find(x=>x.id==='takeoffWeight').status,'review','stale performance mass must not remain checked');
+app.inputs.takeoff.mass=1900;
 wb.statuses.cgOK=false;
 const outside=Object.fromEntries(build(plan,app,wb,verified,'profile').map(x=>[x.id,x]));
 assert.equal(outside.takeoffWeight.status,'review','out-of-envelope real load cannot satisfy checklist');

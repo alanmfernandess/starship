@@ -3,7 +3,7 @@
  */
 (function(){
 'use strict';
-const C=window.SimBriefCore,Checklist=window.FlightChecklist,storageKey='aero-ui-da42-v1',flightKey='aero-ui-flight-plan-v1',idKey='aero-ui-simbrief-id-v1';
+const C=window.SimBriefCore,Checklist=window.FlightChecklist,Load=window.LoadingProfile,storageKey='aero-ui-da42-v1',flightKey='aero-ui-flight-plan-v1',idKey='aero-ui-simbrief-id-v1';
 const root=document.getElementById('app'),checkKey='aero-ui-flight-plan-checks-v1';
 let view='plan',compareTab='fuel',pilotId='',plan=null,reviewed=false,loading=false,err='';
 const icons={
@@ -60,7 +60,7 @@ function reviewItems(){
  if(!plan||!Checklist)return [];
  let profile='';
  try{profile=localStorage.getItem('da42-wb-profile-v1')||''}catch{}
- return Checklist.build(plan,getAppInputs(),wbResult(),checkRecord(),profile,localStorage.getItem('da42-wb-optimized-v1')==='true');
+ return Checklist.build(plan,getAppInputs(),wbResult(),checkRecord(),profile,localStorage.getItem('da42-wb-optimized-v1')==='true',Load?Load.mode(localStorage,plan):'manual');
 }
 function checklistCard(context){
  const all=reviewItems();
@@ -189,7 +189,7 @@ function comparisonPage(){
   comp('ZERO FUEL WEIGHT',plan.zeroFuelWeight,wb?.ok?wb.zeroFuel.mass:null,'KG')+
   comp('LANDING WEIGHT',plan.landingWeight,null,'KG')+
   comp('TAKEOFF CG',null,wb?.ok?wb.takeoff.cg:null,'M');
-  body+='<p class="sub">WEIGHT & BALANCE preserva seu perfil independente e a distribuição real por tanque. Valores divergentes exigem revisão.</p>';
+  body+='<p class="sub">ACTIVE LOAD · '+esc(Load?.mode(localStorage,plan)||'MANUAL').toUpperCase()+'</p>';
  }else if(compareTab==='runway'){
   body+=comp('TAKEOFF DIST',null,p&&!p.error?p.main:null,'M')+
   comp('GROUND ROLL',null,p&&!p.error?p.secondary:null,'M')+
@@ -258,6 +258,7 @@ function setStatus(message,isError){loading=false;err=isError?message:'';view='p
 function acceptRaw(raw,source){
  const next=C.normalize(raw);next.source=source;
  plan=next;reviewed=false;
+  if(Load)try{Load.setMode(localStorage,'simbrief',next)}catch{}
   try{sessionStorage.removeItem(checkKey)}catch{}
  try{sessionStorage.setItem(flightKey,JSON.stringify(plan));sessionStorage.removeItem(flightKey+'-synced')}catch{}
  // The import itself triggers synchronization; there is no second confirmation.
@@ -317,6 +318,7 @@ function applyPlan(navigate=true){
   if(navigate)render();
   return false;
  }
+ if(Load)try{Load.sync(localStorage,plan,wbResult(),Load.mode(localStorage,plan))}catch{}
  reviewed=true;err='';
  if(navigate)show('summary');
  return true;

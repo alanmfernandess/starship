@@ -6,7 +6,7 @@
 'use strict';
 const finite=n=>typeof n==='number'&&Number.isFinite(n);
 const sig=(...fields)=>JSON.stringify(fields.map(v=>v===undefined?null:v));
-function build(plan,stored,wb,confirms,wbProfile,wbOptimized=false){
+function build(plan,stored,wb,confirms,wbProfile,wbOptimized=false,loadingMode='manual'){
  if(!plan)return [];
  const inputs=stored&&stored.inputs||{};
  const takeoff=inputs.takeoff||{};
@@ -74,15 +74,15 @@ function build(plan,stored,wb,confirms,wbProfile,wbOptimized=false){
  // the OFP manifest, even if their numerical TOW happens to be identical.
  const wbAvailable=!!(wb&&wb.ok&&wb.takeoff&&finite(wb.takeoff.cg)&&finite(wb.takeoff.mass));
  const wbWithinLimits=wbAvailable&&wb.statuses?.massOK===true&&wb.statuses?.cgOK===true;
- const wbValid=wbWithinLimits&&!wbOptimized;
- const wbDelta=wbAvailable&&finite(plan.takeoffWeight)?wb.takeoff.mass-plan.takeoffWeight:null;
- const compareText=wbDelta===null?'':' OFP '+plan.takeoffWeight.toFixed(1)+' kg; W&B '+
-  wb.takeoff.mass.toFixed(1)+' kg; Δ '+(wbDelta>=0?'+':'')+wbDelta.toFixed(1)+' kg.';
- add('cg','CG','target','verify',compatible&&wbValid,false,
-   wbOptimized?'O otimizador gera passageiros e bagagens SIMULADOS, não uma carga real. Restaure CARGA MANUAL e valide o perfil antes de confirmar o CG.':
-   wbWithinLimits?'Revise a posição do CG, os limites de envelope e a distribuição de massa no perfil atual de Weight & Balance.':
-   'O perfil W&B está ausente ou não atende aos limites de massa e CG. Ajuste a carga real antes da confirmação.',
-   sig(plan.aircraft,plan.takeoffWeight,profile,wb?.takeoff?.cg,wb?.takeoff?.mass,wb?.ok,wbOptimized),
+ const useWB=loadingMode!=='simbrief';
+ const simulated=loadingMode==='optimized';
+ const wbValid=useWB&&wbWithinLimits&&(!simulated||wbOptimized);
+ const cgDetail=loadingMode==='simbrief'?
+  'CG NOT PROVIDED · OFP supplies mass/fuel, not station loads. Select MANUAL or OPTIMIZED to model a CG.':
+  !wbValid?'CHECK MASS / CG · Complete the selected W&B profile.':
+  simulated?'SIMULATED CG · Model within the available envelope.':'CHECK CG · Confirm the loading stations and envelope.';
+ add('cg','CG','target','verify',wbValid,simulated,cgDetail,
+   sig(loadingMode,plan.aircraft,profile,wb?.takeoff?.cg,wb?.takeoff?.mass,wb?.ok,wbOptimized),
    'OPEN WEIGHT & BALANCE',wbLink,'CONFIRM CG');
  const weatherAvailable=typeof o.raw==='string'&&o.raw.trim().length>0;
  add('weather','WEATHER · OFP SNAPSHOT','cloud','review',compatible&&weatherAvailable,false,
@@ -91,17 +91,19 @@ function build(plan,stored,wb,confirms,wbProfile,wbOptimized=false){
    'VIEW OFP WEATHER','#weather-ofp','ACKNOWLEDGE SNAPSHOT');
  const tw=plan.takeoffWeight;
  const massValid=compatible&&finite(tw)&&tw>=1700&&tw<=1999;
- const match=massValid&&wbValid&&Math.abs(wb.takeoff.mass-tw)<=1&&
-   finite(takeoff.mass)&&Math.abs(takeoff.mass-tw)<=1;
- add('takeoffWeight','TAKEOFF WEIGHT','weight',massValid?'review':'required',match,true,
-   !massValid?'O peso de decolagem do OFP está ausente ou fora do domínio 1700–1999 kg.':
-   wbOptimized?'Otimização cria um cenário SIMULADO, sem representar ocupantes e bagagens reais. Não valida a concordância com o OFP.'+compareText+
-    ' Restaure CARGA MANUAL e confira os valores efetivos.':
-   !wbWithinLimits?'O W&B está ausente, fora do envelope de massa/CG ou ainda não apresenta uma carga real validável.'+compareText:
-   !match?'Os três valores devem concordar (tolerância 1 kg): OFP, W&B e calculadora.'+compareText+
-    ' Ajuste os dados efetivos; não altere o OFP apenas para forçar um CHECKED.':
-   'Pesos de OFP, calculadora e W&B concordantes dentro de 1 kg, com perfil dentro do envelope. Confirme a carga real e os limites aplicáveis.',
-   sig(plan.takeoffWeight,profile,takeoff.mass,wb?.takeoff?.mass,wb?.ok,wbOptimized),
+ const calculatorMatch=finite(takeoff.mass);
+ const simbriefOk=massValid&&calculatorMatch&&Math.abs(takeoff.mass-tw)<=1&&
+   tw<=(finite(takeoff.maxMass)?takeoff.maxMass:1900);
+ const wbOk=wbValid&&calculatorMatch&&Math.abs(wb.takeoff.mass-takeoff.mass)<=1&&
+  wb.takeoff.mass>=1700&&wb.takeoff.mass<=1900;
+ const resolved=loadingMode==='simbrief'?simbriefOk:wbOk;
+ const detail=loadingMode==='simbrief'?
+   'SIMBRIEF · TOW is the active source. Fuel is already included. CG requires separate station data.':
+   loadingMode==='optimized'?
+   'OPTIMIZED · Simulated station loads; within mass/CG limits, with performance masses synchronized.':
+   'MANUAL · Station loads and fuel determine TOW / CG; performance masses are synchronized.';
+ add('takeoffWeight','TAKEOFF WEIGHT','weight',massValid?'review':'required',resolved,true,
+   detail,sig(loadingMode,plan.takeoffWeight,profile,takeoff.mass,wb?.takeoff?.mass,wbOptimized),
    'OPEN WEIGHT & BALANCE',wbLink);
  if(!runwayId){
    add('runwayId','RUNWAY IDENTIFICATION','runway','required',false,false,

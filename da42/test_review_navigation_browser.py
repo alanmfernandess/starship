@@ -84,29 +84,42 @@ with sync_playwright() as p:
   assert page.locator('[data-check-id="cg"] .check-badge').inner_text()!='CHECKED'
   assert page.locator('[data-check-id="cg"]').evaluate("(e)=>e.classList.contains('check-return-item')")
   assert page.locator('[data-check-id="wind"] .check-badge').inner_text()=='CHECKED'
-  # Optimized W&B describes hypothetical loading and must not clear
-  # TAKEOFF WEIGHT even if a random model happens to match the OFP.
+  # SimBrief is authoritative by selection, without requiring simulated
+  # passenger stations to match its TOW numerically.
+  assert page.locator('[data-check-id="takeoffWeight"] .check-badge').inner_text()=='CHECKED'
   page.locator('[data-check-id="takeoffWeight"] summary').click()
   page.locator('[data-check-id="takeoffWeight"] a.check-link').click()
-  assert page.locator('.wb-ofp').count()==1
-  assert 'OFP COMPARISON' in page.locator('.wb-ofp-title').inner_text()
-  assert page.locator('.wb-ofp-cell').count()==3
-  assert 'MISMATCH' in page.locator('.wb-ofp-status').inner_text() or 'NUMERICAL MATCH' in page.locator('.wb-ofp-status').inner_text()
-  page.locator('#optimize').click()
+  assert page.evaluate("WBApp.mode")=='simbrief'
+  assert page.locator('.loading-source.active').inner_text()=='SIMBRIEF'
+  assert page.locator('.loading-metric').count()==3
+  assert page.locator('.loading-metric').nth(0).inner_text().find('1.850')!=-1
+  assert page.locator('.loading-metric').nth(1).inner_text().find('201')!=-1
+  assert page.locator('.loading-note').inner_text()=='FUEL · SPLIT ASSUMED'
+  page.locator('#edit-load').click()
+  assert page.locator('#sheet-mainL').input_value()=='79.5'
+  assert page.locator('#sheet-mainR').input_value()=='79.5'
+  assert page.locator('#sheet-auxL').input_value()=='21.0'
+  assert page.locator('#sheet-auxR').input_value()=='21.0'
+  assert page.locator('#sheet-mainL').get_attribute('readonly') is not None
+  page.locator('.close').click()
+  # Switch source: simulated W&B becomes active, and performance weights
+  # follow the model rather than enforcing any equality with the OFP.
+  page.locator('[data-loading-source="optimized"]').click()
   assert page.evaluate('WBApp.optimizedMode') is True
+  assert page.evaluate("WBApp.mode")=='optimized'
   assert page.locator('#restore-simulated').count()==1
-  assert 'SIMULATED LOADING' in page.locator('.wb-ofp-status').inner_text()
+  assert 'SIMULATED' in page.locator('.loading-note').inner_text()
+  assert page.evaluate("Math.abs(JSON.parse(localStorage.getItem('aero-ui-da42-v1')).inputs.takeoff.mass-WBApp.model.takeoff.mass)<0.001")
   page.locator('#menu').click()
   page.wait_for_url('**/flight.html?review=1&reviewItem=takeoffWeight')
-  assert page.locator('[data-check-id="takeoffWeight"] .check-badge').inner_text()=='REVIEW'
+  assert page.locator('[data-check-id="takeoffWeight"] .check-badge').inner_text()=='CHECKED'
+  assert page.locator('[data-check-id="cg"] .check-badge').inner_text()=='CHECKED'
   page.locator('[data-check-id="takeoffWeight"] summary').click()
-  assert 'SIMULADO' in page.locator('[data-check-id="takeoffWeight"] .review-explanation').inner_text()
-  # Restore manually entered load without changing fuel or OFP.
   page.locator('[data-check-id="takeoffWeight"] a.check-link').click()
   page.locator('#restore-simulated').click()
   assert page.evaluate('WBApp.optimizedMode') is False
+  assert page.evaluate('WBApp.mode')=='manual'
   assert page.locator('#restore-simulated').count()==0
-  assert 'SIMULATED LOADING' not in page.locator('.wb-ofp-status').inner_text()
   page.locator('#menu').click()
   page.wait_for_url('**/flight.html?review=1&reviewItem=takeoffWeight')
   assert not errors,errors

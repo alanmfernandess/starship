@@ -85,8 +85,20 @@ button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus
 .wb-ofp-status{margin-top:10px;padding-top:10px;border-top:1px solid #375365;font-size:10px;line-height:1.5;color:#e7b46d;overflow-wrap:anywhere}
 .wb-ofp-status.equal{color:#79cf9d}
 @media(max-width:355px){.wb-ofp{padding:10px}.wb-ofp-grid{gap:4px}.wb-ofp-cell strong{font-size:13px}}
+
+.loading-sources{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;padding:4px;background:#17242f;border:1px solid #334b5b;border-radius:12px;margin:-3px 0 14px}
+.loading-source{min-width:0;min-height:40px;padding:8px 2px;border:1px solid transparent;border-radius:9px;background:transparent;color:#a4bece;font-weight:650;font-size:10px;letter-spacing:.1px}
+.loading-source.active{background:#203a4c;border-color:#56b9ee;color:#86d2ff}
+.loading-source:disabled{opacity:.35;cursor:default}
+.loading-summary{margin:0 0 12px;border-radius:13px;padding:12px;background:#202d39}
+.loading-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.loading-metric span{display:block;color:#92aabb;font-size:10px;letter-spacing:.3px}
+.loading-metric strong{display:block;color:#edf6fc;font-size:clamp(16px,3.7vw,22px);font-weight:550;font-variant-numeric:tabular-nums;white-space:nowrap}
+.loading-note{color:#e7b46d;font-size:10px;line-height:1.4;margin-top:10px}
+.loading-note.good{color:#67caa9}
+@media(max-width:355px){.loading-source{font-size:9px}.loading-summary{padding:11px}.loading-metrics{gap:4px}}
 </style></head>
-<body><div id="app"></div><script src="./wb-engine.js"></script><script src="./wb-optimizer.js"></script><script>
+<body><div id="app"></div><script src="./wb-engine.js"></script><script src="./wb-optimizer.js"></script><script src="./loading-profile.js"></script><script>
 'use strict';
 const checklistReturn=/[?&]returnToReview=1(?:&|$)/.test(location.search||'');
 const checklistItem=(location.search||'').match(/[?&]reviewItem=([a-zA-Z0-9]+)(?:&|$)/);
@@ -97,7 +109,7 @@ const reviewPlan=(()=>{
   return checklistReturn&&p?.aircraft==='DA42'&&!p.mismatch&&Number.isFinite(p.takeoffWeight)?p:null;
  }catch{return null}
 })();
-const E=window.WBEngine,OPT=window.WBOptimizer,AUTO_KEY='da42-wb-optimized-v1',MANUAL_KEY='da42-wb-pre-auto-manual-v1',KEY='da42-wb-profile-v1';
+const Load=window.LoadingProfile,E=window.WBEngine,OPT=window.WBOptimizer,AUTO_KEY='da42-wb-optimized-v1',MANUAL_KEY='da42-wb-pre-auto-manual-v1',KEY='da42-wb-profile-v1';
 const icons={
  back:'<path d="m15 5-7 7 7 7"/>',
  menu:'<path d="M5 7h14M5 12h9M5 17h6"/>',
@@ -121,7 +133,44 @@ try{optimizedMode=localStorage.getItem(AUTO_KEY)==='true'}catch(e){}
 let optimizeMessage='';
 let previousManual=null;
 try{const saved=JSON.parse(localStorage.getItem(MANUAL_KEY));if(saved&&typeof saved==='object'&&OPT.ADJUSTABLE.every(k=>Object.prototype.hasOwnProperty.call(saved,k)))previousManual=saved}catch(e){}
+let sourceMode=Load.mode(localStorage,Load.plan(sessionStorage));
 let model=E.calculate(profile);
+const planRef=()=>Load.plan(sessionStorage);
+const fuelRef=()=>planRef()?Load.distribute(planRef().plannedFuel):null;
+function resolvedModel(){
+ const fuel=fuelRef();
+ return sourceMode==='simbrief'&&fuel?.ok?E.calculate({...profile,...fuel.tanks}):E.calculate(profile);
+}
+function syncActive(){
+ try{return Load.sync(localStorage,planRef(),sourceMode==='simbrief'?null:E.calculate(profile),sourceMode)}catch{return null}
+}
+function selectSource(value){
+ if(value==='simbrief'&&!planRef())return;
+ if(value==='optimized'){runOptimize();return}
+ if(optimizedMode&&value==='manual'){
+  if(previousManual)profile={...profile,...previousManual};
+  previousManual=null;optimizedMode=false;optimizeMessage='';
+  try{localStorage.removeItem(AUTO_KEY);localStorage.removeItem(MANUAL_KEY)}catch{}
+ }
+ sourceMode=value;
+ Load.setMode(localStorage,value,planRef());
+ render();
+}
+function runOptimize(){
+ const found=OPT.optimize(profile,E);
+ if(!found.ok){optimizeMessage=found.reason&&(/COMBUSTÍVEL|PERFIL|DADOS/.test(found.reason))?'DADOS INVÁLIDOS':'SEM SOLUÇÃO';render();return}
+ if(!optimizedMode){
+  previousManual=Object.fromEntries(OPT.ADJUSTABLE.map(k=>[k,profile[k]]));
+  try{localStorage.setItem(MANUAL_KEY,JSON.stringify(previousManual))}catch{}
+ }
+ profile={...profile,...found.suggested};
+ optimizedMode=true;sourceMode='optimized';
+ Load.setMode(localStorage,'optimized',planRef());
+ optimizeMessage='';
+ try{localStorage.setItem(AUTO_KEY,'true')}catch{}
+ render();
+}
+
 function esc(s){return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;')}
 const profilesInputs=[
  ['nose','NOSE BAGGAGE','kg'],['cabin','CABIN BAGGAGE','kg'],['extension','EXTENSION','kg'],
@@ -130,8 +179,8 @@ const profilesInputs=[
  ['emptyMass','EMPTY WEIGHT','kg'],['emptyMoment','EMPTY MOMENT','kg·m']
 ];
 function card(key,label){
- const v=profile[key];
- return '<div class="field"><label for="val-'+key+'">'+label+'</label><div class="entry"><input data-wb="'+key+'" id="val-'+key+'" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" value="'+esc(inputFormat(v,0))+'" aria-label="'+label+' kg"'+(optimizedMode&&OPT.ADJUSTABLE.includes(key)?' readonly aria-readonly="true"':'')+'><span class="unit">kg</span></div></div>';
+ const fuel=fuelRef(),v=sourceMode==='simbrief'&&fuel?.ok&&Object.prototype.hasOwnProperty.call(fuel.tanks,key)?fuel.tanks[key]:profile[key];
+ return '<div class="field"><label for="val-'+key+'">'+label+'</label><div class="entry"><input data-wb="'+key+'" id="val-'+key+'" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" value="'+esc(inputFormat(v,0))+'" aria-label="'+label+' kg"'+(sourceMode==='simbrief'||sourceMode==='optimized'&&OPT.ADJUSTABLE.includes(key)?' readonly aria-readonly="true"':'')+'><span class="unit">kg</span></div></div>';
 }
 function coords(m,c){const width=270,axisL=2.33,axisR=2.51;return [31+(c-axisL)/(axisR-axisL)*width,181-(m-1500)/450*160]}
 function envelope(){
@@ -141,46 +190,47 @@ function envelope(){
  let path='',points='';
  if(model.ok){
   const plotted=[['zeroFuel','#e7b46d','ZERO FUEL'],['takeoff','#56b9ee','TAKEOFF']];
-  if(plotted.length>1)path='<path d="'+plotted.map(([k],i)=>{const [x,y]=coords(model[k].mass,model[k].cg);return (i?'L':'M')+x.toFixed(2)+' '+y.toFixed(2)}).join(' ')+'" fill="none" stroke="#e7b46d" stroke-dasharray="4 4" stroke-width="1.7"/>';
-  points=plotted.map(([k,color,title])=>{const [x,y]=coords(model[k].mass,model[k].cg);const fill=model[k].cgOK?color:'#ff9e91';return '<circle cx="'+x.toFixed(2)+'" cy="'+y.toFixed(2)+'" r="4.8" fill="'+fill+'" stroke="#202d39" stroke-width="2"><title>'+title+'</title></circle>'}).join('');
+  if(sourceMode!=='simbrief'&&plotted.length>1)path='<path d="'+plotted.map(([k],i)=>{const [x,y]=coords(model[k].mass,model[k].cg);return (i?'L':'M')+x.toFixed(2)+' '+y.toFixed(2)}).join(' ')+'" fill="none" stroke="#e7b46d" stroke-dasharray="4 4" stroke-width="1.7"/>';
+  points=sourceMode==='simbrief'?'':plotted.map(([k,color,title])=>{const [x,y]=coords(model[k].mass,model[k].cg);const fill=model[k].cgOK?color:'#ff9e91';return '<circle cx="'+x.toFixed(2)+'" cy="'+y.toFixed(2)+'" r="4.8" fill="'+fill+'" stroke="#202d39" stroke-width="2"><title>'+title+'</title></circle>'}).join('');
  }
  return '<svg class="graph" viewBox="0 0 320 216" role="img" aria-label="CG envelope, center of gravity versus flight mass">'+lines+columns+'<polygon points="'+poly+'" fill="#56b9ee" fill-opacity=".10" stroke="#56b9ee" stroke-width="2"/>'+path+points+'</svg>';
 }
+function sourceSelector(){
+ return '<div class="loading-sources" role="group" aria-label="Active loading source">'+
+  [['simbrief','SIMBRIEF'],['manual','MANUAL'],['optimized','OPTIMIZED']].map(([id,label])=>
+   '<button type="button" class="loading-source'+(sourceMode===id?' active':'')+
+   '" data-loading-source="'+id+'" aria-pressed="'+(sourceMode===id)+'"'+
+   (id==='simbrief'&&!planRef()?' disabled':'')+'>'+label+'</button>').join('')+'</div>';
+}
 function ofpComparison(){
- if(!reviewPlan)return '';
- const ofp=reviewPlan.takeoffWeight;
- let calc=null;
- try{const s=JSON.parse(localStorage.getItem('aero-ui-da42-v1')||'null');calc=s?.inputs?.takeoff?.mass}catch{}
- const mass=model.ok?model.takeoff.mass:null;
- const available=Number.isFinite(mass)&&Number.isFinite(calc);
- const delta=mass===null?null:mass-ofp;
- const equal=available&&Math.abs(delta)<=1&&Math.abs(calc-ofp)<=1;
- const within=model.ok&&model.statuses.massOK&&model.statuses.cgOK;
- const status=optimizedMode?
-  'SIMULATED LOADING · OTIMIZAR does not reconcile actual weights. Restore CARGA MANUAL and verify the manifest.':
-  !within?'W&B MASS / CG OUT OF LIMITS OR INPUTS INCOMPLETE. Verify actual loading.':
-  !equal?'MASS MISMATCH · OFP, W&B AND TAKEOFF CALCULATOR MUST AGREE WITHIN 1 KG.':
-  'NUMERICAL MATCH · VERIFY ACTUAL LOADING AND APPLICABLE AIRCRAFT LIMITS.';
- const cell=(name,val)=>'<div class="wb-ofp-cell"><span>'+name+'</span><strong>'+esc(Number.isFinite(val)?format(val,1):'—')+'</strong></div>';
- return '<section class="wb-ofp" aria-label="SimBrief OFP takeoff mass comparison"><div class="wb-ofp-title">TAKEOFF WEIGHT · OFP COMPARISON</div>'+
-  '<div class="wb-ofp-grid">'+cell('OFP · KG',ofp)+cell('W&B · KG',mass)+cell('CALC · KG',calc)+'</div>'+
-  '<div class="wb-ofp-status '+(equal&&within&&!optimizedMode?'equal':'')+'">'+esc(status)+(delta!==null?' · W&B − OFP: '+esc((delta>=0?'+':'')+format(delta,1))+' KG':'')+'</div></section>';
+ const data=Load.loading(planRef(),sourceMode==='simbrief'?null:model,sourceMode);
+ const value=x=>Number.isFinite(x)?format(x,1):'—';
+ const note=sourceMode==='simbrief'?(data.fuel?.ok?'FUEL · SPLIT ASSUMED':data.limitation||'FUEL NOT AVAILABLE'):
+   sourceMode==='optimized'?(data.valid?'SIMULATED · WITHIN LIMITS':'SIMULATED · CHECK LIMITS'):
+   data.valid?'MANUAL · WITHIN LIMITS':'MANUAL · CHECK LIMITS';
+ return '<section class="loading-summary">'+
+  '<div class="loading-metrics">'+[['TOW',data.tow],['FUEL',data.fuel?.total],['CG',data.cg]].map(([label,v])=>
+  '<div class="loading-metric"><span>'+label+'</span><strong>'+value(v)+'</strong></div>').join('')+'</div>'+
+  '<div class="loading-note'+(data.valid&&data.fuel?.ok?' good':'')+'">'+esc(note)+'</div></section>';
 }
 function restoreManualLoad(){
  if(!previousManual)return;
- profile={...profile,...previousManual};optimizedMode=false;optimizeMessage='';previousManual=null;
+ profile={...profile,...previousManual};optimizedMode=false;sourceMode='manual';Load.setMode(localStorage,'manual',planRef());optimizeMessage='';previousManual=null;
  try{localStorage.removeItem(AUTO_KEY);localStorage.removeItem(MANUAL_KEY)}catch{}
  render();
 }
 function content(){
- const sc=model.ok?model.statuses:{};
- const metrics=model.ok?'<div class="metrics"><div class="metric"><label>ZFW</label><b>'+format(model.zeroFuel.mass,0)+' kg</b></div><div class="metric"><label>TOW</label><b>'+format(model.takeoff.mass,0)+' kg</b></div></div>':'<div class="metrics"><div class="metric"><label>CHECK INPUTS</label><b>—</b></div></div>';
- const massState=model.ok?(sc.massOK?'WEIGHT WITHIN LIMITS':'WEIGHT LIMIT EXCEEDED'):'CHECK INPUTS';
+ const active=Load.loading(planRef(),sourceMode==='simbrief'?null:model,sourceMode);
+ const sc=sourceMode==='simbrief'?{massOK:active.valid}:model.ok?model.statuses:{};
+ const shown=x=>Number.isFinite(x)?format(x,0):'—';
+ const metrics='<div class="metrics"><div class="metric"><label>ZFW</label><b>'+shown(active.zfw)+' kg</b></div>'+
+ '<div class="metric"><label>TOW</label><b>'+shown(active.tow)+' kg</b></div></div>';
+ const massState=active.valid?'WEIGHT WITHIN LIMITS':'CHECK MASS / CG';
  return '<div class="phone"><header class="topbar"><button class="header-back" id="menu" type="button" aria-label="Back · Performance menu">'+icon('back')+'<span>BACK</span></button><h1>DA42 NG</h1><button class="icon-btn" id="settings" aria-label="Configurações da aeronave">'+icon('settings')+'</button></header>'+
- '<main class="scroller" id="scroller"><div class="module-heading"><span>WEIGHT &amp; BALANCE</span><span class="accent">CG ENVELOPE</span></div>'+
- '<div class="fields">'+card('pilot','PILOT')+card('copilot','COPILOT')+card('pax1','PASSENGER 1')+card('pax2','PASSENGER 2')+'</div>'+
+ '<main class="scroller" id="scroller"><div class="module-heading"><span>WEIGHT &amp; BALANCE</span><span class="accent">CG ENVELOPE</span></div>'+sourceSelector()+
+ (sourceMode==='simbrief'?'':'<div class="fields">'+card('pilot','PILOT')+card('copilot','COPILOT')+card('pax1','PASSENGER 1')+card('pax2','PASSENGER 2')+'</div>')+
  '<button class="open-load" id="edit-load" aria-label="BAGGAGE &amp; FUEL"><span class="main">BAGGAGE &amp; FUEL</span>'+icon('next')+'</button>'+
- '<div class="optimize-row'+(optimizedMode&&previousManual?' has-manual':'')+'"><button id="optimize" class="optimize-button" type="button">OTIMIZAR</button>'+
+ '<div class="optimize-row'+(optimizedMode&&previousManual?' has-manual':'')+'"><button id="optimize" class="optimize-button" type="button">'+(sourceMode==='optimized'?'REOPTIMIZE':'OTIMIZAR')+'</button>'+
   (optimizedMode&&previousManual?'<button id="restore-simulated" class="restore-simulated" type="button">CARGA MANUAL</button>':'')+
   (optimizeMessage?'<span id="optimize-status" class="optimize-feedback" role="alert">'+esc(optimizeMessage)+'</span>':'')+'</div>'+
   ofpComparison()+
@@ -214,11 +264,15 @@ function store(){
  if(E.validate(profile).length===0){try{localStorage.setItem(KEY,JSON.stringify(profile))}catch(e){}}
 }
 function recalc(){
- model=E.calculate(profile);
+ model=resolvedModel();
+ syncActive();
  const set=(s,v)=>{const e=el(s);if(e)e.innerHTML=v};
  set('#envelope',envelope());
- set('#mass-check','<span class="'+(model.ok?(model.statuses.massOK?'good':'error'):'error')+'">'+(model.ok?(model.statuses.massOK?'WEIGHT WITHIN LIMITS':'WEIGHT LIMIT EXCEEDED'):'CHECK INPUTS')+'</span>');
- set('#metrics',model.ok?'<div class="metrics"><div class="metric"><label>ZFW</label><b>'+format(model.zeroFuel.mass,0)+' kg</b></div><div class="metric"><label>TOW</label><b>'+format(model.takeoff.mass,0)+' kg</b></div></div>':'');
+ const active=Load.loading(planRef(),sourceMode==='simbrief'?null:model,sourceMode);
+ set('#mass-check','<span class="'+(active.valid?'good':'error')+'">'+(active.valid?'WEIGHT WITHIN LIMITS':'CHECK MASS / CG')+'</span>');
+ const shown=x=>Number.isFinite(x)?format(x,0):'—';
+ set('#metrics','<div class="metrics"><div class="metric"><label>ZFW</label><b>'+shown(active.zfw)+' kg</b></div>'+
+  '<div class="metric"><label>TOW</label><b>'+shown(active.tow)+' kg</b></div></div>');
  const notice=el('#notice');if(notice){notice.textContent=model.ok?'NOT FOR FLIGHT':model.errors.join(' · ');notice.classList.toggle('bad',!model.ok||!model.statuses.massOK||!model.statuses.cgOK)}
  const optStatus=el('#optimize-status');if(optStatus)optStatus.textContent=optimizeMessage;
  store();
@@ -227,7 +281,7 @@ function bindInputs(root=document){
  root.querySelectorAll('[data-wb]').forEach(inp=>{
   inp.addEventListener('input',()=>{
    const k=inp.dataset.wb;
-   if(optimizedMode&&OPT.ADJUSTABLE.includes(k))return;
+   if(sourceMode==='simbrief'||sourceMode==='optimized'&&OPT.ADJUSTABLE.includes(k))return;
    const clean=normalizeNumericEntry(inp.value);
    if(clean!==inp.value)inp.value=clean;
    profile={...profile,[k]:parseNumber(clean)};
@@ -251,7 +305,7 @@ function sheet(type){
    body+='<div class="section-title">'+title+'</div>';
    for(const k of keys){
     const field=profilesInputs.find(([id])=>id===k);
-    body+='<div class="sheet-row"><label for="sheet-'+k+'">'+field[1]+'</label><input data-wb="'+k+'" id="sheet-'+k+'" inputmode="decimal" autocomplete="off" type="text" value="'+(profile[k]===null?'':esc(inputFormat(profile[k],1)))+'" placeholder="—" aria-label="'+field[1]+'"'+(optimizedMode&&OPT.ADJUSTABLE.includes(k)?' readonly aria-readonly="true"':'')+'><span class="unit">'+field[2]+'</span></div>';
+    body+='<div class="sheet-row"><label for="sheet-'+k+'">'+field[1]+'</label><input data-wb="'+k+'" id="sheet-'+k+'" inputmode="decimal" autocomplete="off" type="text" value="'+(sourceMode==='simbrief'&&profilesInputs.find(([id])=>id===k)&&['mainL','mainR','auxL','auxR'].includes(k)?(fuelRef()?.ok?esc(inputFormat(fuelRef().tanks[k],1)):''):profile[k]===null?'':esc(inputFormat(profile[k],1)))+'" placeholder="—" aria-label="'+field[1]+'"'+(sourceMode==='simbrief'||sourceMode==='optimized'&&OPT.ADJUSTABLE.includes(k)?' readonly aria-readonly="true"':'')+'><span class="unit">'+field[2]+'</span></div>';
    }
   }
   if(type==='settings')body+=(optimizedMode&&previousManual?'<button class="action" id="restore-manual">CARGA MANUAL</button>':'')+'<button class="action" id="reset-example">AFM EXAMPLE</button>';
@@ -268,10 +322,11 @@ function sheet(type){
  d.querySelector('.close').onclick=()=>d.remove();
  bindInputs(d);
  const restore=d.querySelector('#restore-manual');if(restore)restore.onclick=()=>{d.remove();restoreManualLoad()};
- const reset=d.querySelector('#reset-example');if(reset)reset.onclick=()=>{profile={...E.EXAMPLE};optimizedMode=false;previousManual=null;optimizeMessage='';model=E.calculate(profile);try{localStorage.removeItem(KEY);localStorage.removeItem(AUTO_KEY);localStorage.removeItem(MANUAL_KEY)}catch(e){}d.remove();render()};
+ const reset=d.querySelector('#reset-example');if(reset)reset.onclick=()=>{profile={...E.EXAMPLE};optimizedMode=false;sourceMode='manual';Load.setMode(localStorage,'manual',planRef());previousManual=null;optimizeMessage='';model=E.calculate(profile);try{localStorage.removeItem(KEY);localStorage.removeItem(AUTO_KEY);localStorage.removeItem(MANUAL_KEY)}catch(e){}d.remove();render()};
 }
 function render(){
- model=E.calculate(profile);el('#app').innerHTML=content();bindInputs();
+ model=resolvedModel();el('#app').innerHTML=content();bindInputs();
+ document.querySelectorAll('[data-loading-source]').forEach(b=>b.onclick=()=>selectSource(b.dataset.loadingSource));
  el('#menu').onclick=()=>{
    if(checklistReturn){store();location.assign(checklistReturnUrl)}
    else sheet('modules');
@@ -279,26 +334,14 @@ function render(){
  el('#settings').onclick=()=>sheet('settings');
  el('#edit-load').onclick=()=>sheet('load');
   const manual=el('#restore-simulated');if(manual)manual.onclick=restoreManualLoad;
- el('#optimize').onclick=()=>{
-  const found=OPT.optimize(profile,E);
-  if(!found.ok){optimizeMessage=found.reason&&(/COMBUSTÍVEL|PERFIL|DADOS/.test(found.reason))?'DADOS INVÁLIDOS':'SEM SOLUÇÃO';render();return}
-  if(!optimizedMode){
-   previousManual=Object.fromEntries(OPT.ADJUSTABLE.map(k=>[k,profile[k]]));
-   try{localStorage.setItem(MANUAL_KEY,JSON.stringify(previousManual))}catch(e){}
-  }
-  profile={...profile,...found.suggested};
-  optimizedMode=true;
-  optimizeMessage='';
-  try{localStorage.setItem(AUTO_KEY,'true')}catch(e){}
-  render();
- };
- el('#nav-input').onclick=()=>{el('#scroller').scrollTo({top:0,behavior:'smooth'})};
+ el('#optimize').onclick=runOptimize;
+  el('#nav-input').onclick=()=>{el('#scroller').scrollTo({top:0,behavior:'smooth'})};
  el('#nav-chart').onclick=()=>el('.result').scrollIntoView({behavior:'smooth',block:'start'});
  el('#nav-scenarios').onclick=()=>sheet('scenarios');
  el('#nav-settings').onclick=()=>sheet('settings');
  recalc();
 }
-window.WBApp={get profile(){return profile},get model(){return model},get optimizedMode(){return optimizedMode},render,sheet,optimize:()=>OPT.optimize(profile,E)};
+window.WBApp={get profile(){return profile},get model(){return model},get optimizedMode(){return optimizedMode},get mode(){return sourceMode},render,sheet,optimize:()=>OPT.optimize(profile,E)};
 render();
 if('serviceWorker'in navigator&&location.protocol==='https:')window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 </script></body></html>
