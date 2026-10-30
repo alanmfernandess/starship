@@ -39,6 +39,12 @@ function modelInput(v,mass){
   wet:!!v.wet,soft:!!v.soft,slope:v.slope??0,isa:!!v.isa};
 }
 function validate(v){
+ // A new OFP invalidates previous-airport assumptions. Missing runway data
+ // must block the calculation, never be silently replaced with 0 KT or 900 M.
+ if(v?.toraVerified===false)return 'TORA REQUIRED';
+ if(v?.windVerified===false)return 'WIND COMPONENT REQUIRED';
+ if(v?.surfaceVerified===false)return 'RUNWAY SURFACE REQUIRED';
+ if(v?.slopeVerified===false)return 'RUNWAY SLOPE REQUIRED';
  if(!v||!Number.isFinite(v.length)||v.length<=0||v.length>5000)return 'TORA INVÁLIDA (1–5000 M)';
  if(v.paMode&& !['direct','qnh'].includes(v.paMode))return 'MODO DE PRESSÃO INVÁLIDO';
  if(v.paMode==='qnh'&&(!Number.isFinite(v.elevation)||v.elevation< -1000||v.elevation>10000||
