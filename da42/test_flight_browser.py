@@ -55,6 +55,11 @@ with sync_playwright() as p:
   assert page.locator('#confirm-plan, #back-plan, #variant-confirm').count()==0
   assert page.evaluate("JSON.parse(localStorage.getItem('aero-ui-da42-v1')).inputs.takeoff.mass")==1850
   assert page.locator('.metric').count()==4
+  # Reopening Flight Plan resumes the imported OFP, without reentering Pilot ID.
+  page.reload()
+  assert 'PERFORMANCE OVERVIEW' in page.locator('.heading').inner_text()
+  assert page.locator('#import-ofp, #pilot-id').count()==0
+  assert 'SBGR' in page.locator('.route').inner_text()
   page.locator('#open-review').click()
   assert page.locator('.heading').inner_text().find('IMPORTED FLIGHT PLAN')>=0
   assert page.locator('.list-title').first.inner_text()=='FLIGHT DATA'
@@ -134,8 +139,20 @@ with sync_playwright() as p:
   page.locator('[data-view="modules"]').click()
   assert page.locator('a[href*="module=runway"]').count()==1
   assert page.locator('a[href="./wb.html"]').count()==1
+  assert page.locator('.note').count()==0
+  assert 'Os módulos abaixo' not in page.locator('main').inner_text()
   page.locator('[data-view="plan"]').click()
-  assert page.locator('#import-ofp').count()==1
+  assert page.locator('#import-ofp, #pilot-id').count()==0
+  assert 'PERFORMANCE OVERVIEW' in page.locator('.heading').inner_text()
+  # Navigate Flight Plan -> Weight & Balance -> PERFORMANCE menu -> Flight Plan.
+  page.locator('[data-view="modules"]').click()
+  page.locator('a[href="./wb.html"]').click()
+  page.locator('#menu').click()
+  assert page.locator('.sheet a.action').all_inner_texts()==['FLIGHT PLAN','PERFORMANCE','WEIGHT & BALANCE']
+  assert page.locator('.sheet .note').count()==0
+  page.locator('.sheet a.action').first.click()
+  assert 'PERFORMANCE OVERVIEW' in page.locator('.heading').inner_text()
+  assert page.locator('#pilot-id').count()==0
   assert page.locator('html').evaluate('(e)=>e.scrollWidth')<=w
   # Generic DA42 OFPs must not require a manual variant checkbox.
   generic=json.loads(json.dumps(payload))
