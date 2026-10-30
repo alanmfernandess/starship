@@ -95,7 +95,11 @@ function reviewPage(){
  row('RUNWAY',plan.originRunway||'NOT PROVIDED')+'</section>';
  items+='<section class="tile"><div class="list-title">WEATHER · OFP SNAPSHOT</div>'+weatherRows()+'</section>';
  const warnings=hints();
- if(warnings.length)items+='<div class="notice"><strong>'+warnings.length+' ITEMS TO REVIEW</strong><div>'+warnings.map(x=>'<p>'+esc(x)+'</p>').join('')+'</div></div>';
+ if(warnings.length)items+='<section class="tile review-summary review-details" aria-label="Items to review">'+
+  '<div class="review-heading"><strong>'+warnings.length+' ITEMS TO REVIEW</strong>'+icon('warning')+'</div>'+
+  '<div class="review-lines">'+warnings.map(x=>
+   '<details class="review-detail"><summary class="review-line"><span>'+esc(shortWarning(x))+'</span>'+icon('next')+'</summary>'+
+   '<p class="review-explanation">'+esc(x)+'</p></details>').join('')+'</div></section>';
  return items;
 }
 function weatherRows(){
