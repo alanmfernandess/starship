@@ -131,6 +131,7 @@ function proposedInputs(plan,existing){
  if(finite(plan.cruiseAltitude)&&plan.cruiseAltitude<=18000) {
   result.cruise={pa:plan.cruiseAltitude};
   result.cruiseperf={pa:plan.cruiseAltitude};
+  result.climb={...(result.climb||{}),profileTarget:plan.cruiseAltitude};
  }
  if(finite(plan.originElevation)&&finite(o.qnh)&&finite(o.oat)){
   const pa=root.RunwayAnalysis?root.RunwayAnalysis.pressureAltitude(plan.originElevation,o.qnh):null;
