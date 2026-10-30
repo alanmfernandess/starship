@@ -76,6 +76,10 @@ with sync_playwright() as p:
         assert page.locator('input[data-wb="emptyMoment"]').count()==1
         assert page.locator('input[data-wb="emptyMass"]').input_value()=='1450.0'
         assert page.locator('input[data-wb="emptyMoment"]').input_value().find(',')<0
+        page.locator('input[data-wb="emptyMass"]').fill('1.450,0')
+        assert page.locator('input[data-wb="emptyMass"]').input_value()=='1450.0'
+        page.locator('input[data-wb="emptyMass"]').fill('1,450.0')
+        assert page.locator('input[data-wb="emptyMass"]').input_value()=='1450.0'
         page.locator('input[data-wb="emptyMass"]').fill('1470')
         assert page.locator('#notice').inner_text()=='NOT FOR FLIGHT'
         page.locator('#reset-example').click()
