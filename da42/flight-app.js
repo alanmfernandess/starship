@@ -69,7 +69,7 @@ function reviewPage(){
  const incompatible=plan.mismatch||plan.aircraft!=='DA42';
  let items= '<section class="tile"><div class="brand"><span class="title">IMPORTED FLIGHT PLAN</span><span class="pill">REVIEW</span></div>'+
  '<div class="status '+(incompatible?'warn':'ok')+'">'+esc(plan.source==='MANUAL'?'MANUAL PLAN':incompatible?'AIRCRAFT MISMATCH · SYNC BLOCKED':'OFP READ SUCCESSFULLY')+'</div></section>'+routeCard();
- items+='<section class="tile"><div class="list-title">CONFIRM FLIGHT DATA</div><div class="review-grid">'+
+ items+='<section class="tile"><div class="list-title">FLIGHT DATA</div><div class="review-grid">'+
  inputField('distance','MISSION DISTANCE · NM',plan.distance)+inputField('alternateDistance','ALTERNATE DIST · NM',plan.alternateDistance)+
  inputField('takeoffWeight','TAKEOFF WEIGHT · KG',plan.takeoffWeight)+inputField('landingWeight','LANDING WEIGHT · KG',plan.landingWeight)+
  inputField('cruiseAltitude','CRUISE ALT · FT',plan.cruiseAltitude)+inputField('tripFuel','TRIP FUEL · KG',plan.tripFuel)+
@@ -81,7 +81,6 @@ function reviewPage(){
  items+='<section class="tile"><div class="list-title">WEATHER · OFP SNAPSHOT</div>'+weatherRows()+'</section>';
  const warnings=hints();
  if(warnings.length)items+='<div class="notice"><strong>'+warnings.length+' ITEMS TO REVIEW</strong><div>'+warnings.map(x=>'<p>'+esc(x)+'</p>').join('')+'</div></div>';
- items+='<div class="action-row"><button class="secondary" id="back-plan">BACK</button><button class="primary" id="confirm-plan" '+(incompatible?'disabled aria-disabled="true"':'')+'>CONFIRM AND CONTINUE</button></div>';
  return items;
 }
 function weatherRows(){
@@ -189,8 +188,11 @@ function setStatus(message,isError){loading=false;err=isError?message:'';view='p
 function acceptRaw(raw,source){
  const next=C.normalize(raw);next.source=source;
  plan=next;reviewed=false;
- try{sessionStorage.setItem(flightKey,JSON.stringify(plan))}catch{}
- show('review');
+ try{sessionStorage.setItem(flightKey,JSON.stringify(plan));sessionStorage.removeItem(flightKey+'-synced')}catch{}
+ // The import itself triggers synchronization; there is no second confirmation.
+ // Incompatible aircraft remain visible for inspection but never update inputs.
+ if(next.mismatch||next.aircraft!=='DA42'){show('review');return}
+ applyPlan();
 }
 async function importPilot(){
  const id=pilotId.trim();
@@ -209,9 +211,13 @@ async function importPilot(){
  }finally{loading=false}
 }
 
-function applyPlan(){
- if(!plan)return;
- if(plan.mismatch||plan.aircraft!=='DA42'){err='AIRCRAFT MISMATCH · OFP DA42 REQUIRED';render();return}
+function applyPlan(navigate=true){
+ if(!plan)return false;
+ if(plan.mismatch||plan.aircraft!=='DA42'){
+  err='AIRCRAFT MISMATCH · OFP DA42 REQUIRED';
+  if(navigate)show('review');
+  return false;
+ }
  const prepared=C.proposedInputs(plan,getAppInputs().inputs||{});
  let persisted=getAppInputs();
  if(!persisted||typeof persisted!=='object')persisted={};
@@ -222,8 +228,15 @@ function applyPlan(){
  try{
   localStorage.setItem(storageKey,JSON.stringify(persisted));
   sessionStorage.setItem(flightKey,JSON.stringify(plan));
- }catch(e){err='Não foi possível salvar os dados no navegador.';render();return}
- reviewed=true;err='';show('summary');
+  sessionStorage.setItem(flightKey+'-synced','1');
+ }catch(e){
+  err='Não foi possível salvar os dados no navegador.';
+  if(navigate)render();
+  return false;
+ }
+ reviewed=true;err='';
+ if(navigate)show('summary');
+ return true;
 }
 function bind(){
  root.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>show(b.dataset.view));
@@ -234,15 +247,19 @@ function bind(){
   pilot.onkeydown=e=>{if(e.key==='Enter')importPilot()};
  }
  const importButton=root.querySelector('#import-ofp');if(importButton)importButton.onclick=importPilot;
- const back=root.querySelector('#back-plan');if(back)back.onclick=()=>show('plan');
  root.querySelectorAll('[data-review]').forEach(inp=>inp.onchange=()=>{
   const key=inp.dataset.review;const n=C.val(inp.value.trim());
   const maxima={distance:20000,alternateDistance:20000,takeoffWeight:1999,landingWeight:1999,cruiseAltitude:50000,tripFuel:10000};
   if(n!==null&&(n<0||n>maxima[key])){err='Valor fora dos limites de entrada: '+key;render();return}
   plan[key]=n;err='';
-  try{sessionStorage.setItem(flightKey,JSON.stringify(plan))}catch{}
+  // Editing reviewed flight data updates the existing performance inputs,
+  // without a separate confirmation action or a full-screen rerender.
+  if(!plan.mismatch&&plan.aircraft==='DA42'){
+   if(!applyPlan(false)){render();return}
+  }else{
+   try{sessionStorage.setItem(flightKey,JSON.stringify(plan))}catch{}
+  }
  });
- const confirmed=root.querySelector('#confirm-plan');if(confirmed)confirmed.onclick=applyPlan;
  const go=root.querySelector('#go-plan');if(go)go.onclick=()=>show('plan');
  const reviewAgain=root.querySelector('#open-review');if(reviewAgain)reviewAgain.onclick=()=>show('review');
  const compare=root.querySelector('#open-comparison');if(compare)compare.onclick=()=>show('comparison');
@@ -250,12 +267,18 @@ function bind(){
  root.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{compareTab=b.dataset.tab;render()});
  const clear=root.querySelector('#clear-plan');if(clear)clear.onclick=()=>{
   plan=null;reviewed=false;err='';
-  try{sessionStorage.removeItem(flightKey)}catch{}
+  try{sessionStorage.removeItem(flightKey);sessionStorage.removeItem(flightKey+'-synced')}catch{}
   show('plan');
  };
 }
 try{pilotId=localStorage.getItem(idKey)||''}catch{}
-try{const stored=JSON.parse(sessionStorage.getItem(flightKey)||'null');if(stored&&stored.origin&&stored.destination)plan=stored}catch{}
+try{
+ const stored=JSON.parse(sessionStorage.getItem(flightKey)||'null');
+ if(stored&&stored.origin&&stored.destination){
+  plan=stored;
+  reviewed=stored.aircraft==='DA42'&&!stored.mismatch&&sessionStorage.getItem(flightKey+'-synced')==='1';
+ }
+}catch{}
 window.AeroFlight={get plan(){return plan},get view(){return view},normalize:C.normalize,acceptRaw,applyPlan,get performance(){return performance()}};
 render();
 if('serviceWorker' in navigator&&location.protocol==='https:')window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
