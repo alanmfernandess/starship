@@ -179,7 +179,6 @@ function modulesPage(){
  const modules=[
  ['WEIGHT & BALANCE','./wb.html'],
  ['TAKEOFF PERFORMANCE','./index.html?calculator=1&module=takeoff'],
- ['RUNWAY ANALYSIS','./index.html?calculator=1&module=runway'],
  ['CLIMB PERFORMANCE','./index.html?calculator=1&module=climb'],
  ['ONE ENGINE INOPERATIVE','./index.html?calculator=1&module=oei'],
  ['CRUISE PERFORMANCE','./index.html?calculator=1&module=cruiseperf'],
@@ -261,6 +260,18 @@ function applyPlan(navigate=true){
  for(const [name,fields] of Object.entries(prepared.inputs)){
   persisted.inputs[name]={...(persisted.inputs[name]||{}),...fields};
  }
+ // Only one takeoff state feeds distance and available-runway calculations.
+ const takeoff=persisted.inputs.takeoff||{};
+ const runway=persisted.inputs.runway||{};
+ const unified={...takeoff,...runway};
+ for(const key of ['wind','pa','oat','mass','isa']){
+  if(Object.prototype.hasOwnProperty.call(takeoff,key))unified[key]=takeoff[key];
+ }
+ // QNH fields come from the same OFP, and runway-specific values remain
+ // authoritative for TORA and pressure-altitude mode.
+ persisted.inputs.takeoff={...unified};
+ persisted.inputs.runway={...unified};
+ persisted.current=persisted.current==='runway'?'takeoff':persisted.current;
  try{
   localStorage.setItem(storageKey,JSON.stringify(persisted));
   sessionStorage.setItem(flightKey,JSON.stringify(plan));
