@@ -79,14 +79,14 @@
  */
 const MODELS={
  takeoff:{label:'TAKEOFF PERFORMANCE',panel:'TAKEOFF DISTANCE',metric:'GROUND ROLL',unit:'m',metricUnit:'m',fields:[{k:'pa',name:'PRESSURE ALT',u:'ft'},{k:'oat',name:'OAT',u:'°C'},{k:'mass',name:'T/O WEIGHT',u:'kg'},{k:'wind',name:'HEADWIND',u:'kt'}],defaults:{pa:0,oat:15,mass:1800,wind:10,procedure:'normal',isa:false,surface:'paved',wet:false,soft:false,slope:0}},
- climb:{label:'CLIMB',panel:'RATE OF CLIMB',metric:'VERTICAL SPEED',unit:'ft/min',metricUnit:'m/s',fields:[{k:'pa',name:'PRESSURE ALT',u:'ft'},{k:'oat',name:'OAT',u:'°C'},{k:'mass',name:'FLIGHT WEIGHT',u:'kg'},{k:'power',name:'POWER',u:'%',fixed:true}],defaults:{pa:0,oat:15,mass:1800,power:92,flaps:'up',isa:false}},
+ climb:{label:'CLIMB PERFORMANCE',panel:'RATE OF CLIMB',metric:'VERTICAL SPEED',unit:'ft/min',metricUnit:'m/s',fields:[{k:'pa',name:'PRESSURE ALT',u:'ft'},{k:'oat',name:'OAT',u:'°C'},{k:'mass',name:'FLIGHT WEIGHT',u:'kg'},{k:'power',name:'POWER',u:'%',fixed:true}],defaults:{pa:0,oat:15,mass:1800,power:92,flaps:'up',isa:false}},
  oei:{label:'ONE ENGINE CLIMB / DESCENT',panel:'RATE OF CLIMB',metric:'VERTICAL SPEED',unit:'ft/min',metricUnit:'m/s',fields:[{k:'pa',name:'PRESSURE ALT',u:'ft'},{k:'oat',name:'OAT',u:'°C'},{k:'mass',name:'FLIGHT WEIGHT',u:'kg'},{k:'power',name:'ENGINE POWER',u:'%',fixed:true}],defaults:{pa:0,oat:15,mass:1800,power:92,isa:false}},
  cruise:{label:'CRUISING',panel:'TRUE AIRSPEED',metric:'ISA DEVIATION',unit:'KTAS',metricUnit:'°C',fields:[{k:'pa',name:'PRESSURE ALT',u:'ft'},{k:'oat',name:'OAT',u:'°C'},{k:'load',name:'ENGINE LOAD',u:'%'},{k:'engines',name:'ENGINES',u:'',fixed:true,fixedValue:2}],defaults:{pa:10000,oat:-5,load:80,engines:2}},
- landing:{label:'LANDING',panel:'LANDING DISTANCE',metric:'GROUND ROLL',unit:'m',metricUnit:'m',fields:[{k:'pa',name:'PRESSURE ALT',u:'ft'},{k:'oat',name:'OAT',u:'°C'},{k:'mass',name:'LDG WEIGHT',u:'kg'},{k:'wind',name:'HEADWIND',u:'kt'}],defaults:{pa:0,oat:15,mass:1800,wind:10,isa:false,surface:'paved',wet:false,soft:false,slope:0}},
+ landing:{label:'LANDING PERFORMANCE',panel:'LANDING DISTANCE',metric:'GROUND ROLL',unit:'m',metricUnit:'m',fields:[{k:'pa',name:'PRESSURE ALT',u:'ft'},{k:'oat',name:'OAT',u:'°C'},{k:'mass',name:'LDG WEIGHT',u:'kg'},{k:'wind',name:'HEADWIND',u:'kt'}],defaults:{pa:0,oat:15,mass:1800,wind:10,isa:false,surface:'paved',wet:false,soft:false,slope:0}},
  abnormal:{label:'ABNORMAL LANDING',panel:'LANDING DISTANCE',metric:'GROUND ROLL',unit:'m',metricUnit:'m',fields:[{k:'pa',name:'PRESSURE ALT',u:'ft'},{k:'oat',name:'OAT',u:'°C'},{k:'mass',name:'LDG WEIGHT',u:'kg'},{k:'wind',name:'HEADWIND',u:'kt'}],defaults:{pa:0,oat:15,mass:1800,wind:10,isa:false,surface:'paved',wet:false,soft:false,slope:0}},
  goaround:{label:'GO-AROUND',panel:'RATE OF CLIMB',metric:'VERTICAL SPEED',unit:'ft/min',metricUnit:'m/s',fields:[{k:'pa',name:'PRESSURE ALT',u:'ft'},{k:'oat',name:'OAT',u:'°C'},{k:'mass',name:'LANDING WEIGHT',u:'kg'},{k:'speed',name:'VREF',u:'KIAS',fixed:true}],defaults:{pa:0,oat:15,mass:1900,isa:true}},
  timeclimb:{label:'TIME TO CLIMB',panel:'TIME TO CLIMB',metric:'FUEL TO CLIMB',unit:'min',metricUnit:'US gal',fields:[{k:'start',name:'DEPARTURE ALT',u:'ft'},{k:'target',name:'TARGET ALT',u:'ft'},{k:'mass',name:'CLIMB WEIGHT',u:'kg'},{k:'oat',name:'OAT · DEP',u:'°C'}],defaults:{start:2000,target:16000,mass:1900,oat:11}},
- cruiseperf:{label:'CRUISE',panel:'TRUE AIRSPEED',metric:'FUEL FLOW',unit:'KTAS',metricUnit:'US gal/h',fields:[{k:'pa',name:'PRESSURE ALT',u:'ft'},{k:'oat',name:'OAT',u:'°C'},{k:'load',name:'ENGINE POWER',u:'%'},{k:'mass',name:'FLIGHT WEIGHT',u:'kg',fixed:true,fixedValue:'1,999'}],defaults:{pa:10000,oat:-5,load:75,mass:1999,reduced:false}},
+ cruiseperf:{label:'CRUISE PERFORMANCE',panel:'TRUE AIRSPEED',metric:'FUEL FLOW',unit:'KTAS',metricUnit:'US gal/h',fields:[{k:'pa',name:'PRESSURE ALT',u:'ft'},{k:'oat',name:'OAT',u:'°C'},{k:'load',name:'ENGINE POWER',u:'%'},{k:'mass',name:'FLIGHT WEIGHT',u:'kg',fixed:true,fixedValue:'1,999'}],defaults:{pa:10000,oat:-5,load:75,mass:1999,reduced:false}},
  runway:{label:'RUNWAY ANALYSIS',panel:'MAX TAKEOFF WEIGHT',metric:'RUNWAY MARGIN',unit:'kg',metricUnit:'m',fields:[{k:'pa',name:'PRESSURE ALT',u:'ft'},{k:'oat',name:'OAT',u:'°C'},{k:'mass',name:'T/O WEIGHT',u:'kg'},{k:'length',name:'TORA',u:'m'}],defaults:{pa:2000,oat:25,mass:1800,length:900,wind:0,procedure:'normal',surface:'paved',wet:false,soft:false,slope:0,maxMass:1900,paMode:'direct',elevation:2000,qnh:1013.25,isa:false}}
 };
 const el=s=>document.querySelector(s),escapeHTML=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -107,7 +107,21 @@ if(oldRW.runwaySource==='SIMBRIEF OFP'){
   if(Object.prototype.hasOwnProperty.call(oldRW,key))combined[key]=oldRW[key];
  }
 }
-inputs.takeoff=combined;inputs.runway=combined;if(persisted.inputs&&persisted.inputs.goaround&&!Object.prototype.hasOwnProperty.call(persisted.inputs.goaround,'oat')){inputs.goaround.isa=true;delete inputs.goaround.speed;}let history=Array.isArray(persisted.history)?persisted.history.slice(0,20):[];
+inputs.takeoff=combined;inputs.runway=combined;
+// Migrate old deep links and saved state to their consolidated modules.
+if(current==='abnormal'){inputs.landing={...inputs.landing,...inputs.abnormal,mode:'abnormal'};current='landing'}
+if(current==='oei'){inputs.climb={...inputs.climb,...inputs.oei,engineMode:'oei',flaps:'up'};current='climb'}
+if(current==='timeclimb'){
+ const saved=inputs.timeclimb;
+ inputs.climb={...inputs.climb,pa:saved.start,mass:saved.mass,oat:saved.oat,isa:false,flaps:'up',engineMode:'both',profileTarget:saved.target};
+ current='climb';
+}
+if(current==='cruise')current='cruiseperf';
+inputs.landing.mode=inputs.landing.mode==='abnormal'?'abnormal':'normal';
+inputs.climb.engineMode=inputs.climb.engineMode==='oei'?'oei':'both';
+if(!Number.isFinite(inputs.climb.profileTarget))inputs.climb.profileTarget=16000;
+inputs.abnormal=inputs.landing;
+inputs.oei=inputs.climb;if(persisted.inputs&&persisted.inputs.goaround&&!Object.prototype.hasOwnProperty.call(persisted.inputs.goaround,'oat')){inputs.goaround.isa=true;delete inputs.goaround.speed;}let history=Array.isArray(persisted.history)?persisted.history.slice(0,20):[];
 let cruiseTempMode=persisted.cruiseTempMode==='isa'?'isa':'oat';
 function persist(){try{localStorage.setItem('aero-ui-da42-v1',JSON.stringify({current,inputs,history,cruiseTempMode}))}catch{}}
 /**
@@ -286,6 +300,13 @@ function calibrate(){// Anchor the plotted ordinate to the published example, no
  GRAPH_REGISTRATION.oei=212-rawCompute('oei',EXAMPLES.oei).roc;
 }
 calibrate();
+function activeModule(){return current==='landing'&&inputs.landing.mode==='abnormal'?'abnormal':current==='climb'&&inputs.climb.engineMode==='oei'?'oei':current}
+function activeInputs(){return current==='climb'&&inputs.climb.engineMode==='oei'?{...inputs.climb,flaps:'up',power:92}:inputs[current]}
+function climbProfile(){
+ if(current!=='climb'||inputs.climb.engineMode==='oei'||inputs.climb.flaps!=='up'||!window.TimeToClimb)return null;
+ const v=inputs.climb,temperature=v.isa?window.TimeToClimb.isaAt(v.pa):v.oat;
+ return window.TimeToClimb.compute({start:v.pa,target:v.profileTarget,mass:v.mass,oat:temperature});
+}
 function unifiedTakeoffInput(v){const x=window.RunwayAnalysis?.modelInput?window.RunwayAnalysis.modelInput(v,v.mass):{...v};x.wind=v.wind;return x}
 function runwayResult(v){return window.RunwayAnalysis?.compute?window.RunwayAnalysis.compute(v):{error:'RUNWAY DATA UNAVAILABLE'}}
 function limits(id,v){
