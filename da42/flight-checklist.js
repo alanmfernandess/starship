@@ -6,7 +6,7 @@
 'use strict';
 const finite=n=>typeof n==='number'&&Number.isFinite(n);
 const sig=(...fields)=>JSON.stringify(fields.map(v=>v===undefined?null:v));
-function build(plan,stored,wb,confirms,wbProfile){
+function build(plan,stored,wb,confirms,wbProfile,wbOptimized=false){
  if(!plan)return [];
  const inputs=stored&&stored.inputs||{};
  const takeoff=inputs.takeoff||{};
@@ -69,11 +69,20 @@ function build(plan,stored,wb,confirms,wbProfile){
    'Selecione o tipo de superfície e as condições de pista aplicáveis. O OFP não comprova automaticamente PAVED versus GRASS.',
    sig(plan.origin,runwayId,runway.surface,runway.surfaceVerified,runway.wet,runway.soft),
    'OPEN RUNWAY',runLink);
- const wbValid=!!(wb&&wb.ok&&wb.takeoff&&finite(wb.takeoff.cg)&&finite(wb.takeoff.mass));
+ // WBEngine.ok means structurally valid inputs, NOT that the mass/CG are
+ // within the loading envelope. Simulated optimizer loads cannot validate
+ // the OFP manifest, even if their numerical TOW happens to be identical.
+ const wbAvailable=!!(wb&&wb.ok&&wb.takeoff&&finite(wb.takeoff.cg)&&finite(wb.takeoff.mass));
+ const wbWithinLimits=wbAvailable&&wb.statuses?.massOK===true&&wb.statuses?.cgOK===true;
+ const wbValid=wbWithinLimits&&!wbOptimized;
+ const wbDelta=wbAvailable&&finite(plan.takeoffWeight)?wb.takeoff.mass-plan.takeoffWeight:null;
+ const compareText=wbDelta===null?'':' OFP '+plan.takeoffWeight.toFixed(1)+' kg; W&B '+
+  wb.takeoff.mass.toFixed(1)+' kg; Δ '+(wbDelta>=0?'+':'')+wbDelta.toFixed(1)+' kg.';
  add('cg','CG','target','verify',compatible&&wbValid,false,
-   wbValid?'Revise a posição do CG, os limites de envelope e a distribuição de massa no perfil atual de Weight & Balance.':
-      'Configure e valide o perfil de Weight & Balance antes de confirmar o CG.',
-   sig(plan.aircraft,plan.takeoffWeight,profile,wb?.takeoff?.cg,wb?.takeoff?.mass,wb?.ok),
+   wbOptimized?'O otimizador gera passageiros e bagagens SIMULADOS, não uma carga real. Restaure CARGA MANUAL e valide o perfil antes de confirmar o CG.':
+   wbWithinLimits?'Revise a posição do CG, os limites de envelope e a distribuição de massa no perfil atual de Weight & Balance.':
+   'O perfil W&B está ausente ou não atende aos limites de massa e CG. Ajuste a carga real antes da confirmação.',
+   sig(plan.aircraft,plan.takeoffWeight,profile,wb?.takeoff?.cg,wb?.takeoff?.mass,wb?.ok,wbOptimized),
    'OPEN WEIGHT & BALANCE',wbLink,'CONFIRM CG');
  const weatherAvailable=typeof o.raw==='string'&&o.raw.trim().length>0;
  add('weather','WEATHER · OFP SNAPSHOT','cloud','review',compatible&&weatherAvailable,false,
@@ -86,10 +95,13 @@ function build(plan,stored,wb,confirms,wbProfile){
    finite(takeoff.mass)&&Math.abs(takeoff.mass-tw)<=1;
  add('takeoffWeight','TAKEOFF WEIGHT','weight',massValid?'review':'required',match,true,
    !massValid?'O peso de decolagem do OFP está ausente ou fora do domínio 1700–1999 kg.':
-   !wbValid?'Configure o Weight & Balance para comparar peso real e plano.':
-   !match?'O peso do OFP, o perfil Weight & Balance e a calculadora precisam concordar (tolerância 1 kg).':
-   'Peso do OFP, calculadora e Weight & Balance consistentes; confirme também os limites de massa aplicáveis.',
-   sig(plan.takeoffWeight,profile,takeoff.mass,wb?.takeoff?.mass,wb?.ok),
+   wbOptimized?'Otimização cria um cenário SIMULADO, sem representar ocupantes e bagagens reais. Não valida a concordância com o OFP.'+compareText+
+    ' Restaure CARGA MANUAL e confira os valores efetivos.':
+   !wbWithinLimits?'O W&B está ausente, fora do envelope de massa/CG ou ainda não apresenta uma carga real validável.'+compareText:
+   !match?'Os três valores devem concordar (tolerância 1 kg): OFP, W&B e calculadora.'+compareText+
+    ' Ajuste os dados efetivos; não altere o OFP apenas para forçar um CHECKED.':
+   'Pesos de OFP, calculadora e W&B concordantes dentro de 1 kg, com perfil dentro do envelope. Confirme a carga real e os limites aplicáveis.',
+   sig(plan.takeoffWeight,profile,takeoff.mass,wb?.takeoff?.mass,wb?.ok,wbOptimized),
    'OPEN WEIGHT & BALANCE',wbLink);
  if(!runwayId){
    add('runwayId','RUNWAY IDENTIFICATION','runway','required',false,false,

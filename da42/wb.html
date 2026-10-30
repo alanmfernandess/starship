@@ -69,12 +69,30 @@ button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus
 .error{color:var(--red)}.good{color:var(--green)}.warn{color:var(--amber)}
 @media(max-width:355px){.field{height:87px;padding:13px 12px 9px}.entry input{font-size:27px}.module-heading{margin-top:20px}}
 @media(max-height:730px){.topbar{height:72px;padding-top:17px}.module-heading{margin-top:15px;margin-bottom:12px}.field{height:87px}.fields{margin-bottom:10px}.result{padding-top:14px}.bottom{height:57px}}
+
+/* SimBrief reconciliation is separate from hypothetical CG optimization. */
+.wb-ofp{background:#1c303f;border:1px solid #375365;border-radius:13px;padding:12px 13px;margin:0 0 12px}
+.wb-ofp-title{font-size:11px;letter-spacing:.3px;font-weight:700;color:#b9d7e9;margin-bottom:11px}
+.wb-ofp-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.wb-ofp-cell{min-width:0}
+.wb-ofp-cell span{display:block;font-size:9px;color:#9ab4c4;white-space:nowrap}
+.wb-ofp-cell strong{display:block;margin-top:4px;font-size:clamp(13px,3.6vw,17px);font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+.wb-ofp-status{margin-top:10px;padding-top:10px;border-top:1px solid #375365;font-size:10px;line-height:1.5;color:#e7b46d;overflow-wrap:anywhere}
+.wb-ofp-status.equal{color:#79cf9d}
+.restore-simulated{background:transparent;border:1px solid #486c7e;color:#91d1f4;font-weight:650;font-size:10px;line-height:1.3;border-radius:11px;min-height:45px;padding:10px}
+@media(max-width:355px){.wb-ofp{padding:10px}.wb-ofp-grid{gap:4px}.wb-ofp-cell strong{font-size:13px}}
 </style></head>
 <body><div id="app"></div><script src="./wb-engine.js"></script><script src="./wb-optimizer.js"></script><script>
 'use strict';
 const checklistReturn=/[?&]returnToReview=1(?:&|$)/.test(location.search||'');
 const checklistItem=(location.search||'').match(/[?&]reviewItem=([a-zA-Z0-9]+)(?:&|$)/);
 const checklistReturnUrl='./flight.html?review=1'+(checklistItem?'&reviewItem='+checklistItem[1]:'');
+const reviewPlan=(()=>{
+ try{
+  const p=JSON.parse(sessionStorage.getItem('aero-ui-flight-plan-v1')||'null');
+  return checklistReturn&&p?.aircraft==='DA42'&&!p.mismatch&&Number.isFinite(p.takeoffWeight)?p:null;
+ }catch{return null}
+})();
 const E=window.WBEngine,OPT=window.WBOptimizer,AUTO_KEY='da42-wb-optimized-v1',MANUAL_KEY='da42-wb-pre-auto-manual-v1',KEY='da42-wb-profile-v1';
 const icons={
  back:'<path d="m15 5-7 7 7 7"/>',
@@ -124,6 +142,32 @@ function envelope(){
  }
  return '<svg class="graph" viewBox="0 0 320 216" role="img" aria-label="CG envelope, center of gravity versus flight mass">'+lines+columns+'<polygon points="'+poly+'" fill="#56b9ee" fill-opacity=".10" stroke="#56b9ee" stroke-width="2"/>'+path+points+'</svg>';
 }
+function ofpComparison(){
+ if(!reviewPlan)return '';
+ const ofp=reviewPlan.takeoffWeight;
+ let calc=null;
+ try{const s=JSON.parse(localStorage.getItem('aero-ui-da42-v1')||'null');calc=s?.inputs?.takeoff?.mass}catch{}
+ const mass=model.ok?model.takeoff.mass:null;
+ const available=Number.isFinite(mass)&&Number.isFinite(calc);
+ const delta=mass===null?null:mass-ofp;
+ const equal=available&&Math.abs(delta)<=1&&Math.abs(calc-ofp)<=1;
+ const within=model.ok&&model.statuses.massOK&&model.statuses.cgOK;
+ const status=optimizedMode?
+  'SIMULATED LOADING · OTIMIZAR does not reconcile actual weights. Restore CARGA MANUAL and verify the manifest.':
+  !within?'W&B MASS / CG OUT OF LIMITS OR INPUTS INCOMPLETE. Verify actual loading.':
+  !equal?'MASS MISMATCH · OFP, W&B AND TAKEOFF CALCULATOR MUST AGREE WITHIN 1 KG.':
+  'NUMERICAL MATCH · VERIFY ACTUAL LOADING AND APPLICABLE AIRCRAFT LIMITS.';
+ const cell=(name,val)=>'<div class="wb-ofp-cell"><span>'+name+'</span><strong>'+esc(Number.isFinite(val)?format(val,1):'—')+'</strong></div>';
+ return '<section class="wb-ofp" aria-label="SimBrief OFP takeoff mass comparison"><div class="wb-ofp-title">TAKEOFF WEIGHT · OFP COMPARISON</div>'+
+  '<div class="wb-ofp-grid">'+cell('OFP · KG',ofp)+cell('W&B · KG',mass)+cell('CALC · KG',calc)+'</div>'+
+  '<div class="wb-ofp-status '+(equal&&within&&!optimizedMode?'equal':'')+'">'+esc(status)+(delta!==null?' · W&B − OFP: '+esc((delta>=0?'+':'')+format(delta,1))+' KG':'')+'</div></section>';
+}
+function restoreManualLoad(){
+ if(!previousManual)return;
+ profile={...profile,...previousManual};optimizedMode=false;optimizeMessage='';previousManual=null;
+ try{localStorage.removeItem(AUTO_KEY);localStorage.removeItem(MANUAL_KEY)}catch{}
+ render();
+}
 function content(){
  const sc=model.ok?model.statuses:{};
  const metrics=model.ok?'<div class="metrics"><div class="metric"><label>ZFW</label><b>'+format(model.zeroFuel.mass,0)+' kg</b></div><div class="metric"><label>TOW</label><b>'+format(model.takeoff.mass,0)+' kg</b></div></div>':'<div class="metrics"><div class="metric"><label>CHECK INPUTS</label><b>—</b></div></div>';
@@ -132,7 +176,10 @@ function content(){
  '<main class="scroller" id="scroller"><div class="module-heading"><span>WEIGHT &amp; BALANCE</span><span class="accent">CG ENVELOPE</span></div>'+
  '<div class="fields">'+card('pilot','PILOT')+card('copilot','COPILOT')+card('pax1','PASSENGER 1')+card('pax2','PASSENGER 2')+'</div>'+
  '<button class="open-load" id="edit-load" aria-label="BAGGAGE &amp; FUEL"><span class="main">BAGGAGE &amp; FUEL</span>'+icon('next')+'</button>'+
- '<div class="optimize-row"><button id="optimize" class="optimize-button" type="button">OTIMIZAR</button>'+(optimizeMessage?'<span id="optimize-status" class="optimize-feedback" role="alert">'+esc(optimizeMessage)+'</span>':'')+'</div>'+
+ '<div class="optimize-row"><button id="optimize" class="optimize-button" type="button">OTIMIZAR</button>'+
+  (optimizedMode&&previousManual?'<button id="restore-simulated" class="restore-simulated" type="button">CARGA MANUAL</button>':'')+
+  (optimizeMessage?'<span id="optimize-status" class="optimize-feedback" role="alert">'+esc(optimizeMessage)+'</span>':'')+'</div>'+
+  ofpComparison()+
  '<section class="result" aria-live="polite"><div id="envelope">'+envelope()+'</div><div class="legend"><span><i class="dot" style="background:#e7b46d"></i>ZFW</span><span><i class="dot" style="background:#56b9ee"></i>TOW</span></div>'+
  '<div id="mass-check" class="standalone-status '+(sc.massOK?'':'bad')+'">'+(model.ok?massState:'—')+'</div><div id="metrics">'+metrics+'</div>'+
  '</section><div class="notice" id="notice">NOT FOR FLIGHT</div></main>'+
@@ -216,12 +263,7 @@ function sheet(type){
  d.addEventListener('click',ev=>{if(ev.target===d)d.remove()});
  d.querySelector('.close').onclick=()=>d.remove();
  bindInputs(d);
- const restore=d.querySelector('#restore-manual');if(restore)restore.onclick=()=>{
-  if(previousManual)profile={...profile,...previousManual};
-  optimizedMode=false;optimizeMessage='';
-  try{localStorage.removeItem(AUTO_KEY);localStorage.removeItem(MANUAL_KEY)}catch(e){}
-  previousManual=null;d.remove();render();
- };
+ const restore=d.querySelector('#restore-manual');if(restore)restore.onclick=()=>{d.remove();restoreManualLoad()};
  const reset=d.querySelector('#reset-example');if(reset)reset.onclick=()=>{profile={...E.EXAMPLE};optimizedMode=false;previousManual=null;optimizeMessage='';model=E.calculate(profile);try{localStorage.removeItem(KEY);localStorage.removeItem(AUTO_KEY);localStorage.removeItem(MANUAL_KEY)}catch(e){}d.remove();render()};
 }
 function render(){
@@ -232,6 +274,7 @@ function render(){
   };
  el('#settings').onclick=()=>sheet('settings');
  el('#edit-load').onclick=()=>sheet('load');
+  const manual=el('#restore-simulated');if(manual)manual.onclick=restoreManualLoad;
  el('#optimize').onclick=()=>{
   const found=OPT.optimize(profile,E);
   if(!found.ok){optimizeMessage=found.reason&&(/COMBUSTÍVEL|PERFIL|DADOS/.test(found.reason))?'DADOS INVÁLIDOS':'SEM SOLUÇÃO';render();return}

@@ -14,7 +14,7 @@ const app={inputs:{takeoff:{
  slope:0,slopeVerified:false,surface:'paved',surfaceVerified:false,
  runwayId:'10',mass:1910
 },runway:{}}};
-const wb={ok:true,takeoff:{cg:2.4,mass:1905}},verified={};
+const wb={ok:true,takeoff:{cg:2.4,mass:1905},statuses:{massOK:true,cgOK:true}},verified={};
 const states=()=>Object.fromEntries(build(plan,app,wb,verified,'profile').map(x=>[x.id,x]));
 let s=states();
 assert.equal(Object.keys(s).length,9,'expected nine initial review items');
@@ -46,6 +46,21 @@ verified.weather=s.weather.signature;
 assert.equal(states().weather.status,'checked');
 app.inputs.takeoff.wind=9;
 assert.equal(states().weather.status,'review','changed wind invalidates weather acknowledgment');
+// The optimizer creates hypothetical passengers and baggage, so its
+// numerical match must not be interpreted as a verified actual manifest.
+const simulated=Object.fromEntries(build(plan,app,wb,verified,'profile',true).map(x=>[x.id,x]));
+assert.equal(simulated.takeoffWeight.status,'review','optimized simulated load must not validate OFP');
+assert.equal(simulated.cg.status,'verify','simulated CG must not be human-confirmable');
+assert.equal(simulated.cg.manual,false);
+assert.ok(simulated.takeoffWeight.detail.includes('SIMULADO'));
+wb.statuses.cgOK=false;
+const outside=Object.fromEntries(build(plan,app,wb,verified,'profile').map(x=>[x.id,x]));
+assert.equal(outside.takeoffWeight.status,'review','out-of-envelope real load cannot satisfy checklist');
+assert.equal(outside.cg.status,'verify','out-of-envelope CG cannot be confirmed');
+wb.statuses.cgOK=true;
+wb.statuses.massOK=false;
+assert.equal(build(plan,app,wb,verified,'profile').find(x=>x.id==='takeoffWeight').status,'review');
+wb.statuses.massOK=true;
 const altered=fingerprint({...plan,origin:'SBRJ'});
 assert.notEqual(altered,fingerprint(plan),'different mission cannot share confirmed items');
 assert.ok(build({...plan,mismatch:true},app,wb,verified,'profile').every(x=>x.status!=='checked'),

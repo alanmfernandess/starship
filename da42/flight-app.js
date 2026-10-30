@@ -60,7 +60,7 @@ function reviewItems(){
  if(!plan||!Checklist)return [];
  let profile='';
  try{profile=localStorage.getItem('da42-wb-profile-v1')||''}catch{}
- return Checklist.build(plan,getAppInputs(),wbResult(),checkRecord(),profile);
+ return Checklist.build(plan,getAppInputs(),wbResult(),checkRecord(),profile,localStorage.getItem('da42-wb-optimized-v1')==='true');
 }
 function checklistCard(context){
  const all=reviewItems();
