@@ -48,6 +48,21 @@
 .runway-speeds{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px}
 .runway-speeds span{background:#202d39;border-radius:9px;padding:9px 5px;text-align:center;min-width:0;color:var(--txt);font-variant-numeric:tabular-nums;font-size:14px}
 .runway-speeds small{display:block;color:var(--label);font-size:10px;font-weight:600;letter-spacing:.5px;margin-bottom:2px}
+.module-modes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:-3px 0 12px}
+.module-modes .takeoff-option{min-height:43px;white-space:normal;line-height:1.25;color:#b5cad8;text-align:center}
+.module-modes .takeoff-option.selected{border-color:var(--blue);color:#79ceff;background:#1a3a4d}
+.oei-note{margin:0 0 12px;padding:9px 12px;border-radius:9px;background:#29313a;color:var(--amber);font-size:10px;line-height:1.4;letter-spacing:.1px}
+.climb-profile{margin-top:11px;background:var(--tile);border-radius:16px;padding:15px 14px}
+.profile-header{display:flex;justify-content:space-between;gap:8px;color:#b0c5d2;font-size:11px;letter-spacing:.2px}
+.profile-header span:last-child{color:var(--blue);font-size:9px;white-space:nowrap}
+.profile-target{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:13px;padding:10px 12px;border:1px solid var(--line);border-radius:11px}
+.profile-target label{font-size:10px;color:var(--label)}
+.profile-target input{min-width:0;width:42%;border:0;background:transparent;text-align:right;font-size:19px;color:var(--txt);font-variant-numeric:tabular-nums}
+.profile-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:13px}
+.profile-metrics>div{min-width:0;display:flex;flex-direction:column;gap:7px}
+.profile-metrics span{font-size:9px;letter-spacing:.2px;color:var(--label)}
+.profile-metrics strong{font-size:12px;white-space:nowrap;color:var(--txt);font-weight:550;font-variant-numeric:tabular-nums}
+.profile-caution{font-size:10px;color:var(--amber);padding-top:9px}
 .climb-options{margin:-5px 0 12px;display:flex}.climb-options .takeoff-option{flex:1}
 .takeoff-options{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:-5px 0 12px}.takeoff-option{background:#202d39;border:1px solid #344652;color:#9bc8e4;border-radius:11px;padding:10px 7px;font-size:11px;min-height:39px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .temperature-head{display:block;min-width:0}
