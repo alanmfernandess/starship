@@ -40,6 +40,21 @@ function hints(){
   messages.push('TAKEOFF WEIGHT diverge do perfil WEIGHT & BALANCE. Verifique a carga e o combustível por tanque.');
  return messages;
 }
+function shortWarning(message){
+ if(message.includes('variante NG'))return 'DA42 NG · VERIFY VARIANT';
+ if(message.includes('não corresponde ao DA42'))return 'AIRCRAFT · MISMATCH';
+ if(message.includes('PRESSURE ALT abaixo'))return 'PRESSURE ALT · 0 FT TABLE';
+ if(message.includes('PRESSURE ALT da origem'))return 'PRESSURE ALT · CHECK';
+ if(message.includes('WIND COMPONENT'))return 'RUNWAY / CG · VERIFY';
+ if(message.includes('METAR/TAF'))return 'WEATHER · OFP SNAPSHOT';
+ if(message.includes('METAR de origem'))return 'ORIGIN WEATHER · CHECK';
+ if(message.includes('OAT da origem'))return 'OAT · CHECK';
+ if(message.includes('WEIGHT & BALANCE não configurado'))return 'WEIGHT & BALANCE · SETUP';
+ if(message.includes('TAKEOFF WEIGHT diverge'))return 'TAKEOFF WEIGHT · REVIEW';
+ if(message.includes('TAKEOFF WEIGHT fora'))return 'TAKEOFF WEIGHT · OUT OF RANGE';
+ if(message.includes('LANDING WEIGHT ausente'))return 'LANDING WEIGHT · CHECK';
+ return 'INPUT DATA · REVIEW';
+}
 function performance(){
  if(!reviewed||!plan||plan.mismatch)return null;
  const app=getAppInputs(),takeoff=app.inputs?.takeoff;
@@ -104,10 +119,11 @@ function summaryPage(){
  row('CLIMB / OEI','AFM MODEL AVAILABLE')+
  row('WEIGHT & BALANCE',wb?.ok?'LOADING PROFILE AVAILABLE':'PROFILE REQUIRED')+
  row('ALTERNATE',''+(plan.alternate||'NOT SET'))+'</section>';
- body+='<section class="tile"><div class="brand"><strong style="font-size:13px;color:var(--amber)">'+warnings.length+' ITEMS TO REVIEW</strong>'+icon('warning')+'</div>'+
- warnings.slice(0,3).map(x=>'<div class="data-row"><span>'+esc(x)+'</span></div>').join('')+
- '<button class="secondary stretch" id="open-review" style="margin-top:13px">REVIEW DATA</button></section>';
- body+='<button id="open-comparison" class="secondary stretch">VIEW OFP COMPARISON '+icon('next')+'</button>';
+ if(warnings.length)body+='<section class="tile review-summary">'+
+  '<div class="review-heading"><strong>'+warnings.length+' ITEMS TO REVIEW</strong>'+icon('warning')+'</div>'+
+  '<div class="review-lines">'+warnings.map(x=>'<div class="review-line">'+esc(shortWarning(x))+'</div>').join('')+'</div>'+
+  '<button id="open-review" class="review-action" type="button"><span>REVIEW DATA</span>'+icon('next')+'</button></section>';
+ body+='<button id="open-comparison" class="card-button comparison-action" type="button"><span>OFP COMPARISON</span>'+icon('next')+'</button>';
  return body;
 }
 function comparisonPage(){
