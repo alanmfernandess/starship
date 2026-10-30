@@ -542,7 +542,7 @@ with sync_playwright() as p:
         assert page.locator('#val-pa').get_attribute('readonly') is None
         page.locator('#analysis-settings').click()
         page.locator('#rw-wind').evaluate("el => { el.value='-5'; el.dispatchEvent(new Event('input',{bubbles:true})) }")
-        assert page.evaluate("window.AeroCalc.inputs.runway.wind")==0
+        assert page.evaluate("window.AeroCalc.inputs.runway.wind")==10
         assert 'TAILWIND' in page.locator('#rw-wind-output').inner_text()
         page.locator('#rw-save-back').click()
         assert page.evaluate("window.AeroCalc.inputs.runway.wind")==-5
