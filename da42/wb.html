@@ -138,6 +138,11 @@ function content(){
  '<button class="nav-btn" id="nav-scenarios" aria-label="Cenários de combustível e degelo">'+icon('history')+'</button>'+
  '<button class="nav-btn" id="nav-settings" aria-label="Dados da aeronave">'+icon('settings')+'</button></nav></div>';
 }
+function normalizeNumericEntry(text){
+ const raw=String(text).replace(/\s/g,'');
+ if(!raw.includes(','))return raw;
+ return /^[+-]?\d{1,3}(,\d{3})+$/.test(raw)?raw.replaceAll(',',''):raw.replaceAll(',','.');
+}
 function parseNumber(text){
  let v=String(text).trim().replace(/\s/g,'');
  if(!v)return NaN;
@@ -168,7 +173,9 @@ function bindInputs(root=document){
   inp.addEventListener('input',()=>{
    const k=inp.dataset.wb;
    if(optimizedMode&&OPT.ADJUSTABLE.includes(k))return;
-   profile={...profile,[k]:parseNumber(inp.value)};
+   const clean=normalizeNumericEntry(inp.value);
+   if(clean!==inp.value)inp.value=clean;
+   profile={...profile,[k]:parseNumber(clean)};
    recalc();
   });
  });
