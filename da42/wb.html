@@ -86,6 +86,8 @@ const icons={
 const icon=name=>'<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">'+icons[name]+'</svg>';
 const el=s=>document.querySelector(s);
 const format=(x,d=0)=>typeof x==='number'&&Number.isFinite(x)?new Intl.NumberFormat('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d}).format(x):'—';
+const inputFormat=(x,d=0)=>typeof x==='number'&&Number.isFinite(x)?
+ new Intl.NumberFormat('en-US',{useGrouping:false,minimumFractionDigits:d,maximumFractionDigits:d}).format(x):'';
 let profile=E.EXAMPLE;
 try{const saved=JSON.parse(localStorage.getItem(KEY));if(saved&&typeof saved==='object'){const clean=Object.fromEntries(E.INPUTS.filter(k=>Object.prototype.hasOwnProperty.call(saved,k)).map(k=>[k,saved[k]]));profile={...E.EXAMPLE,...clean}}}catch(e){}
 let optimizedMode=false;
@@ -103,7 +105,7 @@ const profilesInputs=[
 ];
 function card(key,label){
  const v=profile[key];
- return '<div class="field"><label for="val-'+key+'">'+label+'</label><div class="entry"><input data-wb="'+key+'" id="val-'+key+'" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" value="'+esc(format(v,0))+'" aria-label="'+label+' kg"'+(optimizedMode&&OPT.ADJUSTABLE.includes(key)?' readonly aria-readonly="true"':'')+'><span class="unit">kg</span></div></div>';
+ return '<div class="field"><label for="val-'+key+'">'+label+'</label><div class="entry"><input data-wb="'+key+'" id="val-'+key+'" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" value="'+esc(inputFormat(v,0))+'" aria-label="'+label+' kg"'+(optimizedMode&&OPT.ADJUSTABLE.includes(key)?' readonly aria-readonly="true"':'')+'><span class="unit">kg</span></div></div>';
 }
 function coords(m,c){const width=270,axisL=2.33,axisR=2.51;return [31+(c-axisL)/(axisR-axisL)*width,181-(m-1500)/450*160]}
 function envelope(){
@@ -186,7 +188,7 @@ function sheet(type){
    body+='<div class="section-title">'+title+'</div>';
    for(const k of keys){
     const field=profilesInputs.find(([id])=>id===k);
-    body+='<div class="sheet-row"><label for="sheet-'+k+'">'+field[1]+'</label><input data-wb="'+k+'" id="sheet-'+k+'" inputmode="decimal" autocomplete="off" type="text" value="'+(profile[k]===null?'':esc(format(profile[k],k==='emptyMoment'?1:1)))+'" placeholder="—" aria-label="'+field[1]+'"'+(optimizedMode&&OPT.ADJUSTABLE.includes(k)?' readonly aria-readonly="true"':'')+'><span class="unit">'+field[2]+'</span></div>';
+    body+='<div class="sheet-row"><label for="sheet-'+k+'">'+field[1]+'</label><input data-wb="'+k+'" id="sheet-'+k+'" inputmode="decimal" autocomplete="off" type="text" value="'+(profile[k]===null?'':esc(inputFormat(profile[k],1)))+'" placeholder="—" aria-label="'+field[1]+'"'+(optimizedMode&&OPT.ADJUSTABLE.includes(k)?' readonly aria-readonly="true"':'')+'><span class="unit">'+field[2]+'</span></div>';
    }
   }
   if(type==='settings')body+=(optimizedMode&&previousManual?'<button class="action" id="restore-manual">CARGA MANUAL</button>':'')+'<button class="action" id="reset-example">AFM EXAMPLE</button>';
