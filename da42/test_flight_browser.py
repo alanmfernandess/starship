@@ -148,7 +148,7 @@ with sync_playwright() as p:
   assert page.locator('#open-review.review-action').count()==1
   assert page.locator('#open-comparison.comparison-action.card-button').count()==1
   assert page.locator('#open-comparison').inner_text()=='OFP COMPARISON'
-  assert page.locator('#open-comparison').evaluate("(e)=>getComputedStyle(e).borderTopWidth==='0px'")
+  assert page.locator('#open-comparison').evaluate("(e)=>getComputedStyle(e).borderTopWidth==='1px'")
   assert page.locator('#open-comparison').evaluate("(e)=>e.getBoundingClientRect().height<=68")
   assert abs(page.locator('#open-comparison').bounding_box()['width']-page.locator('.review-summary').bounding_box()['width'])<2
   page.locator('#open-review').click()
