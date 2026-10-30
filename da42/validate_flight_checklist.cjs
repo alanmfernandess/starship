@@ -13,11 +13,12 @@ const app={inputs:{takeoff:{
  pa:0,wind:0,windVerified:false,toraVerified:false,length:1700,
  slope:0,slopeVerified:false,surface:'paved',surfaceVerified:false,
  runwayId:'10',mass:1910
-},runway:{}}};
+},runway:{},landing:{mass:1860}}};
 const wb={ok:true,takeoff:{cg:2.4,mass:1905},statuses:{massOK:true,cgOK:true}},verified={};
 const states=()=>Object.fromEntries(build(plan,app,wb,verified,'profile').map(x=>[x.id,x]));
 let s=states();
-assert.equal(Object.keys(s).length,9,'expected nine initial review items');
+assert.equal(Object.keys(s).length,10,'landing weight must always have a status');
+assert.equal(s.landingWeight.status,'review','initial loading not yet synced');
 assert.equal(s.tora.status,'required');
 assert.equal(s.wind.status,'required');
 assert.equal(s.weather.status,'review');
@@ -32,7 +33,7 @@ app.inputs.takeoff={
 };
 wb.takeoff.mass=1900;
 s=states();
-for(const id of ['tora','wind','slope','surface','takeoffWeight'])assert.equal(s[id].status,'checked',id);
+for(const id of ['tora','wind','slope','surface','takeoffWeight','landingWeight'])assert.equal(s[id].status,'checked',id);
 for(const item of Object.values(s))if(item.manual)verified[item.id]=item.signature;
 s=states();
 assert.ok(Object.values(s).every(x=>x.status==='checked'));
@@ -72,4 +73,32 @@ const altered=fingerprint({...plan,origin:'SBRJ'});
 assert.notEqual(altered,fingerprint(plan),'different mission cannot share confirmed items');
 assert.ok(build({...plan,mismatch:true},app,wb,verified,'profile').every(x=>x.status!=='checked'),
  'mismatched aircraft must never be checked');
-console.log('flight checklist: 9-item states, dependencies, confirmations, invalidation and mismatch OK');
+
+// Source-aware landing mass: never require the OFP LDW in manual/optimized mode.
+const lowPlan={...plan,landingWeight:1650};
+const lowInputs={inputs:{...app.inputs,landing:{mass:1650}}};
+const loadedWb={...wb,takeoff:{...wb.takeoff,mass:1900},statuses:{massOK:true,cgOK:true}};
+for(const m of ['simbrief','manual','optimized']){
+ const row=build(lowPlan,lowInputs,loadedWb,verified,'profile',m==='optimized',m)
+  .find(x=>x.id==='landingWeight');
+ assert.equal(row.status,'out-of-table',m);
+ assert.equal(row.manual,false);
+}
+const missingPlan={...plan,landingWeight:null,tripFuel:null};
+assert.equal(build(missingPlan,app,loadedWb,verified,'profile',false,'manual')
+ .find(x=>x.id==='landingWeight').status,'required');
+assert.equal(build(missingPlan,app,loadedWb,verified,'profile',false,'simbrief')
+ .find(x=>x.id==='landingWeight').status,'required');
+assert.equal(build({...plan,landingWeight:2050},app,loadedWb,verified,'profile',false,'simbrief')
+ .find(x=>x.id==='landingWeight').status,'required','mass above published upper limit');
+const ownBurn={...plan,landingWeight:1650,tripFuel:130};
+const ownInputs={inputs:{...app.inputs,landing:{mass:1770}}};
+for(const m of ['manual','optimized']){
+ assert.equal(build(ownBurn,ownInputs,loadedWb,verified,'profile',m==='optimized',m)
+  .find(x=>x.id==='landingWeight').status,'checked',
+  'active loading TOW 1900 minus trip burn 130 = 1770');
+}
+const staleInputs={inputs:{...app.inputs,landing:{mass:1800}}};
+assert.equal(build(ownBurn,staleInputs,loadedWb,verified,'profile',true,'optimized')
+ .find(x=>x.id==='landingWeight').status,'review','stale calculator cannot clear checklist');
+console.log('flight checklist: source-aware landing and out-of-table safeguards OK');

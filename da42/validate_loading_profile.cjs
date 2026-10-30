@@ -2,6 +2,7 @@
 const assert=require('node:assert/strict');
 const Load=require('./loading-profile.js');
 const W=require('./wb-engine.js');
+const Landing=require('./landing-tables.js');
 function storage(){
  const map=new Map();
  return {getItem:k=>map.has(k)?map.get(k):null,setItem:(k,v)=>map.set(k,String(v)),removeItem:k=>map.delete(k)};
@@ -60,6 +61,26 @@ assert.equal(JSON.stringify(get()),before,'invalid optimizer result must not upd
 assert.ok(!Load.setMode(db,'simbrief',null),'SIMBRIEF mode requires an OFP');
 assert.equal(Load.loading({...p,plannedFuel:514},null,'simbrief').limitation,'FUEL EXCEEDS TANK CAPACITY');
 assert.equal(Load.loading({...p,takeoffWeight:2000},null,'simbrief').valid,false);
+
+// A published table begins at 1700 kg; the actual simulated mass must not
+// be clamped to a prior in-range value or extrapolated by the landing engine.
+const burnTo1650=wb.takeoff.mass-1650;
+assert.ok(burnTo1650>0,'fixture must be above lower landing table');
+const lowPlan={...p,tripFuel:burnTo1650,landingWeight:1600};
+let low=Load.sync(db,lowPlan,wb,'manual');
+assert.ok(low.valid);
+assert.ok(Math.abs(low.landing-1650)<1e-8);
+for(const key of ['landing','abnormal','goaround'])
+ assert.ok(Math.abs(get()[key].mass-1650)<1e-8,key+' must retain actual out-of-table weight');
+assert.equal(Landing.validate({mass:get().landing.mass,pa:0,oat:15,wind:0}),'MASSA FORA DA TABELA');
+assert.equal(Landing.compute('landing',{mass:get().landing.mass,pa:0,oat:15,wind:0}).error,'MASSA FORA DA TABELA');
+assert.equal(Load.sync(db,lowPlan,wb,'optimized').landing,1650);
+assert.equal(Load.sync(db,{...lowPlan,tripFuel:null,landingWeight:null},wb,'manual').landing,null);
+for(const key of ['landing','abnormal','goaround'])
+ assert.equal(get()[key].mass,null,'unknown landing mass clears stale '+key);
+assert.equal(Load.sync(db,{...p,landingWeight:1650},null,'simbrief').landing,1650);
+assert.equal(get().landing.mass,1650,'SimBrief below-table LDW syncs without table extrapolation');
+
 Load.clearPlan(db);
 assert.equal(Load.plan(second,db),null,'cleared OFP is no longer offered in another tab');
 console.log('PASS loading modes, SimBrief T/O fuel tank distribution, sync, CG provenance, no double counting, invalid fuel guards.');

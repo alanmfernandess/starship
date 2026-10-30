@@ -147,6 +147,23 @@ with sync_playwright() as p:
   assert page.locator('#restore-simulated').count()==0
   page.locator('#menu').click()
   page.wait_for_url('**/flight.html?review=1&reviewItem=takeoffWeight')
+  # Below 1700 kg: informational status, no AFM extrapolation.
+  page.evaluate("""()=>{
+    localStorage.setItem('da42-loading-mode-v1','simbrief');
+    AeroFlight.plan.landingWeight=1650;
+    AeroFlight.applyPlan(false);
+  }""")
+  page.reload()
+  assert page.locator('[data-check-id="landingWeight"] .check-badge').inner_text()=='OUT OF TABLE'
+  assert page.locator('.check-count.status-out-of-table').inner_text()=='1 OUT OF TABLE'
+  assert page.locator('[data-check-id="landingWeight"] [data-check-confirm]').count()==0
+  assert page.locator('[data-check-id="landingWeight"] .check-badge').evaluate(
+    "(e)=>e.scrollWidth<=e.clientWidth+1")
+  assert page.evaluate("""()=>Math.abs(
+    JSON.parse(localStorage.getItem('aero-ui-da42-v1')).inputs.landing.mass-1650)<0.01""")
+  page.goto(CALC+'?calculator=1&module=landing')
+  assert page.evaluate("""()=>AeroCalc.compute('landing',AeroCalc.inputs.landing).error""")=='MASSA FORA DA TABELA'
+  assert page.locator('#main-result').inner_text()=='—'
   assert not errors,errors
   context.close()
  browser.close()

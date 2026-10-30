@@ -62,9 +62,13 @@ function loading(p,wb,selected){
  }
  const ok=!!(wb?.ok&&wb?.statuses?.massOK&&wb?.statuses?.cgOK&&
   finite(wb?.takeoff?.mass)&&wb.takeoff.mass>=1700&&wb.takeoff.mass<=1900);
- const trip=p&&finite(p.takeoffWeight)&&finite(p.landingWeight)?
-  p.takeoffWeight-p.landingWeight:null;
- const landing=ok&&finite(trip)&&trip>=0?wb.takeoff.mass-trip:null;
+ // MANUAL / OPTIMIZED: selected TOW minus planned en-route fuel burn.
+ // Without a tripFuel field, an OFP TOW-LDW delta is a fallback.
+ const trip=p&&finite(p.tripFuel)&&p.tripFuel>=0?p.tripFuel:
+  p&&finite(p.takeoffWeight)&&finite(p.landingWeight)&&p.takeoffWeight>=p.landingWeight?
+   p.takeoffWeight-p.landingWeight:null;
+ const landing=ok&&finite(trip)&&trip>=0&&wb.takeoff.mass>trip?
+   wb.takeoff.mass-trip:null;
  return {mode:selected,tow:wb?.ok?wb.takeoff.mass:null,
   landing:finite(landing)?landing:null,zfw:wb?.ok?wb.zeroFuel.mass:null,
   fuel:wb?.ok?{ok:true,total:wb.fuel.usableTotal,tanks:{
@@ -79,9 +83,11 @@ function sync(storage,p,wb,selected){
  for(const name of ['takeoff','runway','climb','oei']){
   data.inputs[name]={...(data.inputs[name]||{}),mass:item.tow};
  }
- if(finite(item.landing)&&item.landing>=1700&&item.landing<=1900)
-  for(const name of ['landing','abnormal','goaround'])
-   data.inputs[name]={...(data.inputs[name]||{}),mass:item.landing};
+ // Never retain stale landing mass when the source changes.
+ // Out-of-table masses remain exact; the AFM landing engine rejects them.
+ for(const name of ['landing','abnormal','goaround'])
+  data.inputs[name]={...(data.inputs[name]||{}),
+   mass:finite(item.landing)&&item.landing>0?item.landing:null};
  storage.setItem(STORE_KEY,JSON.stringify(data));
  return item;
 }

@@ -61,19 +61,26 @@ function reviewItems(){
  if(!plan||!Checklist)return [];
  let profile='';
  try{profile=localStorage.getItem('da42-wb-profile-v1')||''}catch{}
- return Checklist.build(plan,getAppInputs(),wbResult(),checkRecord(),profile,localStorage.getItem('da42-wb-optimized-v1')==='true',Load?Load.mode(localStorage,plan):'manual');
+ const wb=wbResult(),mode=Load?Load.mode(localStorage,plan):'manual';
+ const active=Load?.loading(plan,mode==='simbrief'?null:wb,mode)||null;
+ return Checklist.build(plan,getAppInputs(),wb,checkRecord(),profile,
+   localStorage.getItem('da42-wb-optimized-v1')==='true',mode,active);
 }
 function checklistCard(context){
  const all=reviewItems();
  if(!all.length)return '';
- const priority={required:0,verify:1,review:2,checked:3};
+ const priority={required:0,verify:1,review:2,'out-of-table':3,checked:4};
  const items=[...all].sort((a,b)=>priority[a.status]-priority[b.status]);
- const pending=items.filter(x=>x.status!=='checked').length,done=items.length-pending;
- const counts={required:0,verify:0,review:0,checked:done};
- for(const item of items)if(item.status!=='checked')counts[item.status]++;
- const tokens=['required','verify','review'].filter(x=>counts[x]).map(x=>'<span class="check-count status-'+x+'"><b>'+counts[x]+'</b> '+x.toUpperCase()+'</span>').join('');
+ const done=items.filter(x=>x.status==='checked').length;
+ const outside=items.filter(x=>x.status==='out-of-table').length;
+ const reviewed=done+outside;
+ const pending=items.length-reviewed;
+ const counts={required:0,verify:0,review:0,'out-of-table':outside,checked:done};
+ for(const item of items)if(!['checked','out-of-table'].includes(item.status))counts[item.status]++;
+ const tokens=['required','verify','review','out-of-table'].filter(x=>counts[x]).map(x=>
+  '<span class="check-count status-'+x+'"><b>'+counts[x]+'</b> '+(x==='out-of-table'?'OUT OF TABLE':x.toUpperCase())+'</span>').join('');
  const rows=items.map(item=>{
-  const checked=item.status==='checked',state=checked?'CHECKED':item.status.toUpperCase();
+  const checked=item.status==='checked',state=checked?'CHECKED':item.status==='out-of-table'?'OUT OF TABLE':item.status.toUpperCase();
   const mark='<span class="check-square" aria-hidden="true">'+(checked?icon('check'):'')+'</span>';
   const move=item.href?item.href==='#weather-ofp'?
     '<button type="button" class="check-link" data-open-weather="1">'+esc(item.action)+'</button>':
@@ -87,15 +94,15 @@ function checklistCard(context){
    '<div class="check-expanded"><p class="review-explanation">'+esc(item.detail)+'</p>'+
    ((move||confirm)?'<div class="check-actions">'+move+confirm+'</div>':'')+'</div></details>';
  }).join('');
- const percent=Math.round(done/items.length*100);
+ const percent=Math.round(reviewed/items.length*100);
  return '<section class="tile review-summary checklist" aria-label="Data validation checklist">'+
-  '<div class="review-heading"><strong>'+(pending?pending+' ITEMS TO REVIEW':'ALL '+items.length+' ITEMS CHECKED')+'</strong>'+
-  '<span class="check-heading-icon">'+icon(pending?'warning':'check')+'</span></div>'+
-  '<div class="check-overview"><span>'+done+' / '+items.length+' CHECKED</span><span>'+percent+'%</span></div>'+
-  '<div class="check-progress" role="progressbar" aria-valuemin="0" aria-valuemax="'+items.length+'" aria-valuenow="'+done+'" aria-label="Verified data items"><span style="width:'+percent+'%"></span></div>'+
+  '<div class="review-heading"><strong>'+(pending?pending+' ITEMS TO REVIEW':outside?'ALL ITEMS REVIEWED':'ALL '+items.length+' ITEMS CHECKED')+'</strong>'+
+  '<span class="check-heading-icon">'+icon(pending||outside?'warning':'check')+'</span></div>'+
+  '<div class="check-overview"><span>'+reviewed+' / '+items.length+' REVIEWED · '+done+' CHECKED</span><span>'+percent+'%</span></div>'+
+  '<div class="check-progress" role="progressbar" aria-valuemin="0" aria-valuemax="'+items.length+'" aria-valuenow="'+reviewed+'" aria-label="Reviewed data items"><span style="width:'+percent+'%"></span></div>'+
   (tokens?'<div class="check-counts">'+tokens+'</div>':'')+'<div class="review-lines">'+rows+'</div>'+
   (context==='summary'?'<button id="open-review" class="review-action" type="button"><span>REVIEW DATA</span>'+icon('next')+'</button>':'')+
-  '<p class="check-note">CHECKED = DATA REVIEWED FOR THIS CHECK · NOT FLIGHT CLEARANCE</p></section>';
+  '<p class="check-note">OUT OF TABLE = LANDING CALC UNAVAILABLE · NOT FLIGHT CLEARANCE</p></section>';
 }
 function performance(){
  if(!reviewed||!plan||plan.mismatch)return null;

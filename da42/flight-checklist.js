@@ -6,7 +6,7 @@
 'use strict';
 const finite=n=>typeof n==='number'&&Number.isFinite(n);
 const sig=(...fields)=>JSON.stringify(fields.map(v=>v===undefined?null:v));
-function build(plan,stored,wb,confirms,wbProfile,wbOptimized=false,loadingMode='manual'){
+function build(plan,stored,wb,confirms,wbProfile,wbOptimized=false,loadingMode='manual',activeLoading=null){
  if(!plan)return [];
  const inputs=stored&&stored.inputs||{};
  const takeoff=inputs.takeoff||{};
@@ -110,11 +110,34 @@ function build(plan,stored,wb,confirms,wbProfile,wbOptimized=false,loadingMode='
      'O OFP não identificou a pista de decolagem. Gere ou importe um OFP com pista definida e confira os dados de pista.',
      sig(plan.origin,plan.originRunway,runwayId),'','');
  }
- if(!finite(plan.landingWeight)||plan.landingWeight<1700||plan.landingWeight>1999){
-   add('landingWeight','LANDING WEIGHT','weight','required',false,false,
-     'Peso de pouso ausente ou fora do domínio da calculadora; revise o OFP antes da análise de pouso.',
-     sig(plan.landingWeight),'','');
- }
+ // The selected loading source, not the OFP alone, owns landing mass.
+ // SimBrief uses OFP LDW; MANUAL / OPTIMIZED use modeled TOW - trip burn.
+ const burn=finite(plan.tripFuel)&&plan.tripFuel>=0?plan.tripFuel:
+  finite(plan.takeoffWeight)&&finite(plan.landingWeight)&&plan.takeoffWeight>=plan.landingWeight?
+   plan.takeoffWeight-plan.landingWeight:null;
+ const modeledLanding=wbValid&&finite(burn)&&finite(wb?.takeoff?.mass)&&wb.takeoff.mass>burn?
+  wb.takeoff.mass-burn:null;
+ const activeValid=activeLoading?.mode===loadingMode&&activeLoading.valid===true;
+ const landingMass=loadingMode==='simbrief'?plan.landingWeight:
+  activeValid?activeLoading.landing:modeledLanding;
+ const landingSourceValid=loadingMode==='simbrief'?compatible:
+  wbValid&&(activeLoading===null||activeValid);
+ const known=landingSourceValid&&finite(landingMass)&&landingMass>0;
+ const inTable=known&&landingMass>=1700&&landingMass<=1999;
+ const outLow=known&&landingMass<1700;
+ const landingInputs=inputs.landing||{};
+ const synced=inTable&&finite(landingInputs.mass)&&Math.abs(landingInputs.mass-landingMass)<=1;
+ const landingPriority=outLow?'out-of-table':!known||landingMass>1999?'required':'review';
+ const landingDetail=outLow?
+  'OUT OF TABLE · '+landingMass.toFixed(1)+' KG · AFM 1700–1999 KG. Landing distance unavailable; no extrapolation.':
+  !known?'LANDING WEIGHT REQUIRED · '+(loadingMode==='simbrief'?'CHECK OFP LDW.':'CHECK W&B AND TRIP FUEL.') :
+  landingMass>1999?'LANDING WEIGHT ABOVE PUBLISHED LIMIT · CHECK LOAD.':
+  synced?'LANDING WEIGHT · '+landingMass.toFixed(1)+' KG · '+loadingMode.toUpperCase()+'.':
+  'SYNC LANDING WEIGHT · '+landingMass.toFixed(1)+' KG · '+loadingMode.toUpperCase()+'.';
+ add('landingWeight','LANDING WEIGHT','weight',landingPriority,synced,true,
+  landingDetail,sig(loadingMode,landingMass,landingInputs.mass,plan.tripFuel,plan.takeoffWeight,plan.landingWeight,profile,wbOptimized),
+  loadingMode==='simbrief'?'OPEN FLIGHT PLAN':'OPEN WEIGHT & BALANCE',
+  loadingMode==='simbrief'?'./flight.html?review=1':wbLink);
  if(!hasOriginPA||!finite(o.oat)||o.oat<0||o.oat>50){
    add('originWeather','ORIGIN WEATHER DATA','cloud','required',false,false,
      'Verifique QNH, elevação e OAT de origem. Os dados importados não permitem sincronização atmosférica completa com a calculadora.',
