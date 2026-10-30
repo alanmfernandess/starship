@@ -66,8 +66,9 @@ function planPage(){
 }
 function reviewPage(){
  if(!plan)return planPage();
+ const incompatible=plan.mismatch||plan.aircraft!=='DA42';
  let items= '<section class="tile"><div class="brand"><span class="title">IMPORTED FLIGHT PLAN</span><span class="pill">REVIEW</span></div>'+
- '<div class="status '+(plan.mismatch?'warn':'ok')+'">'+esc(plan.source==='MANUAL'?'MANUAL PLAN':plan.mismatch?'AIRCRAFT MISMATCH · SYNC BLOCKED':'OFP READ SUCCESSFULLY')+'</div></section>'+routeCard();
+ '<div class="status '+(incompatible?'warn':'ok')+'">'+esc(plan.source==='MANUAL'?'MANUAL PLAN':incompatible?'AIRCRAFT MISMATCH · SYNC BLOCKED':'OFP READ SUCCESSFULLY')+'</div></section>'+routeCard();
  items+='<section class="tile"><div class="list-title">CONFIRM FLIGHT DATA</div><div class="review-grid">'+
  inputField('distance','MISSION DISTANCE · NM',plan.distance)+inputField('alternateDistance','ALTERNATE DIST · NM',plan.alternateDistance)+
  inputField('takeoffWeight','TAKEOFF WEIGHT · KG',plan.takeoffWeight)+inputField('landingWeight','LANDING WEIGHT · KG',plan.landingWeight)+
@@ -80,7 +81,7 @@ function reviewPage(){
  items+='<section class="tile"><div class="list-title">WEATHER · OFP SNAPSHOT</div>'+weatherRows()+'</section>';
  const warnings=hints();
  if(warnings.length)items+='<div class="notice"><strong>'+warnings.length+' ITEMS TO REVIEW</strong><div>'+warnings.map(x=>'<p>'+esc(x)+'</p>').join('')+'</div></div>';
- items+='<div class="action-row"><button class="secondary" id="back-plan">BACK</button><button class="primary" id="confirm-plan">CONFIRM AND CONTINUE</button></div>';
+ items+='<div class="action-row"><button class="secondary" id="back-plan">BACK</button><button class="primary" id="confirm-plan" '+(incompatible?'disabled aria-disabled="true"':'')+'>CONFIRM AND CONTINUE</button></div>';
  return items;
 }
 function weatherRows(){
