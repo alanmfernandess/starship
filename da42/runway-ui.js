@@ -14,8 +14,8 @@ function open(values,render,icon,escape){
  function close(){document.removeEventListener('keydown',keyHandler);overlay.remove()}
  function saveAndBack(){
   if(state.paMode==='qnh'&&(!Number.isFinite(state.elevation)||state.elevation< -1000||state.elevation>10000||!Number.isFinite(state.qnh)||state.qnh<870||state.qnh>1085))error='FIELD ELEV (−1000 a 10000 FT) e QNH (870 a 1085 HPA) são obrigatórios e devem ser válidos.';
-  else if(!Number.isFinite(state.wind)||state.wind< -10||state.wind>20)error='Vento fora da faixa permitida (−10 a +20 KT).';
-  else if(!Number.isFinite(state.slope)||state.slope<0||state.slope>5)error='Aclive deve estar entre 0 e 5%.';
+  else if(state.windVerified!==false&&(!Number.isFinite(state.wind)||state.wind< -10||state.wind>20))error='Vento fora da faixa permitida (−10 a +20 KT).';
+  else if(state.slopeVerified!==false&&(!Number.isFinite(state.slope)||state.slope<0||state.slope>5))error='Aclive deve estar entre 0 e 5%.';
   else error='';
   if(error){view='main';draw();return}
   Object.assign(values,state);
@@ -43,7 +43,7 @@ function open(values,render,icon,escape){
   let body='';
   if(view==='main'){
    const w=Number(state.wind)||0,fill=Math.max(0,Math.min(100,(w+10)/30*100));
-   body='<div class="rw-context">RUNWAY · '+escape(state.runwayId||'NOT IDENTIFIED')+' · '+(state.toraVerified?'TORA OFP / SET':'TORA REQUIRED')+'</div>'+
+   body='<div class="rw-context">RUNWAY · '+escape(state.runwayId||'NOT IDENTIFIED')+' · '+(state.toraVerified?'TORA VERIFIED':state.lengthEstimated?'RUNWAY LENGTH EST.':'TORA REQUIRED')+'</div>'+
     option('takeoff','TAKEOFF',state.procedure==='short'?'SHORT · APP':'NORMAL · UP')+
     option('weight','MAX WEIGHT',state.maxMass===1999?'1999 KG':'1900 KG')+
     option('pressure','PRESSURE ALT',state.paMode==='qnh'?'QNH + ELEV':'DIRECT')+
