@@ -155,7 +155,7 @@ with sync_playwright() as p:
   }""")
   page.reload()
   assert page.locator('[data-check-id="landingWeight"] .check-badge').inner_text()=='OUT OF TABLE'
-  assert page.locator('.check-count.status-out-of-table').inner_text()=='1 OUT OF TABLE'
+  assert ' '.join(page.locator('.check-count.status-out-of-table').inner_text().split())=='1 OUT OF TABLE'
   assert page.locator('[data-check-id="landingWeight"] [data-check-confirm]').count()==0
   assert page.locator('[data-check-id="landingWeight"] .check-badge').evaluate(
     "(e)=>e.scrollWidth<=e.clientWidth+1")
