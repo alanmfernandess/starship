@@ -286,8 +286,8 @@ function calibrate(){// Anchor the plotted ordinate to the published example, no
  GRAPH_REGISTRATION.oei=212-rawCompute('oei',EXAMPLES.oei).roc;
 }
 calibrate();
-function unifiedTakeoffInput(v){const x=window.RunwayAnalysis.modelInput(v,v.mass);x.wind=v.wind;return x}
-function runwayResult(v){return window.RunwayAnalysis.compute(v)}
+function unifiedTakeoffInput(v){const x=window.RunwayAnalysis?.modelInput?window.RunwayAnalysis.modelInput(v,v.mass):{...v};x.wind=v.wind;return x}
+function runwayResult(v){return window.RunwayAnalysis?.compute?window.RunwayAnalysis.compute(v):{error:'RUNWAY DATA UNAVAILABLE'}}
 function limits(id,v){
  if(id==='takeoff')return window.TakeoffTables.validate(unifiedTakeoffInput(v));
  if(id==='runway')return window.RunwayAnalysis.validate(v);
