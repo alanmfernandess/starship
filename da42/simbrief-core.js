@@ -25,6 +25,49 @@ function metar(raw){
  return {raw:line,windDir:wind&&wind[1]!=='VRB'?Number(wind[1]):null,
   windSpeed:wind?Number(wind[2]):null,oat, qnh:pressure?Math.round(pressure*100)/100:null};
 }
+/* SimBrief optional TLR data: lengths are in feet (not TORA in metres).
+ * Do not substitute physical runway length for a missing length_tora.
+ * Never derive runway magnetic heading directly from a runway number.
+ */
+function runwayIdent(id){
+ const v=upper(id).replace(/^RWY\s*/,'');
+ const m=v.match(/^([0-3]?\d)([LRC]?)$/);
+ if(!m)return '';
+ const n=Number(m[1]);
+ return n>=1&&n<=36?String(n).padStart(2,'0')+m[2]:'';
+}
+function runwayData(raw,planRunway,weather){
+ const dep=raw.tlr?.takeoff;
+ const planned=runwayIdent(planRunway);
+ const tlrPlan=runwayIdent(dep?.conditions?.planned_runway);
+ const candidates=Array.isArray(dep?.runway)?dep.runway:dep?.runway?[dep.runway]:[];
+ const match=candidates.find(x=>runwayIdent(x?.identifier)===planned);
+ const runway=planned&&(!tlrPlan||tlrPlan===planned)?match:null;
+ const toraFt=number(val(runway?.length_tora),3.281,16404.2);
+ const tora=toraFt===null?null:Math.floor(toraFt*.3048*10)/10;
+ const trueCourse=number(val(runway?.true_course),0,360);
+ const magneticCourse=number(val(runway?.magnetic_course),0,360);
+ const hw=number(val(runway?.headwind_component),-100,100);
+ const wDir=number(val(weather?.windDir),0,360),wSpeed=number(val(weather?.windSpeed),0,200);
+ let component=null,windSource='';
+ // A TLR runway component is already runway-specific; otherwise METAR winds
+ // are true, so only combine them with TLR TRUE course, never runway number.
+ if(hw!==null){component=hw;windSource='OFP TLR'}
+ else if(trueCourse!==null&&wDir!==null&&wSpeed!==null){
+  component=wSpeed*Math.cos((wDir-trueCourse)*Math.PI/180);
+  windSource='OFP METAR + TRUE COURSE';
+ }
+ const conservative=component===null?null:Math.floor(component+1e-10);
+ const gradient=number(val(runway?.gradient),0,5);
+ const condition=upper(dep?.conditions?.surface_condition);
+ return {identifier:planned,tlrMatched:!!runway,tora,source:tora===null?'':'OFP TLR',
+  trueCourse,magneticCourse,headwind:conservative,windSource,
+  crosswind:conservative===null||wSpeed===null||wDir===null||trueCourse===null?null:
+   Math.round(wSpeed*Math.sin((wDir-trueCourse)*Math.PI/180)*10)/10,
+  slope:gradient,condition:condition==='DRY'||condition==='WET'?condition:'',
+  // PAVED vs GRASS is not established by SimBrief's dry/wet condition.
+  surface:null};
+}
 function normalize(raw){
  if(!raw||typeof raw!=='object')throw Error('OFP inválido: conteúdo não é um objeto.');
  if(raw.fetch&&raw.fetch.status&&upper(raw.fetch.status)!=='SUCCESS')throw Error('SimBrief: '+text(raw.fetch.status).slice(0,130));
@@ -47,7 +90,8 @@ function normalize(raw){
  const result={
   source:'SIMBRIEF',origin:originCode,destination:destinationCode,alternate:/^[A-Z0-9]{4}$/.test(altnCode)?altnCode:'',
   aircraft:type||name||'UNKNOWN',aircraftName:name,aircraftVerified,mismatch,generated,units,
-  originRunway:text(origin.plan_rwy),destinationRunway:text(dest.plan_rwy),
+  originRunway:runwayIdent(origin.plan_rwy),destinationRunway:runwayIdent(dest.plan_rwy),
+  runway:runwayData(raw,origin.plan_rwy,metar(weather.orig_metar)),
   originElevation:number(val(origin.elevation),-1500,15000),destinationElevation:number(val(dest.elevation),-1500,15000),
   route:text(g.route).slice(0,1200),distance:number(val(g.route_distance),0,20000),
   alternateDistance:number(val(alt.distance),0,20000),cruiseAltitude:number(val(g.initial_altitude),0,50000),
@@ -93,7 +137,28 @@ function proposedInputs(plan,existing){
   if(finite(pa)&&pa>=0&&pa<=10000&&d.oat>=-20&&d.oat<=50)
    for(const k of ['landing','abnormal','goaround'])result[k]={...(result[k]||{}),pa,oat:d.oat,isa:false};
  }
- warnings.push('WIND COMPONENT, TORA, RUNWAY SURFACE e CG exigem verificação manual; não foram inferidos.');
+ // A fresh OFP must never silently retain TORA/wind/surface/slope from
+ // the previous airport. A missing field blocks this RUNWAY analysis until
+ // the pilot enters and verifies it in the existing RUNWAY controls.
+ const rw=plan.runway||{};
+ const runwayFields={
+  runwayId:rw.identifier||'',runwaySource:'SIMBRIEF OFP',
+  length:rw.tora!==null&&Number.isFinite(rw.tora)?rw.tora:0,
+  toraVerified:rw.tora!==null&&Number.isFinite(rw.tora),
+  wind:Number.isFinite(rw.headwind)&&rw.headwind>=-10&&rw.headwind<=20?rw.headwind:0,
+  windVerified:Number.isFinite(rw.headwind)&&rw.headwind>=-10&&rw.headwind<=20,
+  windSource:rw.windSource||'',
+  slope:Number.isFinite(rw.slope)?rw.slope:0,
+  slopeVerified:Number.isFinite(rw.slope),
+  surface:'paved',surfaceVerified:false,wet:false,soft:false
+ };
+ result.runway={...(result.runway||{}),...runwayFields};
+ if(!rw.identifier)warnings.push('RUNWAY não identificada no OFP.');
+ if(!runwayFields.toraVerified)warnings.push('TORA indisponível no OFP. Informe a TORA da pista selecionada.');
+ if(!runwayFields.windVerified)warnings.push('WIND COMPONENT não resolvido para a pista. Verifique o vento e o rumo verdadeiro.');
+ if(!runwayFields.slopeVerified)warnings.push('RUNWAY SLOPE não disponível no OFP. Confirme o aclive.');
+ warnings.push('RUNWAY SURFACE não verificada. Confirme PAVED ou GRASS.');
+ warnings.push('CG exige verificação no Weight & Balance.');
  warnings.push('METAR/TAF do OFP são históricos de planejamento, não dados meteorológicos em tempo real.');
  return {inputs:result,warnings};
 }
@@ -110,7 +175,7 @@ function compare(plan,calculated,wb){
  }
  return diffs;
 }
-const api={normalize,metar,proposedInputs,compare,val,kilo,duration};
+const api={normalize,metar,runwayIdent,runwayData,proposedInputs,compare,val,kilo,duration};
 if(typeof module!=='undefined'&&module.exports)module.exports=api;
 root.SimBriefCore=api;
 })(typeof window!=='undefined'?window:globalThis);
