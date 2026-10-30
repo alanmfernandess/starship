@@ -16,7 +16,14 @@ const icons={
  warning:'M12 3 2 21h20L12 3zM12 9v5M12 17h.01',
  download:'M12 3v13m-5-5 5 5 5-5M4 21h16',
  check:'m4 12 5 5L20 6',
- chart:'M3 18h18M5 15l5-5 4 3 5-8'
+ chart:'M3 18h18M5 15l5-5 4 3 5-8',
+ clipboard:'M8 4h-2a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2M9 3h6v4H9zM9 12h6M9 16h6',
+ scale:'M12 3v18M7 21h10M5 7h14M5 7l-3 6h6L5 7zM19 7l-3 6h6L19 7z',
+ planeTakeoff:'M2 19h20M5 15l5-2-2.5-5 2-1 5 4 4.2-1.4a2 2 0 0 1 2.6 1.6L4 17z',
+ trend:'M3 17l6-6 4 4 8-8M15 7h6v6',
+ gauge:'M5 17a9 9 0 1 1 14 0M12 14l4-5M7 18h10',
+ planeLanding:'M2 19h20M5 7l5 2 2.5-4 2 1-1 5 6 3a2 2 0 0 1-1 3L4 10z',
+ rotate:'M3 11a9 9 0 1 0 3-6M3 4v7h7'
 };
 const icon=n=>'<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="'+(icons[n]||icons.next)+'"/></svg>';
 const esc=v=>String(v??'').replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[x]));
@@ -177,18 +184,23 @@ function comparisonPage(){
  body+='</section>';
  return body;
 }
+function moduleCard(name,sub,iconName,url){
+ const body='<span class="module-icon">'+icon(iconName)+'</span>'+
+ '<span class="module-copy"><strong>'+esc(name)+'</strong><span class="module-sub">'+esc(sub)+'</span></span>'+
+ '<span class="module-chevron">'+icon('next')+'</span>';
+ return url?'<a class="card-button module-card" href="'+url+'">'+body+'</a>':
+ '<button type="button" class="card-button module-card" data-go="plan">'+body+'</button>';
+}
 function modulesPage(){
- const modules=[
- ['WEIGHT & BALANCE','./wb.html'],
- ['TAKEOFF PERFORMANCE','./index.html?calculator=1&module=takeoff'],
- ['CLIMB PERFORMANCE','./index.html?calculator=1&module=climb'],
- ['ONE ENGINE INOPERATIVE','./index.html?calculator=1&module=oei'],
- ['CRUISE PERFORMANCE','./index.html?calculator=1&module=cruiseperf'],
- ['LANDING PERFORMANCE','./index.html?calculator=1&module=landing'],
- ['GO-AROUND PERFORMANCE','./index.html?calculator=1&module=goaround'],
- ['TIME TO CLIMB','./index.html?calculator=1&module=timeclimb']
- ];
- return modules.map(([name,url])=>'<a class="card-button" href="'+url+'"><span>'+esc(name)+'</span>'+icon('next')+'</a>').join('');
+ return '<section class="module-list" aria-label="Performance modules">'+
+ moduleCard('FLIGHT PLAN','SimBrief · OFP','clipboard',null)+
+ moduleCard('WEIGHT & BALANCE','Loading · CG','scale','./wb.html')+
+ moduleCard('TAKEOFF PERFORMANCE','Distance · Runway','planeTakeoff','./index.html?calculator=1&module=takeoff')+
+ moduleCard('CLIMB PERFORMANCE','Both engines · OEI · Profile','trend','./index.html?calculator=1&module=climb')+
+ moduleCard('CRUISE PERFORMANCE','TAS · Fuel flow','gauge','./index.html?calculator=1&module=cruiseperf')+
+ moduleCard('LANDING PERFORMANCE','Normal · Abnormal','planeLanding','./index.html?calculator=1&module=landing')+
+ moduleCard('GO-AROUND PERFORMANCE','Climb · VREF','rotate','./index.html?calculator=1&module=goaround')+
+ '</section>';
 }
 function morePage(){
  return '<section class="tile"><div class="list-title">AERO UI · MASTER DESIGN 1.0</div>'+
@@ -289,6 +301,7 @@ function applyPlan(navigate=true){
 }
 function bind(){
  root.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>show(b.dataset.view==='plan'&&plan?(reviewed?'summary':'review'):b.dataset.view));
+ root.querySelectorAll('[data-go="plan"]').forEach(b=>b.onclick=()=>show(plan?(reviewed?'summary':'review'):'plan'));
  const more=root.querySelector('#open-more');if(more)more.onclick=()=>show('more');
  const back=root.querySelector('#back-or-menu');if(back)back.onclick=goBack;
  const pilot=root.querySelector('#pilot-id');if(pilot){
