@@ -367,7 +367,7 @@ function compute(id,v){if(id==='takeoff')return window.TakeoffTables.compute(uni
  const roc=out.roc+GRAPH_REGISTRATION[id];return {main:roc,secondary:roc*0.00508,primaryLabel:id==='oei'&&roc<0?'RATE OF DESCENT':'RATE OF CLIMB'};
  }catch(e){return {error:'DADO GRÁFICO NÃO DIGITALIZADO'};}
 }
-function verticalFmt(v){return current==='climb'?fmt(v,1):fmt(Math.trunc(v*100)/100,2)}
+function verticalFmt(v){return activeModule()==='climb'?fmt(v,1):fmt(Math.trunc(v*100)/100,2)}
 function fmt(v,n=0){if(!Number.isFinite(v))return '—';return new Intl.NumberFormat('en-US',{maximumFractionDigits:n,minimumFractionDigits:n}).format(v)}
 function icon(name){const paths={clipboard:'<rect x="5" y="4" width="14" height="18" rx="2"/><path d="M9 3h6v4H9zM9 12h6M9 16h6"/>',
 scale:'<path d="M12 3v18M7 21h10M5 7h14M5 7l-3 6h6L5 7zM19 7l-3 6h6L19 7z"/>',
