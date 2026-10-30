@@ -577,6 +577,7 @@ function render(){const m=MODELS[current],v=inputs[current],r=compute(current,v)
    }else if((current==='cruise'||current==='cruiseperf')&&cruiseTempMode==='isa'&&key==='oat'){
     inputs[current].oat=Number.isFinite(next)&&Number.isFinite(inputs[current].pa)?(current==='cruiseperf'?window.CruisePerformance.isaAt(inputs[current].pa):isaTemperature(inputs[current].pa))+next:NaN;
    }else inputs[current][key]=next;
+   if(current==='runway'&&key==='length')inputs.runway.toraVerified=Number.isFinite(next)&&next>0&&next<=5000;
    if((current==='takeoff'||current==='climb'||current==='oei'||current==='landing'||current==='abnormal'||current==='goaround')&&key==='pa'&&inputs[current].isa){const oat=el('#val-oat');if(oat)oat.value=fmt((current==='landing'||current==='abnormal'?window.LandingTables.isaAt(next):current==='goaround'?window.GoAroundTables.isaAt(next):isaTemperature(next)),0)}
    refresh();persist();
   });
