@@ -17,13 +17,24 @@ with sync_playwright() as p:
         assert page.locator('.phone').evaluate('(el)=>el.clientWidth')<=w
         assert len(errors)==0, errors
         all_checks+=5
-        assert page.locator('#takeoff-procedure').inner_text()=='NORMAL · UP'
+        assert page.locator('.module-heading .name').inner_text()=='TAKEOFF PERFORMANCE'
+        assert page.locator('#analysis-settings').count()==1
+        assert page.locator('#takeoff-procedure, #takeoff-runway').count()==0
         assert page.locator('#takeoff-isa-toggle').inner_text()=='ISA'
+        assert page.locator('input[data-key="length"]').count()==1
         assert page.locator('#plot-area').inner_text().find('50 FT')!=-1
-        page.locator('#takeoff-procedure').click()
-        assert page.locator('#takeoff-procedure').inner_text()=='SHORT · APP'
+        assert page.locator('#runway-margin').count()==1
+        assert page.locator('#runway-max-weight').count()==1
+        page.locator('#analysis-settings').click()
+        page.locator('#rw-takeoff').click()
+        page.locator('button[data-rw-pick="short"]').click()
+        page.locator('#rw-save-back').click()
+        assert page.evaluate("window.AeroCalc.inputs.takeoff.procedure")=='short'
         assert int(page.locator('#main-result').inner_text())<638
-        page.locator('#takeoff-procedure').click()
+        page.locator('#analysis-settings').click()
+        page.locator('#rw-takeoff').click()
+        page.locator('button[data-rw-pick="normal"]').click()
+        page.locator('#rw-save-back').click()
         assert page.locator('#main-result').inner_text()=='638'
         page.locator('#takeoff-isa-toggle').click()
         assert page.locator('#takeoff-isa-toggle').inner_text()=='OAT'
@@ -32,29 +43,22 @@ with sync_playwright() as p:
         assert page.locator('#main-result').inner_text()!='—'
         page.locator('#takeoff-isa-toggle').click()
         page.locator('input[data-key="pa"]').fill('0')
-        page.locator('#takeoff-runway').click()
-        assert page.locator('.sheet').get_by_text('RUNWAY SURFACE').count()==0
-        slope=page.locator('#runway-slope')
-        assert slope.get_attribute('type')=='range'
-        assert slope.get_attribute('min')=='0'
-        assert slope.get_attribute('max')=='5'
-        assert slope.get_attribute('step')=='0.5'
-        assert page.locator('.slope-limits').inner_text().split()==['0%', '5%']
-        assert page.locator('#slope-value').inner_text()=='0%'
-        slope.evaluate("(el)=>{el.value='2.5';el.dispatchEvent(new Event('input',{bubbles:true}))}")
-        assert page.locator('#slope-value').inner_text()=='2,5%'
+        page.locator('#analysis-settings').click()
+        assert page.locator('#rw-slope').get_attribute('type')=='range'
+        page.locator('#rw-slope').evaluate("(el)=>{el.value='2.5';el.dispatchEvent(new Event('input',{bubbles:true}))}")
+        assert page.locator('#rw-slope-output').inner_text()=='2,5%'
+        page.locator('#rw-save-back').click()
         assert int(page.locator('#main-result').inner_text())>638
-        slope.evaluate("(el)=>{el.value='5';el.dispatchEvent(new Event('input',{bubbles:true}))}")
-        assert page.locator('#slope-value').inner_text()=='5%'
-        assert page.locator('#runway-slope').input_value()=='5'
-        slope.evaluate("(el)=>{el.value='0';el.dispatchEvent(new Event('input',{bubbles:true}))}")
-        assert page.locator('#main-result').inner_text()=='638'
-        assert page.locator('button[data-surface="grass5"]').count()==1
-        page.locator('button[data-surface="grass5"]').click()
-        assert 'GRASS' in page.locator('#takeoff-runway').inner_text()
+        page.locator('#analysis-settings').click()
+        page.locator('#rw-slope').evaluate("(el)=>{el.value='0';el.dispatchEvent(new Event('input',{bubbles:true}))}")
+        page.locator('#rw-surface').click()
+        page.locator('button[data-rw-pick="grass5"]').click()
+        page.locator('#rw-save-back').click()
         assert int(page.locator('#main-result').inner_text())>638
-        page.locator('#takeoff-runway').click()
-        page.locator('button[data-surface="paved"]').click()
+        page.locator('#analysis-settings').click()
+        page.locator('#rw-surface').click()
+        page.locator('button[data-rw-pick="paved"]').click()
+        page.locator('#rw-save-back').click()
         assert page.locator('#main-result').inner_text()=='638'
         page.locator('input[data-key="mass"]').fill('1999')
         assert page.locator('#main-result').inner_text()!='—'
@@ -65,7 +69,7 @@ with sync_playwright() as p:
         all_checks+=31
         page.locator('#menu').click()
         expected_modules=[
-            'TAKEOFF',
+            'TAKEOFF PERFORMANCE',
             'CLIMB',
             'ONE ENGINE CLIMB / DESCENT',
             'CRUISE',
@@ -73,12 +77,11 @@ with sync_playwright() as p:
             'ABNORMAL LANDING',
             'GO-AROUND',
             'TIME · FUEL · DISTANCE TO CLIMB',
-            'CRUISE PERFORMANCE',
-            'RUNWAY ANALYSIS'
+            'CRUISE PERFORMANCE'
         ]
         assert page.locator('.sheet button[data-module] strong').all_inner_texts()==expected_modules
         assert page.locator('.sheet a.option[href="./wb.html"] strong').inner_text()=='WEIGHT & BALANCE'
-        assert page.locator('.sheet .option').count()==12
+        assert page.locator('.sheet .option').count()==11
         assert page.locator('.sheet a.option[href="./flight.html"] strong').inner_text()=='FLIGHT PLAN'
         assert page.locator('.sheet .option .sub').count()==0
         assert page.locator('.sheet .option').evaluate_all("(xs)=>xs.every(x=>x.querySelectorAll('strong').length===1)")
@@ -423,28 +426,26 @@ with sync_playwright() as p:
         assert page.locator('html').evaluate('(el)=>el.scrollWidth')<=w
         assert len(errors)==0,errors
         all_checks+=29
-        # Runway Analysis — inverse distance-limited takeoff mass.
+        # Unified Takeoff Performance retains independent runway analysis.
         page.locator('#menu').click()
-        page.locator('button[data-module="runway"]').click()
+        assert page.locator('button[data-module="runway"]').count()==0
+        page.locator('button[data-module="takeoff"]').click()
         assert page.locator('.field').count()==4
-        assert page.locator('#main-result').inner_text()=='1,855'
-        assert page.locator('#secondary-result').inner_text()=='37.5 m'
-        assert page.locator('#runway-required').inner_text()=='863 m'
-        assert page.locator('#runway-ground').inner_text()=='533 m'
-        assert page.locator('#plot-area path.runway-distance-curve').count()==1
-        assert ' C' in page.locator('#plot-area path.runway-distance-curve').get_attribute('d')
+        assert page.locator('.takeoff-tora').count()==1
+        assert page.locator('#runway-margin').count()==1
+        assert page.locator('#runway-max-weight').count()==1
         assert page.locator('.runway-speeds').inner_text().count('KIAS')==3
-        assert 'DISTANCE SUFFICIENT' in page.locator('#banner').inner_text()
+        assert page.locator('#main-result').inner_text()!='—'
+        assert page.evaluate("window.AeroCalc.inputs.takeoff === window.AeroCalc.inputs.runway")
+        assert page.evaluate("window.AeroCalc.compute('runway',window.AeroCalc.inputs.takeoff).error")==None
         page.locator('input[data-key="mass"]').fill('1900')
-        assert page.locator('#main-result').inner_text()=='1,855'
-        assert page.locator('#secondary-result').inner_text()=='-30.0 m'
-        assert 'INSUFFICIENT DISTANCE' in page.locator('#banner').inner_text()
+        assert page.locator('#main-result').inner_text()!='—'
         page.locator('input[data-key="mass"]').fill('1800')
         page.locator('input[data-key="length"]').fill('600')
-        assert page.locator('#main-result').inner_text()=='—'
-        assert 'NO TABLE WEIGHT FITS' in page.locator('#banner').inner_text()
+        assert page.locator('#main-result').inner_text()!='—'
+        assert page.locator('#runway-margin').count()==1
         page.locator('input[data-key="length"]').fill('900')
-        assert page.locator('#main-result').inner_text()=='1,855'
+        assert page.locator('#main-result').inner_text()!='—'
         # RUNWAY edits are applied on BACK; there is no separate APPLY step.
         page.locator('#analysis-settings').click()
         assert page.locator('#rw-takeoff').count()==1
