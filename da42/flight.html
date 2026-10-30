@@ -54,7 +54,8 @@ label{display:block;font-size:11px;font-weight:600;color:#aabfce;letter-spacing:
 .note{background:#1a3648;border:1px solid #3c5b71;border-radius:13px;padding:12px;margin:12px 0;color:#a9d7ed;font-size:11px;line-height:1.5}
 .route{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:15px 0}
 .apt{text-align:center;font-size:28px;font-weight:600;letter-spacing:-.6px;min-width:0}
-.plane-line{color:var(--blue);flex:1;display:flex;align-items:center;gap:5px}
+.plane-line{color:var(--blue);flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:5px}
+.plane-line .icon{display:block;width:24px;height:24px;flex:0 0 24px;stroke-width:1.9;transform:rotate(45deg) scale(.84);transform-origin:center;overflow:visible}
 .plane-line:before,.plane-line:after{content:"";height:1px;background:#4b7085;flex:1}
 .route-foot{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;border-top:1px solid var(--line);padding-top:13px}
 .route-foot strong{display:block;margin-top:5px;font-size:13px;font-weight:600}
