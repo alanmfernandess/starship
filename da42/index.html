@@ -334,7 +334,7 @@ function bannerFor(id,v,r){
  if(r.error)return r.error;
  if((id==='landing'||id==='abnormal')&&v.surface==='grass25')return 'GRASS >10 CM · +25% MÍNIMO · NÃO USAR EM VOO';
  if(id==='runway')return (r.status==='DISTANCE SUFFICIENT'?'DISTANCE SUFFICIENT':r.status==='INSUFFICIENT DISTANCE'?'INSUFFICIENT DISTANCE':r.status==='MASS LIMIT EXCEEDED'?'AIRCRAFT WEIGHT LIMIT EXCEEDED':'NO TABLE WEIGHT FITS')+(r.paBelowChart?' · PA < 0: 0 FT TABLE':' · DISTANCE ONLY')+' · NOT FOR FLIGHT';
- if(id==='takeoff')return (v.toraVerified===false?'TORA NOT VERIFIED · ':'')+(v.lengthEstimated?'RUNWAY LENGTH EST. · ':'')+(v.procedure==='short'?'SHORT · APP':'NORMAL · UP')+' · NOT FOR FLIGHT';
+ if(id==='takeoff')return (v.paMode==='qnh'&&window.RunwayAnalysis.effectivePa(v)<0?'PA < 0: 0 FT TABLE · ':'')+(v.toraVerified===false?'TORA NOT VERIFIED · ':'')+(v.lengthEstimated?'RUNWAY LENGTH EST. · ':'')+(v.procedure==='short'?'SHORT · APP':'NORMAL · UP')+' · NOT FOR FLIGHT';
  if(id==='climb')return (v.flaps==='app'?'FLAPS APP · VY 85 KIAS':v.mass>1900?'FLAPS UP · VY 92 KIAS':'FLAPS UP · VY 90 KIAS')+' · BOTH 92% · GEAR UP';
  if(id==='oei')return r.main<0?'ROC NEGATIVO · DESCIDA':r.main<50?'ROC < 50 FT/MIN · AFM CAUTION':'OEI · VYSE 85 KIAS · FLAPS UP · GEAR UP';
  if(id==='timeclimb')return 'FLAPS UP · BOTH 92% · GEAR UP · ZERO WIND';
