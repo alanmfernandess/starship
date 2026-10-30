@@ -27,8 +27,9 @@ button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus
 .fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(10px,1.7dvh,18px);margin-bottom:clamp(12px,2dvh,24px)}
 .field{min-width:0;height:clamp(94px,14dvh,158px);background:var(--tile);border-radius:16px;padding:15px 15px 13px;display:flex;flex-direction:column;justify-content:space-between}
 .field label,.field .field-label{color:var(--label);font-size:clamp(10px,1.6dvh,15px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:.3px}
-.entry{display:flex;align-items:baseline;gap:5px;min-width:0}
+.entry{display:grid;grid-template-columns:minmax(0,1fr) max-content;align-items:baseline;gap:6px;min-width:0}
 .entry input{color:var(--txt);background:none;border:0;outline:none;width:100%;min-width:0;font-size:clamp(30px,4.7dvh,52px);font-weight:500;font-variant-numeric:tabular-nums;letter-spacing:-.7px}
+.entry input{font-size:clamp(25px,4.1dvh,43px)}
 .entry input:focus{outline:0}.field:focus-within{box-shadow:inset 0 0 0 1px var(--blue)}
 .unit{font-size:15px;color:#89a6b9;white-space:nowrap;flex:none}
 .open-load{width:100%;background:var(--tile);border:0;border-radius:16px;padding:15px;min-height:70px;margin-bottom:clamp(12px,2dvh,24px);display:flex;align-items:center;justify-content:space-between;text-align:left;color:var(--txt)}
