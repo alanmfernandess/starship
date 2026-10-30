@@ -70,7 +70,7 @@
  * NOT independently validated at off-example conditions. Not approved for flight.
  */
 const MODELS={
- takeoff:{label:'TAKEOFF',panel:'TAKEOFF DISTANCE',metric:'GROUND ROLL',unit:'m',metricUnit:'m',fields:[{k:'pa',name:'PRESSURE ALT',u:'ft'},{k:'oat',name:'OAT',u:'°C'},{k:'mass',name:'T/O WEIGHT',u:'kg'},{k:'wind',name:'HEADWIND',u:'kt'}],defaults:{pa:0,oat:15,mass:1800,wind:10,procedure:'normal',isa:false,surface:'paved',wet:false,soft:false,slope:0}},
+ takeoff:{label:'TAKEOFF PERFORMANCE',panel:'TAKEOFF DISTANCE',metric:'GROUND ROLL',unit:'m',metricUnit:'m',fields:[{k:'pa',name:'PRESSURE ALT',u:'ft'},{k:'oat',name:'OAT',u:'°C'},{k:'mass',name:'T/O WEIGHT',u:'kg'},{k:'wind',name:'HEADWIND',u:'kt'}],defaults:{pa:0,oat:15,mass:1800,wind:10,procedure:'normal',isa:false,surface:'paved',wet:false,soft:false,slope:0}},
  climb:{label:'CLIMB',panel:'RATE OF CLIMB',metric:'VERTICAL SPEED',unit:'ft/min',metricUnit:'m/s',fields:[{k:'pa',name:'PRESSURE ALT',u:'ft'},{k:'oat',name:'OAT',u:'°C'},{k:'mass',name:'FLIGHT WEIGHT',u:'kg'},{k:'power',name:'POWER',u:'%',fixed:true}],defaults:{pa:0,oat:15,mass:1800,power:92,flaps:'up',isa:false}},
  oei:{label:'ONE ENGINE CLIMB / DESCENT',panel:'RATE OF CLIMB',metric:'VERTICAL SPEED',unit:'ft/min',metricUnit:'m/s',fields:[{k:'pa',name:'PRESSURE ALT',u:'ft'},{k:'oat',name:'OAT',u:'°C'},{k:'mass',name:'FLIGHT WEIGHT',u:'kg'},{k:'power',name:'ENGINE POWER',u:'%',fixed:true}],defaults:{pa:0,oat:15,mass:1800,power:92,isa:false}},
  cruise:{label:'CRUISING',panel:'TRUE AIRSPEED',metric:'ISA DEVIATION',unit:'KTAS',metricUnit:'°C',fields:[{k:'pa',name:'PRESSURE ALT',u:'ft'},{k:'oat',name:'OAT',u:'°C'},{k:'load',name:'ENGINE LOAD',u:'%'},{k:'engines',name:'ENGINES',u:'',fixed:true,fixedValue:2}],defaults:{pa:10000,oat:-5,load:80,engines:2}},
@@ -83,7 +83,23 @@ const MODELS={
 };
 const el=s=>document.querySelector(s),escapeHTML=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const persisted=(()=>{try{return JSON.parse(localStorage.getItem('aero-ui-da42-v1'))||{}}catch{return {}}})();
-let current=Object.prototype.hasOwnProperty.call(MODELS,persisted.current)?persisted.current:'takeoff';const requestedModule=(location.search||'').match(/[?&]module=([a-z]+)/);if(requestedModule&&Object.prototype.hasOwnProperty.call(MODELS,requestedModule[1]))current=requestedModule[1];let inputs={};for(const id in MODELS)inputs[id]={...MODELS[id].defaults,...(persisted.inputs&&persisted.inputs[id]||{})};if(persisted.inputs&&persisted.inputs.goaround&&!Object.prototype.hasOwnProperty.call(persisted.inputs.goaround,'oat')){inputs.goaround.isa=true;delete inputs.goaround.speed;}let history=Array.isArray(persisted.history)?persisted.history.slice(0,20):[];
+let current=Object.prototype.hasOwnProperty.call(MODELS,persisted.current)?persisted.current:'takeoff';
+const requestedModule=(location.search||'').match(/[?&]module=([a-z]+)/);
+if(requestedModule&&Object.prototype.hasOwnProperty.call(MODELS,requestedModule[1]))current=requestedModule[1];
+if(current==='runway')current='takeoff';
+let inputs={};for(const id in MODELS)inputs[id]={...MODELS[id].defaults,...(persisted.inputs&&persisted.inputs[id]||{})};
+const oldRW=inputs.runway,oldTO=inputs.takeoff;
+const combined={...MODELS.runway.defaults,...oldRW,...oldTO};
+for(const key of ['length','maxMass','paMode','elevation','qnh','runwayId','runwaySource','toraVerified',
+ 'windVerified','windSource','surfaceVerified','slopeVerified','lengthEstimated','runwayLength']){
+ if(Object.prototype.hasOwnProperty.call(oldRW,key))combined[key]=oldRW[key];
+}
+if(oldRW.runwaySource==='SIMBRIEF OFP'){
+ for(const key of ['pa','oat','mass','wind','procedure','isa','slope','surface','wet','soft']){
+  if(Object.prototype.hasOwnProperty.call(oldRW,key))combined[key]=oldRW[key];
+ }
+}
+inputs.takeoff=combined;inputs.runway=combined;if(persisted.inputs&&persisted.inputs.goaround&&!Object.prototype.hasOwnProperty.call(persisted.inputs.goaround,'oat')){inputs.goaround.isa=true;delete inputs.goaround.speed;}let history=Array.isArray(persisted.history)?persisted.history.slice(0,20):[];
 let cruiseTempMode=persisted.cruiseTempMode==='isa'?'isa':'oat';
 function persist(){try{localStorage.setItem('aero-ui-da42-v1',JSON.stringify({current,inputs,history,cruiseTempMode}))}catch{}}
 /**
@@ -262,8 +278,10 @@ function calibrate(){// Anchor the plotted ordinate to the published example, no
  GRAPH_REGISTRATION.oei=212-rawCompute('oei',EXAMPLES.oei).roc;
 }
 calibrate();
+function unifiedTakeoffInput(v){const x=window.RunwayAnalysis.modelInput(v,v.mass);x.wind=v.wind;return x}
+function runwayResult(v){return window.RunwayAnalysis.compute(v)}
 function limits(id,v){
- if(id==='takeoff')return window.TakeoffTables.validate(v);
+ if(id==='takeoff')return window.TakeoffTables.validate(unifiedTakeoffInput(v));
  if(id==='runway')return window.RunwayAnalysis.validate(v);
  if(id==='climb')return window.ClimbTables.validate(v);
  if(id==='oei')return window.OEITables.validate(v);
@@ -280,7 +298,7 @@ function limits(id,v){
  if((id==='takeoff'||id==='landing'||id==='abnormal')&&(!Number.isFinite(v.wind)||v.wind < -10||v.wind >20))return 'VENTO FORA DO GRÁFICO';
  return null;
 }
-function compute(id,v){if(id==='takeoff')return window.TakeoffTables.compute(v);if(id==='runway')return window.RunwayAnalysis.compute(v);if(id==='climb')return window.ClimbTables.compute(v);if(id==='oei')return window.OEITables.compute(v);if(id==='timeclimb')return window.TimeToClimb.compute(v);if(id==='cruiseperf')return window.CruisePerformance.compute(v);if(id==='landing'||id==='abnormal')return window.LandingTables.compute(id,v);if(id==='goaround')return goAroundCompute(v);if(id==='cruise')return cruiseCompute(v);const error=limits(id,v);if(error)return {error};
+function compute(id,v){if(id==='takeoff')return window.TakeoffTables.compute(unifiedTakeoffInput(v));if(id==='runway')return window.RunwayAnalysis.compute(v);if(id==='climb')return window.ClimbTables.compute(v);if(id==='oei')return window.OEITables.compute(v);if(id==='timeclimb')return window.TimeToClimb.compute(v);if(id==='cruiseperf')return window.CruisePerformance.compute(v);if(id==='landing'||id==='abnormal')return window.LandingTables.compute(id,v);if(id==='goaround')return goAroundCompute(v);if(id==='cruise')return cruiseCompute(v);const error=limits(id,v);if(error)return {error};
  try{
  if(id==='abnormal'){
   const raw=abnormalRaw(v),ground=raw.ground+GRAPH_REGISTRATION.abnormal.ground,total=raw.total+GRAPH_REGISTRATION.abnormal.total;
@@ -308,7 +326,7 @@ function bannerFor(id,v,r){
  if(r.error)return r.error;
  if((id==='landing'||id==='abnormal')&&v.surface==='grass25')return 'GRASS >10 CM · +25% MÍNIMO · NÃO USAR EM VOO';
  if(id==='runway')return (r.status==='DISTANCE SUFFICIENT'?'DISTANCE SUFFICIENT':r.status==='INSUFFICIENT DISTANCE'?'INSUFFICIENT DISTANCE':r.status==='MASS LIMIT EXCEEDED'?'AIRCRAFT WEIGHT LIMIT EXCEEDED':'NO TABLE WEIGHT FITS')+(r.paBelowChart?' · PA < 0: 0 FT TABLE':' · DISTANCE ONLY')+' · NOT FOR FLIGHT';
- if(id==='takeoff')return (v.procedure==='short'?'SHORT · FLAPS APP · VR 76 / V50 82 KIAS':'NORMAL · FLAPS UP · VR 80 / V50 85 KIAS')+' · NOT FOR FLIGHT';
+ if(id==='takeoff')return (v.toraVerified===false?'TORA NOT VERIFIED · ':'')+(v.lengthEstimated?'RUNWAY LENGTH EST. · ':'')+(v.procedure==='short'?'SHORT · APP':'NORMAL · UP')+' · NOT FOR FLIGHT';
  if(id==='climb')return (v.flaps==='app'?'FLAPS APP · VY 85 KIAS':v.mass>1900?'FLAPS UP · VY 92 KIAS':'FLAPS UP · VY 90 KIAS')+' · BOTH 92% · GEAR UP';
  if(id==='oei')return r.main<0?'ROC NEGATIVO · DESCIDA':r.main<50?'ROC < 50 FT/MIN · AFM CAUTION':'OEI · VYSE 85 KIAS · FLAPS UP · GEAR UP';
  if(id==='timeclimb')return 'FLAPS UP · BOTH 92% · GEAR UP · ZERO WIND';
@@ -516,7 +534,7 @@ function runwayAnalysisPlot(v,r){
  +'<text x="272" y="134" font-size="9" text-anchor="end" fill="#91a8b8">'+fmt(upper)+' KG</text>'
  +'</svg>';
 }
-function createPlot(id,v,res){if(id==='runway')return runwayAnalysisPlot(v,res);if(id==='timeclimb')return timeToClimbPlot(v,res);if(id==='cruiseperf')return cruisePerformancePlot(v,res);if(id==='climb'||id==='oei')return verticalRatePlot(id,res);if(id==='takeoff')return takeoffPlot(v,res);if(id==='goaround')return goAroundPlot(v,res);if(id==='landing'||id==='abnormal')return landingPlot(v,res);if(id==='cruise')return cruisePlot(v,res);if(res.error)return `<svg class="plot" viewBox="0 0 290 138" aria-label="Gráfico indisponível" role="img"></svg>`;
+function createPlot(id,v,res){if(id==='runway')return runwayAnalysisPlot(v,res);if(id==='timeclimb')return timeToClimbPlot(v,res);if(id==='cruiseperf')return cruisePerformancePlot(v,res);if(id==='climb'||id==='oei')return verticalRatePlot(id,res);if(id==='takeoff')return takeoffPlot(unifiedTakeoffInput(v),res);if(id==='goaround')return goAroundPlot(v,res);if(id==='landing'||id==='abnormal')return landingPlot(v,res);if(id==='cruise')return cruisePlot(v,res);if(res.error)return `<svg class="plot" viewBox="0 0 290 138" aria-label="Gráfico indisponível" role="img"></svg>`;
  // Smoothed spline for the live model's response to temperature, sampled at constant PA/mass.
  const T=(id==='climb'||id==='oei')?[-20,-15,-10,-5,0,5,10,15,20,25,30,35,40,45,50]:[-30,-25,-20,-15,-10,-5,0,5,10,15,20,25,30,35,40,45].filter(t=>t<=15-0.0019812*v.pa+35 && t>=-35);
  const usable=T.map(t=>{const r=compute(id,{...v,oat:t,...((id==='climb'||id==='oei')?{isa:false}:{})});return {t,val:r.error?null:r.main,second:r.error?null:r.secondary}}).filter(x=>x.val!=null);
