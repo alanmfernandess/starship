@@ -1,8 +1,8 @@
-/* Aero UI Master Design 1.0 — RUNWAY modal: draft / select / apply.
+/* Aero UI Master Design 1.0 — RUNWAY modal: select and save on Back.
    UI only: calculations remain in runway-analysis.js and takeoff-tables.js. */
 (function(){
 'use strict';
-const CSS="\n.runway-ui.sheet{padding:20px 20px max(22px,env(safe-area-inset-bottom));}\n.runway-ui .sheet-header{position:sticky;top:-20px;background:#17232e;z-index:2}\n.runway-ui .rw-option{display:grid;grid-template-columns:minmax(98px,1fr) minmax(0,1.6fr) 16px;min-height:68px;gap:9px;align-items:center;text-align:left}\n.runway-ui .rw-label{color:#edf5fa;font-size:13px;font-weight:650}\n.runway-ui .rw-value{color:#e8f2f9;text-align:right;font-size:13px;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}\n.runway-ui .rw-option .icon{width:18px;color:var(--blue)}\n.runway-ui #rw-weight .rw-label,.runway-ui #rw-weight .rw-value{white-space:nowrap;overflow-wrap:normal}\n.runway-ui #rw-weight .rw-value{font-variant-numeric:tabular-nums}\n.runway-ui .rw-panel{margin:10px 0;padding:15px;border-radius:14px;background:var(--tile)}\n.runway-ui .rw-line{display:flex;align-items:baseline;justify-content:space-between;gap:8px}\n.runway-ui .rw-line label,.runway-ui .rw-panel>label{font-size:13px;color:#edf5fa;font-weight:650}\n.runway-ui .rw-line output{color:#f1f5f9;font-size:14px;font-variant-numeric:tabular-nums}\n.runway-ui input[type=range]{display:block;appearance:none;-webkit-appearance:none;touch-action:pan-y;cursor:pointer;width:100%;height:34px;margin:12px 0 2px;border:0;background:linear-gradient(to right,var(--blue) 0 var(--fill),#405464 var(--fill) 100%) center/100% 5px no-repeat}\n.runway-ui input[type=range].rw-tail{background:linear-gradient(to right,var(--amber) 0 var(--fill),#405464 var(--fill) 100%) center/100% 5px no-repeat}\n.runway-ui input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:22px;height:22px;border:2px solid var(--blue);border-radius:50%;background:#f1f5f9;box-shadow:0 0 0 2px #17232e}\n.runway-ui input[type=range]::-moz-range-thumb{width:18px;height:18px;border:2px solid var(--blue);border-radius:50%;background:#f1f5f9}\n.runway-ui input[type=range]:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:9px}\n.runway-ui .rw-scale{display:flex;justify-content:space-between;font-size:11px;color:var(--label);font-variant-numeric:tabular-nums}\n.runway-ui input[type=number]{display:block;width:100%;margin:8px 0 0;padding:11px;border:1px solid #466779;border-radius:9px;background:#15232e;color:var(--txt)}\n.runway-ui .rw-flags{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}\n.runway-ui .rw-flags button{min-height:46px;font-size:11px;padding:9px;justify-content:center}\n.runway-ui .rw-flags button:disabled{opacity:.45;cursor:not-allowed}\n.runway-ui .rw-footer{position:sticky;bottom:-24px;z-index:2;background:#17232e;border-top:1px solid var(--line);margin-top:14px;padding:12px 0 max(3px,env(safe-area-inset-bottom));display:grid;grid-template-columns:1fr 1.4fr;gap:10px}\n.runway-ui .rw-footer button{min-height:48px;border-radius:11px;font-size:13px;font-weight:650;letter-spacing:.25px}\n.runway-ui .rw-cancel{background:transparent;color:#bbcedb;border:1px solid #415567}\n.runway-ui .rw-apply{background:#193c52;color:#eaf7ff;border:1px solid var(--blue)}\n.runway-ui .rw-error{font-size:12px;line-height:1.5;color:#ffbb9c;margin:10px 0}\n.runway-ui .rw-note{font-size:11px;line-height:1.55;color:var(--label);margin:12px 0}\n.runway-ui .rw-picker .rw-picker-caption{flex:1}\n.runway-ui .rw-picker strong{display:block;font-size:14px}\n.runway-ui .rw-picker{min-height:62px;align-items:center;gap:12px;padding:14px 16px}.runway-ui .rw-picker strong{font-size:14px;font-weight:650;line-height:1.35;letter-spacing:.1px;overflow-wrap:anywhere}\n.runway-ui .rw-back{font-size:24px;line-height:1}\n@media(max-width:355px){.runway-ui .rw-option{grid-template-columns:minmax(86px,1fr) minmax(0,1.4fr) 15px;gap:5px}.runway-ui .rw-label,.runway-ui .rw-value{font-size:12px}}\n";
+const CSS="\n.runway-ui.sheet{padding:20px 20px max(22px,env(safe-area-inset-bottom));}\n.runway-ui .sheet-header{position:sticky;top:-20px;background:#17232e;z-index:2}\n.runway-ui .rw-option{display:grid;grid-template-columns:minmax(98px,1fr) minmax(0,1.6fr) 16px;min-height:68px;gap:9px;align-items:center;text-align:left}\n.runway-ui .rw-label{color:#edf5fa;font-size:13px;font-weight:650}\n.runway-ui .rw-value{color:#e8f2f9;text-align:right;font-size:13px;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}\n.runway-ui .rw-option .icon{width:18px;color:var(--blue)}\n.runway-ui #rw-weight .rw-label,.runway-ui #rw-weight .rw-value{white-space:nowrap;overflow-wrap:normal}\n.runway-ui #rw-weight .rw-value{font-variant-numeric:tabular-nums}\n.runway-ui .rw-panel{margin:10px 0;padding:15px;border-radius:14px;background:var(--tile)}\n.runway-ui .rw-line{display:flex;align-items:baseline;justify-content:space-between;gap:8px}\n.runway-ui .rw-line label,.runway-ui .rw-panel>label{font-size:13px;color:#edf5fa;font-weight:650}\n.runway-ui .rw-line output{color:#f1f5f9;font-size:14px;font-variant-numeric:tabular-nums}\n.runway-ui input[type=range]{display:block;appearance:none;-webkit-appearance:none;touch-action:pan-y;cursor:pointer;width:100%;height:34px;margin:12px 0 2px;border:0;background:linear-gradient(to right,var(--blue) 0 var(--fill),#405464 var(--fill) 100%) center/100% 5px no-repeat}\n.runway-ui input[type=range].rw-tail{background:linear-gradient(to right,var(--amber) 0 var(--fill),#405464 var(--fill) 100%) center/100% 5px no-repeat}\n.runway-ui input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:22px;height:22px;border:2px solid var(--blue);border-radius:50%;background:#f1f5f9;box-shadow:0 0 0 2px #17232e}\n.runway-ui input[type=range]::-moz-range-thumb{width:18px;height:18px;border:2px solid var(--blue);border-radius:50%;background:#f1f5f9}\n.runway-ui input[type=range]:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:9px}\n.runway-ui .rw-scale{display:flex;justify-content:space-between;font-size:11px;color:var(--label);font-variant-numeric:tabular-nums}\n.runway-ui input[type=number]{display:block;width:100%;margin:8px 0 0;padding:11px;border:1px solid #466779;border-radius:9px;background:#15232e;color:var(--txt)}\n.runway-ui .rw-flags{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}\n.runway-ui .rw-flags button{min-height:46px;font-size:11px;padding:9px;justify-content:center}\n.runway-ui .rw-flags button:disabled{opacity:.45;cursor:not-allowed}\n.runway-ui .rw-footer{position:sticky;bottom:-24px;z-index:2;background:#17232e;border-top:1px solid var(--line);margin-top:14px;padding:12px 0 max(3px,env(safe-area-inset-bottom));display:grid;grid-template-columns:1fr;gap:10px}\n.runway-ui .rw-footer button{min-height:48px;border-radius:11px;font-size:13px;font-weight:650;letter-spacing:.25px}\n.runway-ui .rw-save-back{background:#243c4d;color:#dcebf4;border:1px solid #456777}\n.runway-ui .rw-error{font-size:12px;line-height:1.5;color:#ffbb9c;margin:10px 0}\n.runway-ui .rw-note{font-size:11px;line-height:1.55;color:var(--label);margin:12px 0}\n.runway-ui .rw-picker .rw-picker-caption{flex:1}\n.runway-ui .rw-picker strong{display:block;font-size:14px}\n.runway-ui .rw-picker{min-height:62px;align-items:center;gap:12px;padding:14px 16px}.runway-ui .rw-picker strong{font-size:14px;font-weight:650;line-height:1.35;letter-spacing:.1px;overflow-wrap:anywhere}\n.runway-ui .rw-back{font-size:24px;line-height:1}\n@media(max-width:355px){.runway-ui .rw-option{grid-template-columns:minmax(86px,1fr) minmax(0,1.4fr) 15px;gap:5px}.runway-ui .rw-label,.runway-ui .rw-value{font-size:12px}}\n";
 function open(values,render,icon,escape){
  if(!document.getElementById('runway-ui-css')){
   const style=document.createElement('style');style.id='runway-ui-css';style.textContent=CSS;document.head.appendChild(style);
@@ -12,8 +12,18 @@ function open(values,render,icon,escape){
  const state={...values};let view='main',error='';
  overlay.className='sheet-backdrop';
  function close(){document.removeEventListener('keydown',keyHandler);overlay.remove()}
+ function saveAndBack(){
+  if(state.paMode==='qnh'&&(!Number.isFinite(state.elevation)||state.elevation< -1000||state.elevation>10000||!Number.isFinite(state.qnh)||state.qnh<870||state.qnh>1085))error='FIELD ELEV (−1000 a 10000 FT) e QNH (870 a 1085 HPA) são obrigatórios e devem ser válidos.';
+  else if(!Number.isFinite(state.wind)||state.wind< -10||state.wind>20)error='Vento fora da faixa permitida (−10 a +20 KT).';
+  else if(!Number.isFinite(state.slope)||state.slope<0||state.slope>5)error='Aclive deve estar entre 0 e 5%.';
+  else error='';
+  if(error){view='main';draw();return}
+  Object.assign(values,state);
+  close();
+  render();
+ }
  function keyHandler(e){
-  if(e.key==='Escape'){e.preventDefault();if(view==='main')close();else go('main')}
+  if(e.key==='Escape'){e.preventDefault();if(view==='main')saveAndBack();else go('main')}
   if(e.key==='Tab'){
    const controls=[...overlay.querySelectorAll('button:not([disabled]),input:not([disabled])')].filter(x=>x.getClientRects().length>0);
    if(!controls.length)return;
@@ -48,7 +58,7 @@ function open(values,render,icon,escape){
     '<input id="rw-slope" class="slope-slider" type="range" min="0" max="5" step="0.5" value="'+escape(state.slope||0)+'" style="--fill:'+Number(state.slope||0)*20+'%" aria-label="Aclive de pista em percentual"/>'+
     '<div class="slope-limits"><span>0%</span><span>5%</span></div></div>'+
     (error?'<p class="rw-error" role="alert">'+escape(error)+'</p>':'')+
-    '<div class="rw-footer"><button type="button" id="rw-cancel" class="rw-cancel">CANCEL</button><button type="button" id="rw-apply" class="rw-apply">APPLY</button></div>';
+    '<div class="rw-footer"><button type="button" id="rw-save-back" class="rw-save-back">BACK</button></div>';
   }else{
    const candidates={
     takeoff:[['normal','NORMAL TAKEOFF'],['short','SHORT FIELD']],
@@ -60,7 +70,7 @@ function open(values,render,icon,escape){
    body=candidates.map(o=>'<button type="button" class="option rw-picker '+(selected===o[0]?'selected':'')+'" data-rw-pick="'+o[0]+'" aria-label="'+escape(o[1])+'"><strong>'+o[1]+'</strong>'+(selected===o[0]?icon('check'):icon('next'))+'</button>').join('');
   }
   overlay.innerHTML='<section class="sheet runway-ui" role="dialog" aria-modal="true" aria-labelledby="rw-dialog-title">'+head+body+'</section>';
-  overlay.querySelector('#rw-close').onclick=close;
+  overlay.querySelector('#rw-close').onclick=()=>view==='main'?saveAndBack():go('main');
   const back=overlay.querySelector('#rw-back');if(back)back.onclick=()=>go('main');
   if(view!=='main'){
    overlay.querySelectorAll('[data-rw-pick]').forEach(b=>b.onclick=()=>{
@@ -97,19 +107,9 @@ function open(values,render,icon,escape){
   [['rw-wet','wet'],['rw-soft','soft']].forEach(([id,key])=>{
    overlay.querySelector('#'+id).onclick=()=>{state[key]=!state[key];draw()};
   });
-  overlay.querySelector('#rw-cancel').onclick=close;
-  overlay.querySelector('#rw-apply').onclick=()=>{
-   if(state.paMode==='qnh'&&(!Number.isFinite(state.elevation)||state.elevation< -1000||state.elevation>10000||!Number.isFinite(state.qnh)||state.qnh<870||state.qnh>1085))error='FIELD ELEV (−1000 a 10000 FT) e QNH (870 a 1085 HPA) são obrigatórios e devem ser válidos.';
-   else if(!Number.isFinite(state.wind)||state.wind< -10||state.wind>20)error='Vento fora da faixa permitida (−10 a +20 KT).';
-   else if(!Number.isFinite(state.slope)||state.slope<0||state.slope>5)error='Aclive deve estar entre 0 e 5%.';
-   else error='';
-   if(error){draw();return}
-   Object.assign(values,state);
-   close();
-   render();
-  };
+  overlay.querySelector('#rw-save-back').onclick=saveAndBack;
  }
- overlay.addEventListener('click',e=>{if(e.target===overlay)close()});
+ overlay.addEventListener('click',e=>{if(e.target===overlay){if(view==='main')saveAndBack();else go('main')}});
  document.addEventListener('keydown',keyHandler);
  root.appendChild(overlay);draw();
  const first=overlay.querySelector('#rw-takeoff');if(first)first.focus({preventScroll:true});
