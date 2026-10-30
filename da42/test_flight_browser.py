@@ -99,6 +99,20 @@ with sync_playwright() as p:
   assert page.evaluate("JSON.parse(localStorage.getItem('aero-ui-da42-v1')).inputs.takeoff.mass")==1850
   assert page.evaluate("JSON.parse(localStorage.getItem('aero-ui-da42-v1')).inputs.runway.qnh")==1025
   assert page.evaluate("JSON.parse(localStorage.getItem('aero-ui-da42-v1')).inputs.takeoff.wind")==None
+  # Summary warnings must remain concise, while full technical detail stays in Review.
+  assert page.locator('.review-summary').count()==1
+  assert page.locator('.review-summary .review-line').count()>=2
+  assert page.locator('.review-summary .review-line').evaluate_all("(items)=>items.every(e=>e.textContent.trim().length<=38 && e.clientHeight<=37)")
+  assert 'exigem verificação manual' not in page.locator('.review-summary').inner_text()
+  assert page.locator('#open-review.review-action').count()==1
+  assert page.locator('#open-comparison.comparison-action.card-button').count()==1
+  assert page.locator('#open-comparison').inner_text()=='OFP COMPARISON'
+  assert page.locator('#open-comparison').evaluate("(e)=>getComputedStyle(e).borderTopWidth==='0px'")
+  assert page.locator('#open-comparison').evaluate("(e)=>e.getBoundingClientRect().height<=68")
+  assert abs(page.locator('#open-comparison').bounding_box()['width']-page.locator('.review-summary').bounding_box()['width'])<2
+  page.locator('#open-review').click()
+  assert 'WIND COMPONENT, TORA' in page.locator('.notice').last.inner_text()
+  page.locator('[data-view="summary"]').click()
   page.locator('#open-comparison').click()
   assert page.locator('.heading').inner_text().find('OFP COMPARISON')>=0
   page.locator('[data-tab="weight"]').click()
