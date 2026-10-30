@@ -38,11 +38,15 @@ function runwayIdent(id){
 }
 function runwayData(raw,planRunway,weather){
  const dep=raw.tlr?.takeoff;
- const planned=runwayIdent(planRunway);
+ const declared=runwayIdent(planRunway);
  const tlrPlan=runwayIdent(dep?.conditions?.planned_runway);
+ const planned=declared||tlrPlan;
+ const airport=upper(raw.origin?.icao_code||raw.origin?.icao);
+ const tlrAirport=upper(dep?.conditions?.airport_icao);
+ const airportMatch=!tlrAirport||tlrAirport===airport;
  const candidates=Array.isArray(dep?.runway)?dep.runway:dep?.runway?[dep.runway]:[];
  const match=candidates.find(x=>runwayIdent(x?.identifier)===planned);
- const runway=planned&&(!tlrPlan||tlrPlan===planned)?match:null;
+ const runway=planned&&airportMatch&&(!declared||!tlrPlan||tlrPlan===declared)?match:null;
  const toraFt=number(val(runway?.length_tora),3.281,16404.2);
  const tora=toraFt===null?null:Math.floor(toraFt*.3048*10)/10;
  const trueCourse=number(val(runway?.true_course),0,360);
