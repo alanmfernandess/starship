@@ -5,7 +5,7 @@
 'use strict';
 const C=window.SimBriefCore,storageKey='aero-ui-da42-v1',flightKey='aero-ui-flight-plan-v1',idKey='aero-ui-simbrief-id-v1';
 const root=document.getElementById('app');
-let view='plan',compareTab='fuel',pilotId='',plan=null,reviewed=false,loading=false,err='',confirmVariant=false;
+let view='plan',compareTab='fuel',pilotId='',plan=null,reviewed=false,loading=false,err='';
 const icons={
  menu:'M4 7h16M4 12h12M4 17h8',settings:'M4 6h16M4 12h16M4 18h16',next:'m9 5 7 7-7 7',
  plan:'M3 3h18v18H3zM7 8h10M7 12h10M7 16h6',summary:'M4 20V11M10 20V5M16 20v-9M22 20V8',
@@ -80,7 +80,6 @@ function reviewPage(){
  items+='<section class="tile"><div class="list-title">WEATHER · OFP SNAPSHOT</div>'+weatherRows()+'</section>';
  const warnings=hints();
  if(warnings.length)items+='<div class="notice"><strong>'+warnings.length+' ITEMS TO REVIEW</strong><div>'+warnings.map(x=>'<p>'+esc(x)+'</p>').join('')+'</div></div>';
- if(!plan.aircraftVerified&&!plan.mismatch)items+='<label class="check-label"><input type="checkbox" id="variant-confirm" '+(confirmVariant?'checked':'')+'><span>CONFIRM DA42 NG: o OFP é da variante adequada e as limitações aplicáveis foram verificadas.</span></label>';
  items+='<div class="action-row"><button class="secondary" id="back-plan">BACK</button><button class="primary" id="confirm-plan">CONFIRM AND CONTINUE</button></div>';
  return items;
 }
@@ -188,7 +187,7 @@ function show(v){view=v;err='';render()}
 function setStatus(message,isError){loading=false;err=isError?message:'';view='plan';render()}
 function acceptRaw(raw,source){
  const next=C.normalize(raw);next.source=source;
- plan=next;reviewed=false;confirmVariant=false;
+ plan=next;reviewed=false;
  try{sessionStorage.setItem(flightKey,JSON.stringify(plan))}catch{}
  show('review');
 }
@@ -211,8 +210,7 @@ async function importPilot(){
 
 function applyPlan(){
  if(!plan)return;
- if(plan.mismatch){err='Aeronave incompatível. Importe um OFP DA42 NG ou use entrada manual.';render();return}
- if(!plan.aircraftVerified&&!confirmVariant){err='Confirme a variante DA42 NG antes de sincronizar.';render();return}
+ if(plan.mismatch||plan.aircraft!=='DA42'){err='AIRCRAFT MISMATCH · OFP DA42 REQUIRED';render();return}
  const prepared=C.proposedInputs(plan,getAppInputs().inputs||{});
  let persisted=getAppInputs();
  if(!persisted||typeof persisted!=='object')persisted={};
@@ -243,7 +241,6 @@ function bind(){
   plan[key]=n;err='';
   try{sessionStorage.setItem(flightKey,JSON.stringify(plan))}catch{}
  });
- const variant=root.querySelector('#variant-confirm');if(variant)variant.onchange=()=>{confirmVariant=variant.checked};
  const confirmed=root.querySelector('#confirm-plan');if(confirmed)confirmed.onclick=applyPlan;
  const go=root.querySelector('#go-plan');if(go)go.onclick=()=>show('plan');
  const reviewAgain=root.querySelector('#open-review');if(reviewAgain)reviewAgain.onclick=()=>show('review');
@@ -251,7 +248,7 @@ function bind(){
  const backSum=root.querySelector('#back-summary');if(backSum)backSum.onclick=()=>show('summary');
  root.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{compareTab=b.dataset.tab;render()});
  const clear=root.querySelector('#clear-plan');if(clear)clear.onclick=()=>{
-  plan=null;reviewed=false;confirmVariant=false;err='';
+  plan=null;reviewed=false;err='';
   try{sessionStorage.removeItem(flightKey)}catch{}
   show('plan');
  };
