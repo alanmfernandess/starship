@@ -34,10 +34,15 @@ button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus
 .unit{font-size:15px;color:#89a6b9;white-space:nowrap;flex:none}
 .open-load{width:100%;background:var(--tile);border:0;border-radius:16px;padding:15px;min-height:70px;margin-bottom:clamp(12px,2dvh,24px);display:flex;align-items:center;justify-content:space-between;text-align:left;color:var(--txt)}
 .open-load .main{display:block;font-size:13px;font-weight:600;color:var(--txt);letter-spacing:.15px}
-.optimize-row{display:flex;gap:9px;margin:-7px 0 clamp(12px,2dvh,22px);align-items:stretch}
-.optimize-button{flex:1;min-height:46px;border:1px solid #40738f;border-radius:13px;color:#8dd2ff;background:#203a4c;font-weight:600;letter-spacing:.4px;font-size:13px}
-.optimize-button:active{background:#2b5069}
-.optimize-feedback{flex:1;min-width:0;align-self:center;color:var(--amber);font-size:11px;text-align:right}
+.optimize-row{display:grid;grid-template-columns:minmax(0,1fr);gap:9px;margin:-7px 0 clamp(12px,2dvh,22px);align-items:stretch}
+.optimize-row.has-manual{grid-template-columns:repeat(2,minmax(0,1fr))}
+.optimize-row .optimize-button,.optimize-row .restore-simulated{display:flex;justify-content:center;align-items:center;min-width:0;width:100%;min-height:52px;padding:11px 9px;border:1px solid #40738f;border-radius:13px;line-height:1.2;text-align:center;color:#8dd2ff;font-weight:700;letter-spacing:.2px;font-size:13px;white-space:nowrap}
+.optimize-row .optimize-button{background:#203a4c}
+.optimize-row .optimize-button:active{background:#2b5069}
+.optimize-row .restore-simulated{background:#182b38;border-color:#40738f;color:#8dd2ff}
+.optimize-row .restore-simulated:active{background:#244252}
+.optimize-feedback{grid-column:1/-1;min-width:0;color:var(--amber);font-size:11px;text-align:left}
+@media(max-width:355px){.optimize-row .optimize-button,.optimize-row .restore-simulated{font-size:11px;letter-spacing:0;padding:10px 6px}}
 .field input[readonly],.sheet-row input[readonly]{color:#aac2d1;cursor:default}
 
 .result{background:var(--tile);border-radius:19px;padding:15px 15px 16px;min-height:0}
@@ -79,7 +84,6 @@ button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus
 .wb-ofp-cell strong{display:block;margin-top:4px;font-size:clamp(13px,3.6vw,17px);font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
 .wb-ofp-status{margin-top:10px;padding-top:10px;border-top:1px solid #375365;font-size:10px;line-height:1.5;color:#e7b46d;overflow-wrap:anywhere}
 .wb-ofp-status.equal{color:#79cf9d}
-.restore-simulated{background:transparent;border:1px solid #486c7e;color:#91d1f4;font-weight:650;font-size:10px;line-height:1.3;border-radius:11px;min-height:45px;padding:10px}
 @media(max-width:355px){.wb-ofp{padding:10px}.wb-ofp-grid{gap:4px}.wb-ofp-cell strong{font-size:13px}}
 </style></head>
 <body><div id="app"></div><script src="./wb-engine.js"></script><script src="./wb-optimizer.js"></script><script>
@@ -176,7 +180,7 @@ function content(){
  '<main class="scroller" id="scroller"><div class="module-heading"><span>WEIGHT &amp; BALANCE</span><span class="accent">CG ENVELOPE</span></div>'+
  '<div class="fields">'+card('pilot','PILOT')+card('copilot','COPILOT')+card('pax1','PASSENGER 1')+card('pax2','PASSENGER 2')+'</div>'+
  '<button class="open-load" id="edit-load" aria-label="BAGGAGE &amp; FUEL"><span class="main">BAGGAGE &amp; FUEL</span>'+icon('next')+'</button>'+
- '<div class="optimize-row"><button id="optimize" class="optimize-button" type="button">OTIMIZAR</button>'+
+ '<div class="optimize-row'+(optimizedMode&&previousManual?' has-manual':'')+'"><button id="optimize" class="optimize-button" type="button">OTIMIZAR</button>'+
   (optimizedMode&&previousManual?'<button id="restore-simulated" class="restore-simulated" type="button">CARGA MANUAL</button>':'')+
   (optimizeMessage?'<span id="optimize-status" class="optimize-feedback" role="alert">'+esc(optimizeMessage)+'</span>':'')+'</div>'+
   ofpComparison()+

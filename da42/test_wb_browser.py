@@ -90,6 +90,26 @@ with sync_playwright() as p:
         pre_fuel=page.evaluate("JSON.stringify([WBApp.profile.mainL,WBApp.profile.mainR,WBApp.profile.auxL,WBApp.profile.auxR,WBApp.profile.deice,WBApp.profile.emptyMass,WBApp.profile.emptyMoment])")
         page.locator('#optimize').click()
         assert page.evaluate("WBApp.optimizedMode") is True
+        # Primary/secondary actions use identical dimensions, radius and
+        # typography on every supported mobile viewport without overflowing.
+        assert page.locator('.optimize-row.has-manual').count()==1
+        assert page.locator('#restore-simulated').inner_text()=='CARGA MANUAL'
+        assert page.locator('.optimize-row').evaluate("""(row)=>{
+          const buttons=[row.querySelector('#optimize'),row.querySelector('#restore-simulated')];
+          if(buttons.some(b=>!b))return false;
+          const [a,b]=buttons.map(x=>x.getBoundingClientRect());
+          const [ca,cb]=buttons.map(x=>getComputedStyle(x));
+          return Math.abs(a.width-b.width)<1 &&
+            Math.abs(a.height-b.height)<1 &&
+            Math.abs(a.top-b.top)<1 &&
+            ca.borderRadius===cb.borderRadius &&
+            ca.fontSize===cb.fontSize &&
+            ca.fontWeight===cb.fontWeight &&
+            a.left>=row.getBoundingClientRect().left-1 &&
+            b.right<=row.getBoundingClientRect().right+1 &&
+            buttons.every(x=>x.scrollWidth<=x.clientWidth+1);
+        }"""), (w,h,'optimize/manual design mismatch')
+        assert page.locator('html').evaluate('(e)=>e.scrollWidth')<=w
         assert page.evaluate("WBApp.model.statuses.cgOK && WBApp.model.statuses.massOK && WBApp.model.statuses.scenariosOK") is True
         assert page.locator('#envelope svg circle').count()==2
         assert page.locator('#mass-check').inner_text().find('WEIGHT WITHIN LIMITS')!=-1
