@@ -68,7 +68,7 @@ function normalize(raw){
 function proposedInputs(plan,existing){
  const result={};const warnings=[],o=plan.weather?.origin||{},d=plan.weather?.destination||{};
  const tw=plan.takeoffWeight,lw=plan.landingWeight;
- if(!plan.aircraftVerified)warnings.push('Confirme que o OFP corresponde especificamente ao DA42 NG.');
+ if(!plan.aircraftVerified)warnings.push('O OFP não especifica a variante NG. Verifique a compatibilidade dos dados antes do uso.');
  if(plan.mismatch)warnings.push('O código de aeronave do OFP não corresponde ao DA42. Sincronização bloqueada.');
  if(tw===null||tw<1700||tw>1999)warnings.push('TAKEOFF WEIGHT fora do domínio da calculadora (1700–1999 KG).');
  else for(const key of ['takeoff','climb','oei','runway'])result[key]={mass:tw};
