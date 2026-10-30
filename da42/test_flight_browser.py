@@ -141,12 +141,16 @@ with sync_playwright() as p:
   page.locator('[data-tab="weight"]').click()
   assert 'TAKEOFF WEIGHT' in page.locator('.tile').last.inner_text()
   page.locator('[data-view="modules"]').click()
+  assert page.locator('.module-card').count()==7
+  assert page.locator('.module-card .module-icon svg').count()==7
+  assert page.locator('.module-card .module-copy strong').all_inner_texts()==['FLIGHT PLAN','WEIGHT & BALANCE','TAKEOFF PERFORMANCE','CLIMB PERFORMANCE','CRUISE PERFORMANCE','LANDING PERFORMANCE','GO-AROUND PERFORMANCE']
+  assert page.locator('.module-card .module-sub').count()==7
   assert page.locator('a[href*="module=runway"]').count()==0
   assert page.locator('a[href*="module=takeoff"]').count()==1
   assert page.locator('a[href="./wb.html"]').count()==1
   assert page.locator('.note').count()==0
   assert 'Os módulos abaixo' not in page.locator('main').inner_text()
-  page.locator('[data-view="plan"]').click()
+  page.locator('[data-go="plan"]').click()
   assert page.locator('#import-ofp, #pilot-id').count()==0
   assert 'PERFORMANCE OVERVIEW' in page.locator('.heading').inner_text()
   # Navigate Flight Plan -> Weight & Balance -> PERFORMANCE menu -> Flight Plan.
