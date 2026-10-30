@@ -157,6 +157,9 @@ function proposedInputs(plan,existing){
   surface:'paved',surfaceVerified:false,wet:false,soft:false
  };
  result.runway={...(result.runway||{}),...runwayFields};
+ // The same runway-specific component feeds TAKEOFF. When unknown, clear the
+ // old wind instead of carrying an assumed headwind from a previous mission.
+ result.takeoff={...(result.takeoff||{}),wind:runwayFields.windVerified?runwayFields.wind:null};
  if(!rw.identifier)warnings.push('RUNWAY não identificada no OFP.');
  if(!runwayFields.toraVerified)warnings.push('TORA indisponível no OFP. Informe a TORA da pista selecionada.');
  if(!runwayFields.windVerified)warnings.push('WIND COMPONENT não resolvido para a pista. Verifique o vento e o rumo verdadeiro.');
