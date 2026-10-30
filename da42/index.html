@@ -115,6 +115,10 @@ const MODELS={
 const el=s=>document.querySelector(s),escapeHTML=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const persisted=(()=>{try{return JSON.parse(localStorage.getItem('aero-ui-da42-v1'))||{}}catch{return {}}})();
 let current=Object.prototype.hasOwnProperty.call(MODELS,persisted.current)?persisted.current:'takeoff';
+// Preserve origin only for links opened from the SimBrief validation checklist.
+const checklistReturn=/[?&]returnToReview=1(?:&|$)/.test(location.search||'');
+const checklistItem=(location.search||'').match(/[?&]reviewItem=([a-zA-Z0-9]+)(?:&|$)/);
+const checklistReturnUrl='./flight.html?review=1'+(checklistItem?'&reviewItem='+checklistItem[1]:'');
 const requestedModule=(location.search||'').match(/[?&]module=([a-z]+)/);
 if(requestedModule&&Object.prototype.hasOwnProperty.call(MODELS,requestedModule[1]))current=requestedModule[1];
 if(current==='runway')current='takeoff';
@@ -686,7 +690,10 @@ function render(){const m=MODELS[current],v=inputs[current],r=compute(activeModu
  }
  if(current==='cruiseperf'){const config=el('#cruise-config');if(config)config.onclick=()=>{inputs.cruiseperf.reduced=!inputs.cruiseperf.reduced;render()}}
  if(current==='goaround'){const isa=el('#goaround-isa-toggle');if(isa)isa.onclick=()=>{inputs.goaround.isa=!inputs.goaround.isa;if(!inputs.goaround.isa)inputs.goaround.oat=window.GoAroundTables.isaAt(inputs.goaround.pa);render()}}
- el('#menu').onclick=()=>showSheet('modules');el('#settings').onclick=()=>showSheet('settings');document.querySelectorAll('button[data-panel]').forEach(b=>b.onclick=()=>{const p=b.dataset.panel;if(p!=='calculator')showSheet(p)});
+ el('#menu').onclick=()=>{
+  if(checklistReturn){persist();location.assign(checklistReturnUrl)}
+  else showSheet('modules');
+ };el('#settings').onclick=()=>showSheet('settings');document.querySelectorAll('button[data-panel]').forEach(b=>b.onclick=()=>{const p=b.dataset.panel;if(p!=='calculator')showSheet(p)});
  const temperatureToggle=el('#temp-mode-toggle');
  if(temperatureToggle)temperatureToggle.onclick=()=>{cruiseTempMode=cruiseTempMode==='isa'?'oat':'isa';render()};
  document.querySelectorAll('input[data-key]').forEach(inp=>{
@@ -764,7 +771,10 @@ function refresh(){
   (current==='runway'&&(r.status!=='DISTANCE SUFFICIENT'||r.paBelowChart))));
 }
 
-function showSheet(type){if(type==='runwayanalysis'&&(current==='runway'||current==='takeoff'))return window.RunwayUI.open(inputs.takeoff,render,icon,escapeHTML);const main=el('.phone'),title={modules:'PERFORMANCE',settings:'PREFERÊNCIAS',chart:'SENSIBILIDADE',history:'HISTÓRICO',runway:'RUNWAY',runwayanalysis:'RUNWAY'}[type]||'';const v=inputs[current];const r=compute(activeModule(),activeInputs());let content='';
+function showSheet(type){if(type==='runwayanalysis'&&(current==='runway'||current==='takeoff'))return window.RunwayUI.open(inputs.takeoff,()=>{
+  render(); // Preserve runway changes before changing pages.
+  if(checklistReturn){persist();location.assign(checklistReturnUrl)}
+ },icon,escapeHTML);const main=el('.phone'),title={modules:'PERFORMANCE',settings:'PREFERÊNCIAS',chart:'SENSIBILIDADE',history:'HISTÓRICO',runway:'RUNWAY',runwayanalysis:'RUNWAY'}[type]||'';const v=inputs[current];const r=compute(activeModule(),activeInputs());let content='';
  if(type==='modules'){
   const items=[
    ['flight','FLIGHT PLAN','SimBrief · OFP','clipboard','./flight.html'],

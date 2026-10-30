@@ -76,7 +76,7 @@ function checklistCard(context){
   const mark='<span class="check-square" aria-hidden="true">'+(checked?icon('check'):'')+'</span>';
   const move=item.href?item.href==='#weather-ofp'?
     '<button type="button" class="check-link" data-open-weather="1">'+esc(item.action)+'</button>':
-    '<a class="check-link" href="'+esc(item.href)+'">'+esc(item.action)+'</a>':'';
+    '<a class="check-link" href="'+esc(item.href+(item.href.includes('?')?'&':'?')+'returnToReview=1&reviewItem='+encodeURIComponent(item.id))+'">'+esc(item.action)+'</a>':'';
   const confirm=item.manual?
     '<button type="button" class="check-confirm" data-check-confirm="'+esc(item.id)+'" data-check-sig="'+esc(item.signature)+'" data-check-revoke="'+(item.confirmed?'1':'0')+'">'+(item.confirmed?'REVOKE CONFIRMATION':esc(item.confirmText))+'</button>':'';
   return '<details class="review-detail check-item status-'+item.status+'" data-check-id="'+esc(item.id)+'">'+
@@ -378,8 +378,21 @@ try{
  }
 }catch{}
 // Returning from Performance/W&B resumes the imported OFP summary.
-if(plan)view=reviewed?'summary':'review';
+if(plan)view=/[?&]review=1(?:&|$)/.test(location.search||'')?'review':reviewed?'summary':'review';
 window.AeroFlight={get plan(){return plan},get view(){return view},normalize:C.normalize,acceptRaw,applyPlan,get performance(){return performance()}};
 render();
+// A checklist-origin return always resumes the review checklist, not the OFP summary.
+// The checklist itself recomputes from saved performance and W&B data on every render.
+if(plan&&view==='review'&&/[?&]review=1(?:&|$)/.test(location.search||'')){
+ const match=(location.search||'').match(/[?&]reviewItem=([a-zA-Z0-9]+)(?:&|$)/);
+ const card=root.querySelector('.checklist');
+ if(card){
+  if(match){
+   const row=Array.from(card.querySelectorAll('[data-check-id]')).find(x=>x.dataset.checkId===match[1]);
+   if(row)row.classList.add('check-return-item');
+  }
+  card.scrollIntoView({block:'start'});
+ }
+}
 if('serviceWorker' in navigator&&location.protocol==='https:')window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 })();

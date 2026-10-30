@@ -72,6 +72,9 @@ button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus
 </style></head>
 <body><div id="app"></div><script src="./wb-engine.js"></script><script src="./wb-optimizer.js"></script><script>
 'use strict';
+const checklistReturn=/[?&]returnToReview=1(?:&|$)/.test(location.search||'');
+const checklistItem=(location.search||'').match(/[?&]reviewItem=([a-zA-Z0-9]+)(?:&|$)/);
+const checklistReturnUrl='./flight.html?review=1'+(checklistItem?'&reviewItem='+checklistItem[1]:'');
 const E=window.WBEngine,OPT=window.WBOptimizer,AUTO_KEY='da42-wb-optimized-v1',MANUAL_KEY='da42-wb-pre-auto-manual-v1',KEY='da42-wb-profile-v1';
 const icons={
  back:'<path d="m15 5-7 7 7 7"/>',
@@ -223,7 +226,10 @@ function sheet(type){
 }
 function render(){
  model=E.calculate(profile);el('#app').innerHTML=content();bindInputs();
- el('#menu').onclick=()=>sheet('modules');
+ el('#menu').onclick=()=>{
+   if(checklistReturn){store();location.assign(checklistReturnUrl)}
+   else sheet('modules');
+  };
  el('#settings').onclick=()=>sheet('settings');
  el('#edit-load').onclick=()=>sheet('load');
  el('#optimize').onclick=()=>{
