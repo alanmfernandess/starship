@@ -107,6 +107,8 @@ with sync_playwright() as p:
   assert page.locator('[data-check-id="takeoffWeight"] .check-badge').inner_text()=='CHECKED'
   page.locator('[data-check-id="takeoffWeight"] summary').click()
   page.locator('[data-check-id="takeoffWeight"] a.check-link').click()
+  page.wait_for_url('**/wb.html?returnToReview=1&reviewItem=takeoffWeight')
+  page.locator('.loading-source.active').wait_for()
   assert page.evaluate("WBApp.mode")=='simbrief'
   assert page.locator('.loading-source.active').inner_text()=='SIMBRIEF'
   assert page.locator('.loading-metric').count()==3

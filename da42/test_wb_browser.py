@@ -51,9 +51,11 @@ with sync_playwright() as p:
         # The compact TOW/FUEL/CG card and shared performance state must
         # react to each keystroke, with no APPLY button or mode re-selection.
         before=page.locator('.loading-metric').first.inner_text()
-        page.locator('input[data-wb="pilot"]').fill('81')
-        assert page.locator('.loading-metric').first.inner_text()!=before
-        assert '1.900,0' in page.locator('.loading-metric').first.inner_text()
+        page.locator('input[data-wb="pilot"]').fill('79')
+        current=page.locator('.loading-metric').first.inner_text()
+        assert current!=before
+        parse_kg=lambda text: float(text.strip().splitlines()[-1].replace('.','').replace(',','.'))
+        assert abs(parse_kg(current)-parse_kg(before)+1.0)<0.001, (before,current)
         assert page.evaluate("""()=>
             Math.abs(JSON.parse(localStorage.getItem('aero-ui-da42-v1')).inputs.takeoff.mass-
             WBApp.model.takeoff.mass)<0.001""")
