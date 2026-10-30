@@ -445,12 +445,14 @@ with sync_playwright() as p:
         assert 'NO TABLE WEIGHT FITS' in page.locator('#banner').inner_text()
         page.locator('input[data-key="length"]').fill('900')
         assert page.locator('#main-result').inner_text()=='1,855'
-        # RUNWAY is a transactional in-sheet dialog: no parent state changes until APPLY.
+        # RUNWAY edits are applied on BACK; there is no separate APPLY step.
         page.locator('#analysis-settings').click()
         assert page.locator('#rw-takeoff').count()==1
         assert page.locator('#rw-weight').count()==1
         assert page.locator('#rw-pressure').count()==1
         assert page.locator('#rw-wind').get_attribute('type')=='range'
+        assert page.locator('#rw-save-back').inner_text()=='BACK'
+        assert page.locator('#rw-apply, #rw-cancel').count()==0
         assert page.locator('#rw-wind').get_attribute('min')=='-10'
         assert page.locator('#rw-wind').get_attribute('max')=='20'
         assert page.locator('#rw-slope').get_attribute('step')=='0.5'
@@ -472,17 +474,17 @@ with sync_playwright() as p:
         page.locator('button[data-rw-pick="short"]').click()
         assert 'SHORT · APP' in page.locator('#rw-takeoff').inner_text()
         assert page.evaluate("window.AeroCalc.inputs.runway.procedure")=='normal'
-        page.locator('#rw-cancel').click()
-        assert page.evaluate("window.AeroCalc.inputs.runway.procedure")=='normal'
+        page.locator('#rw-save-back').click()
+        assert page.evaluate("window.AeroCalc.inputs.runway.procedure")=='short'
         page.locator('#analysis-settings').click()
         page.locator('#rw-takeoff').click()
         page.locator('button[data-rw-pick="short"]').click()
-        page.locator('#rw-apply').click()
+        page.locator('#rw-save-back').click()
         assert page.evaluate("window.AeroCalc.inputs.runway.procedure")=='short'
         page.locator('#analysis-settings').click()
         page.locator('#rw-takeoff').click()
         page.locator('button[data-rw-pick="normal"]').click()
-        page.locator('#rw-apply').click()
+        page.locator('#rw-save-back').click()
         assert page.evaluate("window.AeroCalc.inputs.runway.procedure")=='normal'
         page.locator('#analysis-settings').click()
         assert page.locator('#rw-weight .rw-value').inner_text()=='1900 KG'
@@ -494,13 +496,13 @@ with sync_playwright() as p:
         assert page.locator('#rw-weight .rw-value').evaluate("(e)=>e.scrollWidth<=e.clientWidth")
         assert page.locator('#rw-authorize').count()==0
         assert page.evaluate("window.AeroCalc.inputs.runway.maxMass")==1900
-        page.locator('#rw-apply').click()
+        page.locator('#rw-save-back').click()
         assert page.evaluate("window.AeroCalc.inputs.runway.maxMass")==1999
         assert '1,999 KG' in page.locator('#analysis-settings').inner_text()
         page.locator('#analysis-settings').click()
         page.locator('#rw-weight').click()
         page.locator('button[data-rw-pick="1900"]').click()
-        page.locator('#rw-apply').click()
+        page.locator('#rw-save-back').click()
         assert page.evaluate("window.AeroCalc.inputs.runway.maxMass")==1900
         page.locator('#analysis-settings').click()
         assert page.locator('#rw-weight .rw-value').inner_text()=='1900 KG'
@@ -510,13 +512,13 @@ with sync_playwright() as p:
         assert page.locator('#rw-elevation').count()==1
         assert page.locator('#rw-qnh').count()==1
         assert page.locator('#val-pa').get_attribute('readonly') is None
-        page.locator('#rw-apply').click()
+        page.locator('#rw-save-back').click()
         assert page.locator('#val-pa').get_attribute('readonly') is not None
         # QNH above standard at sea level: negative PA is physically valid.
         page.locator('#analysis-settings').click()
         page.locator('#rw-elevation').fill('0')
         page.locator('#rw-qnh').fill('1030')
-        page.locator('#rw-apply').click()
+        page.locator('#rw-save-back').click()
         assert page.locator('#main-result').inner_text()!='—'
         assert page.locator('#val-pa').input_value().startswith('-')
         assert '0 FT TABLE' in page.locator('#banner').inner_text()
@@ -524,32 +526,32 @@ with sync_playwright() as p:
         assert page.evaluate("window.AeroCalc.compute('runway',window.AeroCalc.inputs.runway).tablePa")==0
         page.locator('#analysis-settings').click()
         page.locator('#rw-qnh').fill('1000')
-        page.locator('#rw-apply').click()
+        page.locator('#rw-save-back').click()
         assert page.locator('#main-result').inner_text()!='—'
         assert float(page.locator('#val-pa').input_value().replace(',',''))>0
         assert '0 FT TABLE' not in page.locator('#banner').inner_text()
         page.locator('#analysis-settings').click()
         page.locator('#rw-qnh').fill('1013.25')
-        page.locator('#rw-apply').click()
+        page.locator('#rw-save-back').click()
         assert page.locator('#main-result').inner_text()!='—'
         page.locator('#analysis-settings').click()
         page.locator('#rw-pressure').click()
         page.locator('button[data-rw-pick="direct"]').click()
-        page.locator('#rw-apply').click()
+        page.locator('#rw-save-back').click()
         assert page.locator('#val-pa').get_attribute('readonly') is None
         page.locator('#analysis-settings').click()
         page.locator('#rw-wind').evaluate("el => { el.value='-5'; el.dispatchEvent(new Event('input',{bubbles:true})) }")
         assert page.evaluate("window.AeroCalc.inputs.runway.wind")==0
         assert 'TAILWIND' in page.locator('#rw-wind-output').inner_text()
-        page.locator('#rw-cancel').click()
-        assert page.evaluate("window.AeroCalc.inputs.runway.wind")==0
+        page.locator('#rw-save-back').click()
+        assert page.evaluate("window.AeroCalc.inputs.runway.wind")==-5
         page.locator('#analysis-settings').click()
         page.locator('#rw-wind').evaluate("el => { el.value='12'; el.dispatchEvent(new Event('input',{bubbles:true})) }")
-        page.locator('#rw-apply').click()
+        page.locator('#rw-save-back').click()
         assert page.evaluate("window.AeroCalc.inputs.runway.wind")==12
         page.locator('#analysis-settings').click()
         page.locator('#rw-wind').evaluate("el => { el.value='0'; el.dispatchEvent(new Event('input',{bubbles:true})) }")
-        page.locator('#rw-apply').click()
+        page.locator('#rw-save-back').click()
         assert page.evaluate("window.AeroCalc.inputs.runway.wind")==0
         assert page.locator('html').evaluate('(el)=>el.scrollWidth')<=w
         assert len(errors)==0, errors
