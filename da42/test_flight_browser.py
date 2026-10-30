@@ -59,6 +59,18 @@ with sync_playwright() as p:
   assert page.locator('.heading').inner_text().find('IMPORTED FLIGHT PLAN')>=0
   assert page.locator('.list-title').first.inner_text()=='FLIGHT DATA'
   assert page.locator('#confirm-plan, #back-plan, #variant-confirm').count()==0
+  assert page.locator('.notice').count()==0
+  assert page.locator('.review-details .review-detail').count()>=2
+  assert page.locator('.review-details .review-line').evaluate_all("(items)=>items.every(e=>e.textContent.trim().length<=38 && e.scrollWidth<=e.clientWidth+1)")
+  assert page.locator('.review-details .review-detail').evaluate_all("(items)=>items.every(e=>!e.open)")
+  detail=page.locator('.review-detail').filter(has_text='RUNWAY / CG')
+  assert detail.count()==1
+  assert not detail.locator('.review-explanation').is_visible()
+  detail.locator('summary').click()
+  assert detail.locator('.review-explanation').is_visible()
+  assert 'WIND COMPONENT, TORA' in detail.locator('.review-explanation').inner_text()
+  detail.locator('summary').click()
+  assert not detail.locator('.review-explanation').is_visible()
   assert 'SBGR' in page.locator('.route').inner_text()
   assert 'SBFL' in page.locator('.route').inner_text()
   plane=page.locator('.route .plane-line .icon')
@@ -111,7 +123,9 @@ with sync_playwright() as p:
   assert page.locator('#open-comparison').evaluate("(e)=>e.getBoundingClientRect().height<=68")
   assert abs(page.locator('#open-comparison').bounding_box()['width']-page.locator('.review-summary').bounding_box()['width'])<2
   page.locator('#open-review').click()
-  assert 'WIND COMPONENT, TORA' in page.locator('.notice').last.inner_text()
+  assert page.locator('.review-details').count()==1
+  assert 'RUNWAY / CG · VERIFY' in page.locator('.review-details').inner_text()
+  assert page.locator('.notice').count()==0
   page.locator('[data-view="summary"]').click()
   page.locator('#open-comparison').click()
   assert page.locator('.heading').inner_text().find('OFP COMPARISON')>=0
