@@ -47,8 +47,14 @@ function runwayData(raw,planRunway,weather){
  const candidates=Array.isArray(dep?.runway)?dep.runway:dep?.runway?[dep.runway]:[];
  const match=candidates.find(x=>runwayIdent(x?.identifier)===planned);
  const runway=planned&&airportMatch&&(!declared||!tlrPlan||tlrPlan===declared)?match:null;
- const toraFt=number(val(runway?.length_tora),3.281,16404.2);
- const tora=toraFt===null?null:Math.floor(toraFt*.3048*10)/10;
+ const unitName=upper(raw.params?.tlr_length_units||raw.params?.length_units||dep?.conditions?.length_units||dep?.conditions?.length_unit);
+ const asMetres=unitName==='M'||unitName==='METERS'||unitName==='METRES';
+ const asFeet=!unitName||unitName==='FT'||unitName==='FEET';
+ const factor=asMetres?1:asFeet?0.3048:null;
+ const distance=x=>{const rawLength=number(val(x),1,16404.2);
+  return rawLength!==null&&factor!==null?Math.floor(rawLength*factor*10)/10:null};
+ const tora=distance(runway?.length_tora);
+ const length=distance(runway?.length);
  const trueCourse=number(val(runway?.true_course),0,360);
  const magneticCourse=number(val(runway?.magnetic_course),0,360);
  const hw=number(val(runway?.headwind_component),-100,100);
@@ -64,7 +70,7 @@ function runwayData(raw,planRunway,weather){
  const conservative=component===null?null:Math.floor(component+1e-10);
  const gradient=number(val(runway?.gradient),0,5);
  const condition=upper(dep?.conditions?.surface_condition);
- return {identifier:planned,tlrMatched:!!runway,tora,source:tora===null?'':'OFP TLR',
+ return {identifier:planned,tlrMatched:!!runway,tora,length,lengthUnits:unitName||'FT (DEFAULT)',source:tora===null?'':'OFP TLR',
   trueCourse,magneticCourse,headwind:conservative,windSource,
   crosswind:conservative===null||wSpeed===null||wDir===null||trueCourse===null?null:
    Math.round(wSpeed*Math.sin((wDir-trueCourse)*Math.PI/180)*10)/10,
@@ -147,8 +153,10 @@ function proposedInputs(plan,existing){
  const rw=plan.runway||{};
  const runwayFields={
   runwayId:rw.identifier||'',runwaySource:'SIMBRIEF OFP',
-  length:rw.tora!==null&&Number.isFinite(rw.tora)?rw.tora:0,
-  toraVerified:rw.tora!==null&&Number.isFinite(rw.tora),
+  length:Number.isFinite(rw.tora)?rw.tora:Number.isFinite(rw.length)?rw.length:0,
+  runwayLength:Number.isFinite(rw.length)?rw.length:null,
+  lengthEstimated:!Number.isFinite(rw.tora)&&Number.isFinite(rw.length),
+  toraVerified:Number.isFinite(rw.tora),
   wind:Number.isFinite(rw.headwind)&&rw.headwind>=-10&&rw.headwind<=20?rw.headwind:0,
   windVerified:Number.isFinite(rw.headwind)&&rw.headwind>=-10&&rw.headwind<=20,
   windSource:rw.windSource||'',
