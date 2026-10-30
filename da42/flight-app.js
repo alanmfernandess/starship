@@ -6,6 +6,7 @@
 const C=window.SimBriefCore,Checklist=window.FlightChecklist,Load=window.LoadingProfile,storageKey='aero-ui-da42-v1',flightKey='aero-ui-flight-plan-v1',idKey='aero-ui-simbrief-id-v1';
 const root=document.getElementById('app'),checkKey='aero-ui-flight-plan-checks-v1';
 let view='plan',compareTab='fuel',pilotId='',plan=null,reviewed=false,loading=false,err='';
+let backTrail=[];
 const icons={
  menu:'M4 7h16M4 12h12M4 17h8',settings:'M4 6h16M4 12h16M4 18h16',next:'m9 5 7 7-7 7',
  plan:'M3 3h18v18H3zM7 8h10M7 12h10M7 16h6',summary:'M4 20V11M10 20V5M16 20v-9M22 20V8',
@@ -240,26 +241,38 @@ function heading(){
 }
 function render(){
  const page=view==='plan'?planPage():view==='review'?reviewPage():view==='summary'?summaryPage():view==='comparison'?comparisonPage():view==='modules'?modulesPage():morePage();
- root.innerHTML='<div class="phone"><header class="topbar"><button id="back-or-menu" class="header-back" aria-label="Back" type="button">'+icon('back')+'<span>BACK</span></button><h1>DA42 NG</h1><button id="open-more" aria-label="Settings">'+icon('settings')+'</button></header>'+
- '<main class="content" id="scroll-content">'+heading()+page+(view==='plan'?'':'<p class="disclaimer">EXPERIMENTAL PERFORMANCE · NOT FOR FLIGHT</p>')+'</main>'+
+ root.innerHTML='<div class="phone"><header class="topbar"><span class="topbar-placeholder" aria-hidden="true"></span><h1>DA42 NG</h1><button id="open-more" aria-label="Settings">'+icon('settings')+'</button></header>'+
+ '<main class="content" id="scroll-content">'+heading()+page+(view==='plan'?'':'<p class="disclaimer">EXPERIMENTAL PERFORMANCE · NOT FOR FLIGHT</p>')+'<div class="page-back"><button id="back-or-menu" type="button" aria-label="Back">BACK</button></div></main>'+
  '<nav class="bottom" aria-label="Main navigation">'+[['plan','PLAN'],['summary','SUMMARY'],['modules','MODULES'],['more','MORE']].map(([k,label])=>
  '<button type="button" class="nav '+((view===k||view==='review'&&k==='plan'||view==='comparison'&&k==='summary')?'active':'')+'" data-view="'+k+'" aria-label="'+label+'">'+icon(k)+'<span>'+label+'</span></button>').join('')+'</nav></div>';
  bind();
 }
-function show(v){view=v;err='';render()}
+function show(v,returning=false){
+ if(!returning&&v!==view){
+  backTrail.push(view);
+  if(backTrail.length>24)backTrail.shift();
+ }
+ view=v;err='';render();
+}
 function goBack(){
- // Every editable value is persisted on its input/change event.
- // Return to the logical parent without resetting the imported OFP.
- if(view==='comparison'||view==='review')return show(plan&&reviewed?'summary':'modules');
- if(view==='summary'||view==='plan')return show('modules');
- if(view==='modules')return show(plan?(reviewed?'summary':'review'):'plan');
- if(view==='more')return show(plan?(reviewed?'summary':'review'):'modules');
- return show('modules');
+ // Navigation is history-aware within Flight Plan, with deterministic
+ // fallbacks for direct URLs and reloaded sessions.
+ if(backTrail.length){return show(backTrail.pop(),true)}
+ if(view==='comparison'||view==='review')return show(plan?'summary':'plan',true);
+ if(view==='summary'||view==='plan'){
+  if(view==='plan'&&/[?&]returnToWB=1(?:&|$)/.test(location.search||'')){
+   location.assign('./wb.html');return;
+  }
+  return show('modules',true);
+ }
+ if(view==='more')return show('modules',true);
+ if(view==='modules'){location.assign('./index.html?calculator=1');return}
+ return show('modules',true);
 }
 function setStatus(message,isError){loading=false;err=isError?message:'';view='plan';render()}
 function acceptRaw(raw,source){
  const next=C.normalize(raw);next.source=source;
- plan=next;reviewed=false;
+ plan=next;reviewed=false;backTrail=[];
   if(Load)try{Load.setMode(localStorage,'simbrief',next)}catch{}
   try{sessionStorage.removeItem(checkKey)}catch{}
  try{sessionStorage.setItem(flightKey,JSON.stringify(plan));sessionStorage.removeItem(flightKey+'-synced')}catch{}
@@ -369,7 +382,7 @@ function bind(){
   root.querySelector('#weather-ofp')?.scrollIntoView({block:'start'});
  });
  const clear=root.querySelector('#clear-plan');if(clear)clear.onclick=()=>{
-  plan=null;reviewed=false;err='';
+  plan=null;reviewed=false;err='';backTrail=[];
    try{sessionStorage.removeItem(checkKey)}catch{}
   try{sessionStorage.removeItem(flightKey);sessionStorage.removeItem(flightKey+'-synced')}catch{}
   if(Load)try{Load.clearPlan(localStorage);Load.setMode(localStorage,'manual',null)}catch{}

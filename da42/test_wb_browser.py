@@ -17,6 +17,10 @@ with sync_playwright() as p:
         page.on('pageerror',lambda e:errors.append(str(e)))
         page.goto(url)
         assert page.locator('#cg').count()==0
+        assert page.locator('.topbar #menu').count()==0
+        assert page.locator('.scroller > .page-back #menu').count()==1
+        assert page.locator('#menu').inner_text()=='BACK'
+        assert page.locator('#menu').evaluate("(b)=>b.getBoundingClientRect().height>=51")
         assert page.locator('#cg-status').count()==0
         assert page.locator('#zfcg').count()==0
         assert page.locator('.result-head').count()==0
@@ -40,6 +44,8 @@ with sync_playwright() as p:
         # Minimal PERFORMANCE menu: three consistent destinations.
         page.locator('#menu').click()
         assert page.locator('.sheet a.action').all_inner_texts()==['FLIGHT PLAN','PERFORMANCE','WEIGHT & BALANCE']
+        assert page.locator('.sheet-head .close').count()==0
+        assert page.locator('.sheet > .sheet-return').inner_text()=='BACK'
         assert [x.split('/')[-1] for x in page.locator('.sheet a.action').evaluate_all("(xs)=>xs.map(a=>a.getAttribute('href'))")]==['flight.html','index.html?calculator=1','wb.html']
         page.locator('.close').click()
         assert page.locator('svg.graph polygon').count()==1

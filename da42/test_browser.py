@@ -18,6 +18,13 @@ with sync_playwright() as p:
         assert len(errors)==0, errors
         all_checks+=5
         assert page.locator('.module-heading .name').inner_text()=='TAKEOFF PERFORMANCE'
+        assert page.locator('header #menu').count()==0
+        assert page.locator('.scroller > .page-back #menu').count()==1
+        assert page.locator('#menu').inner_text()=='BACK'
+        assert page.locator('#menu').evaluate("""(b)=>{
+           const r=b.getBoundingClientRect(),p=b.closest('.page-back').getBoundingClientRect();
+           return r.width>0&&r.width<=p.width+1&&r.height>=51;
+        }""")
         assert page.locator('#analysis-settings').count()==1
         assert page.locator('#takeoff-procedure, #takeoff-runway').count()==0
         assert page.locator('#takeoff-isa-toggle').inner_text()=='ISA'
@@ -27,6 +34,9 @@ with sync_playwright() as p:
         assert page.locator('#runway-max-weight').count()==1
         page.locator('#analysis-settings').click()
         page.locator('#rw-takeoff').click()
+        assert page.locator('#rw-back').inner_text()=='BACK'
+        assert page.locator('.runway-ui .sheet-header #rw-back').count()==0
+        assert page.locator('.runway-ui .rw-footer #rw-back').count()==1
         page.locator('button[data-rw-pick="short"]').click()
         page.locator('#rw-save-back').click()
         assert page.evaluate("window.AeroCalc.inputs.takeoff.procedure")=='short'
@@ -78,6 +88,8 @@ with sync_playwright() as p:
             'GO-AROUND PERFORMANCE'
         ]
         assert page.locator('.sheet button[data-module] strong').all_inner_texts()==expected_modules
+        assert page.locator('.sheet-header .close').count()==0
+        assert page.locator('.sheet > .sheet-return').inner_text()=='BACK'
         assert page.locator('.sheet a.option[href="./wb.html"] strong').inner_text()=='WEIGHT & BALANCE'
         assert page.locator('.sheet .option').count()==7
         assert page.locator('.sheet a.option[href="./flight.html"] strong').inner_text()=='FLIGHT PLAN'

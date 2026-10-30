@@ -36,6 +36,9 @@ with sync_playwright() as p:
   page.route('**/xml.fetcher.php**',fulfill)
   page.goto(url)
   assert page.locator('.heading').count()==0
+  assert page.locator('.topbar #back-or-menu').count()==0
+  assert page.locator('.content > .page-back #back-or-menu').count()==1
+  assert page.locator('#back-or-menu').inner_text()=='BACK'
   assert page.locator('[data-view]').count()==4
   # SIMBRIEF import card must have exactly ONE input and ONE action.
   assert page.locator('.sb-import-card').count()==1
@@ -60,6 +63,10 @@ with sync_playwright() as p:
   assert 'PERFORMANCE OVERVIEW' in page.locator('.heading').inner_text()
   assert page.locator('#import-ofp, #pilot-id').count()==0
   assert 'SBGR' in page.locator('.route').inner_text()
+  page.locator('#open-review').click()
+  assert page.locator('.content > .page-back #back-or-menu').count()==1
+  page.locator('#back-or-menu').click()
+  assert 'PERFORMANCE OVERVIEW' in page.locator('.heading').inner_text()
   page.locator('#open-review').click()
   assert page.locator('.heading').inner_text().find('IMPORTED FLIGHT PLAN')>=0
   assert page.locator('.list-title').first.inner_text()=='FLIGHT DATA'

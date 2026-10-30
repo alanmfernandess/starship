@@ -44,8 +44,11 @@ with sync_playwright() as p:
   # opens the import page instead of silently doing nothing.
   assert page.locator('[data-loading-source="simbrief"]').is_enabled()
   page.locator('[data-loading-source="simbrief"]').click()
-  page.wait_for_url('**/flight.html?import=1')
+  page.wait_for_url('**/flight.html?import=1&returnToWB=1')
   assert page.evaluate('AeroFlight.view')=='plan'
+  page.locator('#back-or-menu').click()
+  page.wait_for_url('**/wb.html')
+  assert page.locator('.scroller > .page-back #menu').count()==1
 
   page.goto(FLIGHT)
   page.evaluate("(raw)=>window.AeroFlight.acceptRaw(raw,'SIMBRIEF')",OFP)
@@ -69,8 +72,10 @@ with sync_playwright() as p:
   page.locator('[data-check-id="wind"] a.check-link').click()
   assert 'returnToReview=1' in page.url
   assert page.locator('#rw-save-back').count()==1
+  assert page.locator('.runway-ui .rw-footer #rw-save-back').count()==1
   # Nested BACK stays in RUNWAY until the pilot is done editing.
   page.locator('#rw-surface').click()
+  assert page.locator('.runway-ui .rw-footer #rw-back').inner_text()=='BACK'
   page.locator('#rw-back').click()
   assert page.locator('#rw-save-back').count()==1
   page.locator('#rw-wind').evaluate("(e)=>{e.value='5';e.dispatchEvent(new Event('input',{bubbles:true}))}")

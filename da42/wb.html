@@ -97,6 +97,13 @@ button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus
 .loading-note{color:#e7b46d;font-size:10px;line-height:1.4;margin-top:11px;min-height:14px}
 .loading-note.good{color:#67caa9}
 @media(max-width:355px){.loading-source{font-size:9px}.loading-summary{padding:11px}.loading-metrics{gap:6px}.loading-metric strong{font-size:15px;letter-spacing:-.4px}}
+
+.topbar-placeholder{width:42px;height:36px}
+.page-back{margin:17px 0 11px;padding-top:13px;border-top:1px solid var(--line)}
+.page-back button,.sheet-return{display:flex;align-items:center;justify-content:center;width:100%;min-height:58px;padding:12px 14px;border:1px solid #456b80;border-radius:13px;background:#243c4d;color:#dcebf4;font-size:14px;font-weight:700;letter-spacing:.25px}
+.page-back button:active,.sheet-return:active{background:#2c4b60}
+.sheet-return{margin-top:15px}
+@media(max-height:730px){.page-back button,.sheet-return{min-height:51px}}
 </style></head>
 <body><div id="app"></div><script src="./wb-engine.js"></script><script src="./wb-optimizer.js"></script><script src="./loading-profile.js"></script><script>
 'use strict';
@@ -146,7 +153,7 @@ function syncActive(){
 }
 function selectSource(value){
  if(value==='simbrief'&&!planRef()){
-  location.assign('./flight.html?import=1');return;
+  location.assign('./flight.html?import=1&returnToWB=1');return;
  }
  if(value==='optimized'){runOptimize();return}
  if(optimizedMode&&value==='manual'){
@@ -228,7 +235,7 @@ function content(){
  const metrics='<div class="metrics"><div class="metric"><label>ZFW</label><b>'+shown(active.zfw)+' kg</b></div>'+
  '<div class="metric"><label>TOW</label><b>'+shown(active.tow)+' kg</b></div></div>';
  const massState=active.valid?'WEIGHT WITHIN LIMITS':sourceMode==='simbrief'?'CHECK OFP WEIGHT':model.ok?'WEIGHT LIMIT EXCEEDED':'CHECK INPUTS';
- return '<div class="phone"><header class="topbar"><button class="header-back" id="menu" type="button" aria-label="Back · Performance menu">'+icon('back')+'<span>BACK</span></button><h1>DA42 NG</h1><button class="icon-btn" id="settings" aria-label="Configurações da aeronave">'+icon('settings')+'</button></header>'+
+ return '<div class="phone"><header class="topbar"><span class="topbar-placeholder" aria-hidden="true"></span><h1>DA42 NG</h1><button class="icon-btn" id="settings" aria-label="Configurações da aeronave">'+icon('settings')+'</button></header>'+
  '<main class="scroller" id="scroller"><div class="module-heading"><span>WEIGHT &amp; BALANCE</span><span class="accent">CG ENVELOPE</span></div>'+sourceSelector()+
  (sourceMode==='simbrief'?'':'<div class="fields">'+card('pilot','PILOT')+card('copilot','COPILOT')+card('pax1','PASSENGER 1')+card('pax2','PASSENGER 2')+'</div>')+
  '<button class="open-load" id="edit-load" aria-label="BAGGAGE &amp; FUEL"><span class="main">BAGGAGE &amp; FUEL</span>'+icon('next')+'</button>'+
@@ -238,7 +245,7 @@ function content(){
   ofpComparison()+
  '<section class="result" aria-live="polite"><div id="envelope">'+envelope()+'</div><div class="legend"><span><i class="dot" style="background:#e7b46d"></i>ZFW</span><span><i class="dot" style="background:#56b9ee"></i>TOW</span></div>'+
  '<div id="mass-check" class="standalone-status '+(sc.massOK?'':'bad')+'">'+(model.ok?massState:'—')+'</div><div id="metrics">'+metrics+'</div>'+
- '</section><div class="notice" id="notice">NOT FOR FLIGHT</div></main>'+
+ '</section><div class="notice" id="notice">NOT FOR FLIGHT</div><div class="page-back"><button id="menu" type="button" aria-label="Back · '+(checklistReturn?'Checklist':'Performance menu')+'">BACK</button></div></main>'+
  '<nav class="bottom"><button class="nav-btn active" id="nav-input" aria-label="Ocupantes">'+icon('calculator')+'</button>'+
  '<button class="nav-btn" id="nav-chart" aria-label="Envelope CG">'+icon('chart')+'</button>'+
  '<button class="nav-btn" id="nav-scenarios" aria-label="Cenários de combustível e degelo">'+icon('history')+'</button>'+
@@ -319,7 +326,7 @@ function sheet(type){
   if(model.ok)body+='<div class="section-title">LOADED CONDITION</div><div class="case"><div class="value"><span>ZFW</span><b>'+format(model.zeroFuel.mass,0)+' kg</b></div></div><div class="case"><div class="value"><span>TOW</span><b>'+format(model.takeoff.mass,0)+' kg</b></div></div>';
  }
  if(type==='modules')body='<a class="action" href="./flight.html">FLIGHT PLAN</a><a class="action" href="./index.html?calculator=1">PERFORMANCE</a><a class="action" href="./wb.html">WEIGHT &amp; BALANCE</a>';
- const d=document.createElement('div');d.className='sheet-backdrop';d.innerHTML='<div class="sheet" role="dialog" aria-modal="true" aria-label="'+titles[type]+'"><div class="sheet-head"><h2>'+titles[type]+'</h2><button class="close" aria-label="Back">BACK</button></div>'+body+'</div>';
+ const d=document.createElement('div');d.className='sheet-backdrop';d.innerHTML='<div class="sheet" role="dialog" aria-modal="true" aria-label="'+titles[type]+'"><div class="sheet-head"><h2>'+titles[type]+'</h2></div>'+body+'<button class="close sheet-return" type="button" aria-label="Back · Weight and Balance">BACK</button></div>';
  el('.phone').appendChild(d);
  d.addEventListener('click',ev=>{if(ev.target===d)d.remove()});
  d.querySelector('.close').onclick=()=>d.remove();
