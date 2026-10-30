@@ -826,7 +826,7 @@ function showSheet(type){if(type==='runwayanalysis'&&(current==='runway'||curren
  if(current==='climb')inputs.oei=inputs.climb;
  d.remove();render()});}
 window.AeroCalc={MODELS,RUNWAY_ANALYSIS_ENGINE:window.RunwayAnalysis,GO_AROUND_ENGINE:window.GoAroundTables,LANDING_TABLE_ENGINE:window.LandingTables,CRUISE_PERFORMANCE_ENGINE:window.CruisePerformance,TIME_CLIMB_ENGINE:window.TimeToClimb,OEI_TABLES:window.OEITables?.TABLES,OEI_ENGINE:window.OEITables,CLIMB_TABLES:window.ClimbTables?.TABLES,CLIMB_ENGINE:window.ClimbTables,TAKEOFF_TABLES:window.TakeoffTables?.TABLES,TAKEOFF_ENGINE:window.TakeoffTables,NOMOGRAMS,CRUISE_CHART,LANDING_CHART,ABNORMAL_CHART,GO_AROUND_PUBLISHED,GRAPH_REGISTRATION,limits,compute,showSheet,get current(){return current},get cruiseTempMode(){return cruiseTempMode},get inputs(){return inputs},isaTemperature,cruiseDeviation};
-render();if(new URLSearchParams(location.search).get('reviewRunway')==='1'&&current==='takeoff')showSheet('runwayanalysis');if('serviceWorker' in navigator&&location.protocol==='https:')window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+render();if(/[?&]reviewRunway=1(?:&|$)/.test(location.search||'')&&current==='takeoff')showSheet('runwayanalysis');if('serviceWorker' in navigator&&location.protocol==='https:')window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 </script>
 <script>if(location.protocol==='https:'&&!/[?&](calculator|module)=/.test(location.search||'')){location.replace('./flight.html')}</script>
 </body>
