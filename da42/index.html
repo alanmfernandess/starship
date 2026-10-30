@@ -637,7 +637,7 @@ function showSheet(type){if(type==='runwayanalysis'&&current==='runway')return w
    runway:'RUNWAY ANALYSIS'
   };
   const weightBalance='<a class="option" href="./wb.html" style="text-decoration:none"><span><strong>WEIGHT &amp; BALANCE</strong></span>'+icon('next')+'</a>';
-   const flightPlan='<a class="option" href="./flight.html" style="text-decoration:none"><strong>FLIGHT PLAN / SIMBRIEF</strong>'+icon('next')+'</a>';
+   const flightPlan='<a class="option" href="./flight.html" style="text-decoration:none"><strong>FLIGHT PLAN</strong>'+icon('next')+'</a>';
   content=flightPlan+Object.entries(MODELS).map(([k,m])=>
    (k==='timeclimb'?weightBalance:'')+
    `<button class="option ${current===k?'selected':''}" data-module="${k}"><span><strong>${escapeHTML(names[k]||m.label)}</strong></span>${current===k?icon('check'):icon('next')}</button>`
