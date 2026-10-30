@@ -45,7 +45,12 @@ function shortWarning(message){
  if(message.includes('não corresponde ao DA42'))return 'AIRCRAFT · MISMATCH';
  if(message.includes('PRESSURE ALT abaixo'))return 'PRESSURE ALT · 0 FT TABLE';
  if(message.includes('PRESSURE ALT da origem'))return 'PRESSURE ALT · CHECK';
- if(message.includes('WIND COMPONENT'))return 'RUNWAY / CG · VERIFY';
+ if(message.includes('RUNWAY não identificada'))return 'RUNWAY · SELECT';
+ if(message.includes('TORA indisponível'))return 'TORA · REQUIRED';
+ if(message.includes('WIND COMPONENT'))return 'RUNWAY WIND · REQUIRED';
+ if(message.includes('RUNWAY SLOPE'))return 'RUNWAY SLOPE · VERIFY';
+ if(message.includes('RUNWAY SURFACE'))return 'RUNWAY SURFACE · VERIFY';
+ if(message.includes('CG exige'))return 'CG · VERIFY';
  if(message.includes('METAR/TAF'))return 'WEATHER · OFP SNAPSHOT';
  if(message.includes('METAR de origem'))return 'ORIGIN WEATHER · CHECK';
  if(message.includes('OAT da origem'))return 'OAT · CHECK';
@@ -119,7 +124,10 @@ function summaryPage(){
  metric('TAKEOFF DIST',p&&!p.error?p.main:null,'M',p&&!p.error?'AERO UI · REVIEW WIND':'REVIEW INPUTS')+'</div>';
  if(p?.error)body+='<div class="notice">TAKEOFF PERFORMANCE: '+esc(p.error)+' · Abra o módulo para completar os dados.</div>';
  body+='<section class="tile"><div class="list-title">PERFORMANCE MODULES</div>'+
- row('RUNWAY ANALYSIS','OPEN MODULE TO VERIFY TORA')+
+ row('RUNWAY ANALYSIS',(()=>{const r=getAppInputs().inputs?.runway||{};
+   return r.toraVerified===false||r.windVerified===false||r.surfaceVerified===false||r.slopeVerified===false?
+    'INPUTS REQUIRED':r.runwayId?'RWY '+r.runwayId+' · REVIEW':'OPEN MODULE';
+  })())+
  row('CLIMB / OEI','AFM MODEL AVAILABLE')+
  row('WEIGHT & BALANCE',wb?.ok?'LOADING PROFILE AVAILABLE':'PROFILE REQUIRED')+
  row('ALTERNATE',''+(plan.alternate||'NOT SET'))+'</section>';
