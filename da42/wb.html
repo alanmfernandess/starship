@@ -225,7 +225,7 @@ function content(){
  const shown=x=>Number.isFinite(x)?format(x,0):'—';
  const metrics='<div class="metrics"><div class="metric"><label>ZFW</label><b>'+shown(active.zfw)+' kg</b></div>'+
  '<div class="metric"><label>TOW</label><b>'+shown(active.tow)+' kg</b></div></div>';
- const massState=active.valid?'WEIGHT WITHIN LIMITS':'CHECK MASS / CG';
+ const massState=active.valid?'WEIGHT WITHIN LIMITS':sourceMode==='simbrief'?'CHECK OFP WEIGHT':model.ok?'WEIGHT LIMIT EXCEEDED':'CHECK INPUTS';
  return '<div class="phone"><header class="topbar"><button class="header-back" id="menu" type="button" aria-label="Back · Performance menu">'+icon('back')+'<span>BACK</span></button><h1>DA42 NG</h1><button class="icon-btn" id="settings" aria-label="Configurações da aeronave">'+icon('settings')+'</button></header>'+
  '<main class="scroller" id="scroller"><div class="module-heading"><span>WEIGHT &amp; BALANCE</span><span class="accent">CG ENVELOPE</span></div>'+sourceSelector()+
  (sourceMode==='simbrief'?'':'<div class="fields">'+card('pilot','PILOT')+card('copilot','COPILOT')+card('pax1','PASSENGER 1')+card('pax2','PASSENGER 2')+'</div>')+
@@ -269,7 +269,7 @@ function recalc(){
  const set=(s,v)=>{const e=el(s);if(e)e.innerHTML=v};
  set('#envelope',envelope());
  const active=Load.loading(planRef(),sourceMode==='simbrief'?null:model,sourceMode);
- set('#mass-check','<span class="'+(active.valid?'good':'error')+'">'+(active.valid?'WEIGHT WITHIN LIMITS':'CHECK MASS / CG')+'</span>');
+ set('#mass-check','<span class="'+(active.valid?'good':'error')+'">'+(active.valid?'WEIGHT WITHIN LIMITS':sourceMode==='simbrief'?'CHECK OFP WEIGHT':model.ok?'WEIGHT LIMIT EXCEEDED':'CHECK INPUTS')+'</span>');
  const shown=x=>Number.isFinite(x)?format(x,0):'—';
  set('#metrics','<div class="metrics"><div class="metric"><label>ZFW</label><b>'+shown(active.zfw)+' kg</b></div>'+
   '<div class="metric"><label>TOW</label><b>'+shown(active.tow)+' kg</b></div></div>');

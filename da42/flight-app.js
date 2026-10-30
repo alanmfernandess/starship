@@ -162,7 +162,7 @@ function summaryPage(){
     'DATA REQUIRED':r.runwayId?'RWY '+r.runwayId:'NOT SET';
   })())+
  row('CLIMB / OEI','AFM MODEL AVAILABLE')+
- row('WEIGHT & BALANCE',wb?.ok?'LOADING PROFILE AVAILABLE':'PROFILE REQUIRED')+
+ row('WEIGHT & BALANCE',Load?.mode(localStorage,plan)?.toUpperCase()||'MANUAL')+
  row('ALTERNATE',''+(plan.alternate||'NOT SET'))+'</section>';
  body+=checklistCard('summary');
  body+='<button id="open-comparison" class="card-button comparison-action" type="button"><span>OFP COMPARISON</span>'+icon('next')+'</button>';
@@ -171,6 +171,8 @@ function summaryPage(){
 function comparisonPage(){
  if(!plan)return summaryPage();
  const wb=wbResult(),p=performance();
+ const activeMode=Load?.mode(localStorage,plan)||'manual';
+ const loading=Load?.loading(plan,activeMode==='simbrief'?null:wb,activeMode);
  const comparisons=C.compare(plan,p,wb);
  const tabs=['fuel','weight','runway','weather'];
  let body=routeCard()+'<div class="tabs" role="tablist" aria-label="OFP comparison categories">'+
@@ -185,10 +187,10 @@ function comparisonPage(){
    comp('FINAL RESERVE',plan.reserveFuel,null,'KG')+comp('LANDING FUEL',plan.landingFuel,null,'KG');
   body+='<p class="sub">FUEL / RANGE / ENDURANCE Aero UI engine ainda não implementado. Dados de combustível exibidos são do OFP, não recálculo independente.</p>';
  }else if(compareTab==='weight'){
-  body+=comp('TAKEOFF WEIGHT',plan.takeoffWeight,wb?.ok?wb.takeoff.mass:null,'KG')+
-  comp('ZERO FUEL WEIGHT',plan.zeroFuelWeight,wb?.ok?wb.zeroFuel.mass:null,'KG')+
-  comp('LANDING WEIGHT',plan.landingWeight,null,'KG')+
-  comp('TAKEOFF CG',null,wb?.ok?wb.takeoff.cg:null,'M');
+  body+=comp('TAKEOFF WEIGHT',plan.takeoffWeight,loading?.tow,'KG')+
+  comp('ZERO FUEL WEIGHT',plan.zeroFuelWeight,loading?.zfw,'KG')+
+  comp('LANDING WEIGHT',plan.landingWeight,loading?.landing,'KG')+
+  comp('TAKEOFF CG',null,loading?.cg,'M');
   body+='<p class="sub">ACTIVE LOAD · '+esc(Load?.mode(localStorage,plan)||'MANUAL').toUpperCase()+'</p>';
  }else if(compareTab==='runway'){
   body+=comp('TAKEOFF DIST',null,p&&!p.error?p.main:null,'M')+
