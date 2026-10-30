@@ -68,12 +68,12 @@ with sync_playwright() as p:
   assert page.locator('.review-details .review-detail').count()>=2
   assert page.locator('.review-details .review-line').evaluate_all("(items)=>items.every(e=>e.textContent.trim().length<=38 && e.scrollWidth<=e.clientWidth+1)")
   assert page.locator('.review-details .review-detail').evaluate_all("(items)=>items.every(e=>!e.open)")
-  detail=page.locator('.review-detail').filter(has_text='RUNWAY / CG')
+  detail=page.locator('.review-detail').filter(has_text='RUNWAY WIND')
   assert detail.count()==1
   assert not detail.locator('.review-explanation').is_visible()
   detail.locator('summary').click()
   assert detail.locator('.review-explanation').is_visible()
-  assert 'WIND COMPONENT, TORA' in detail.locator('.review-explanation').inner_text()
+  assert 'WIND COMPONENT não resolvido' in detail.locator('.review-explanation').inner_text()
   detail.locator('summary').click()
   assert not detail.locator('.review-explanation').is_visible()
   assert 'SBGR' in page.locator('.route').inner_text()
@@ -116,6 +116,10 @@ with sync_playwright() as p:
   assert page.evaluate("JSON.parse(localStorage.getItem('aero-ui-da42-v1')).inputs.takeoff.mass")==1850
   assert page.evaluate("JSON.parse(localStorage.getItem('aero-ui-da42-v1')).inputs.runway.qnh")==1025
   assert page.evaluate("JSON.parse(localStorage.getItem('aero-ui-da42-v1')).inputs.takeoff.wind")==None
+  assert page.evaluate("JSON.parse(localStorage.getItem('aero-ui-da42-v1')).inputs.runway.toraVerified") is False
+  assert page.evaluate("JSON.parse(localStorage.getItem('aero-ui-da42-v1')).inputs.runway.windVerified") is False
+  assert page.evaluate("JSON.parse(localStorage.getItem('aero-ui-da42-v1')).inputs.runway.length")==0
+  assert page.evaluate("JSON.parse(localStorage.getItem('aero-ui-da42-v1')).inputs.runway.runwayId")=='10R'
   # Summary warnings must remain concise, while full technical detail stays in Review.
   assert page.locator('.review-summary').count()==1
   assert page.locator('.review-summary .review-line').count()>=2
@@ -129,7 +133,7 @@ with sync_playwright() as p:
   assert abs(page.locator('#open-comparison').bounding_box()['width']-page.locator('.review-summary').bounding_box()['width'])<2
   page.locator('#open-review').click()
   assert page.locator('.review-details').count()==1
-  assert 'RUNWAY / CG · VERIFY' in page.locator('.review-details').inner_text()
+  assert 'RUNWAY WIND · REQUIRED' in page.locator('.review-details').inner_text()
   assert page.locator('.notice').count()==0
   page.locator('[data-view="summary"]').click()
   page.locator('#open-comparison').click()
