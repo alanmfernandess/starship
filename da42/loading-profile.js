@@ -6,12 +6,32 @@
 'use strict';
 const MODE_KEY='da42-loading-mode-v1';
 const OFP_KEY='aero-ui-flight-plan-v1';
+const LAST_OFP_KEY='aero-ui-last-simbrief-ofp-v1';
 const STORE_KEY='aero-ui-da42-v1';
 const PROFILE_KEY='da42-wb-profile-v1';
 const OPT_KEY='da42-wb-optimized-v1';
 const finite=v=>typeof v==='number'&&Number.isFinite(v);
 const parse=s=>{try{return JSON.parse(s||'null')}catch{return null}};
-function plan(storage){const p=parse(storage.getItem(OFP_KEY));return p&&p.aircraft==='DA42'&&!p.mismatch?p:null}
+function usablePlan(p){
+ return !!(p&&p.aircraft==='DA42'&&!p.mismatch&&p.source==='SIMBRIEF'&&
+  typeof p.origin==='string'&&typeof p.destination==='string'&&
+  finite(p.takeoffWeight));
+}
+// The session OFP is authoritative when present. A persisted imported OFP is
+// a deliberate cross-tab fallback, never a synthesized flight plan.
+function plan(session,local){
+ const active=parse(session.getItem(OFP_KEY));
+ if(active)return usablePlan(active)?active:null;
+ if(!local)return null;
+ const saved=parse(local.getItem(LAST_OFP_KEY));
+ return usablePlan(saved)?saved:null;
+}
+function savePlan(local,p){
+ if(!usablePlan(p))return false;
+ local.setItem(LAST_OFP_KEY,JSON.stringify(p));
+ return true;
+}
+function clearPlan(local){local.removeItem(LAST_OFP_KEY)}
 function mode(storage,p){
  const v=storage.getItem(MODE_KEY);
  if(!p)return v==='optimized'?'optimized':'manual';
@@ -65,8 +85,8 @@ function sync(storage,p,wb,selected){
  storage.setItem(STORE_KEY,JSON.stringify(data));
  return item;
 }
-const api={MODE_KEY,OFP_KEY,STORE_KEY,PROFILE_KEY,OPT_KEY,capacity,totalCapacity,
- plan,mode,setMode,distribute,loading,sync};
+const api={MODE_KEY,OFP_KEY,LAST_OFP_KEY,STORE_KEY,PROFILE_KEY,OPT_KEY,capacity,totalCapacity,
+ plan,savePlan,clearPlan,mode,setMode,distribute,loading,sync};
 if(typeof module!=='undefined'&&module.exports)module.exports=api;
 root.LoadingProfile=api;
 })(typeof window!=='undefined'?window:globalThis);

@@ -7,9 +7,20 @@ function storage(){
  return {getItem:k=>map.has(k)?map.get(k):null,setItem:(k,v)=>map.set(k,String(v)),removeItem:k=>map.delete(k)};
 }
 const db=storage();
-const p={aircraft:'DA42',origin:'SBGL',destination:'SBSP',
+const p={aircraft:'DA42',source:'SIMBRIEF',origin:'SBGL',destination:'SBSP',
  takeoffWeight:1850,zeroFuelWeight:1649,plannedFuel:201,landingWeight:1730};
 assert.equal(Load.mode(db,p),'simbrief','new OFP defaults to SIMBRIEF');
+const second=storage();
+assert.equal(Load.plan(second,db),null,'no import yet');
+assert.equal(Load.savePlan(db,p),true);
+assert.equal(Load.plan(second,db).takeoffWeight,1850,'cross-tab OFP fallback');
+assert.equal(Load.plan(db,db).origin,'SBGL');
+second.setItem(Load.OFP_KEY,JSON.stringify({...p,aircraft:'B738'}));
+assert.equal(Load.plan(second,db),null,'incompatible active OFP must block stale fallback');
+second.removeItem(Load.OFP_KEY);
+assert.equal(Load.savePlan(db,{...p,source:'MANUAL'}),false,'manual plan cannot impersonate SimBrief');
+assert.equal(Load.plan(second,db).source,'SIMBRIEF');
+
 assert.equal(Load.mode(db,null),'manual','without OFP, editable manual loading is default');
 assert.equal(Load.distribute(514).ok,false,'impossible fuel cannot be loaded into the DA42');
 assert.equal(Load.distribute(null).ok,false,'missing fuel must remain unknown');
@@ -49,4 +60,6 @@ assert.equal(JSON.stringify(get()),before,'invalid optimizer result must not upd
 assert.ok(!Load.setMode(db,'simbrief',null),'SIMBRIEF mode requires an OFP');
 assert.equal(Load.loading({...p,plannedFuel:514},null,'simbrief').limitation,'FUEL EXCEEDS TANK CAPACITY');
 assert.equal(Load.loading({...p,takeoffWeight:2000},null,'simbrief').valid,false);
+Load.clearPlan(db);
+assert.equal(Load.plan(second,db),null,'cleared OFP is no longer offered in another tab');
 console.log('PASS loading modes, SimBrief T/O fuel tank distribution, sync, CG provenance, no double counting, invalid fuel guards.');

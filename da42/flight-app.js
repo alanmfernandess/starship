@@ -263,6 +263,7 @@ function acceptRaw(raw,source){
   if(Load)try{Load.setMode(localStorage,'simbrief',next)}catch{}
   try{sessionStorage.removeItem(checkKey)}catch{}
  try{sessionStorage.setItem(flightKey,JSON.stringify(plan));sessionStorage.removeItem(flightKey+'-synced')}catch{}
+ if(Load)try{if(source==='SIMBRIEF')Load.savePlan(localStorage,plan);else Load.clearPlan(localStorage)}catch{}
  // The import itself triggers synchronization; there is no second confirmation.
  // Incompatible aircraft remain visible for inspection but never update inputs.
  if(next.mismatch||next.aircraft!=='DA42'){show('review');return}
@@ -315,6 +316,7 @@ function applyPlan(navigate=true){
   localStorage.setItem(storageKey,JSON.stringify(persisted));
   sessionStorage.setItem(flightKey,JSON.stringify(plan));
   sessionStorage.setItem(flightKey+'-synced','1');
+  if(Load&&plan.source==='SIMBRIEF')Load.savePlan(localStorage,plan);
  }catch(e){
   err='Não foi possível salvar os dados no navegador.';
   if(navigate)render();
@@ -370,6 +372,7 @@ function bind(){
   plan=null;reviewed=false;err='';
    try{sessionStorage.removeItem(checkKey)}catch{}
   try{sessionStorage.removeItem(flightKey);sessionStorage.removeItem(flightKey+'-synced')}catch{}
+  if(Load)try{Load.clearPlan(localStorage);Load.setMode(localStorage,'manual',null)}catch{}
   show('plan');
  };
 }
@@ -381,8 +384,13 @@ try{
   reviewed=stored.aircraft==='DA42'&&!stored.mismatch&&sessionStorage.getItem(flightKey+'-synced')==='1';
  }
 }catch{}
+if(!plan&&Load)try{
+ const retained=Load.plan(sessionStorage,localStorage);
+ if(retained){plan=retained;reviewed=false}
+}catch{}
 // Returning from Performance/W&B resumes the imported OFP summary.
-if(plan)view=/[?&]review=1(?:&|$)/.test(location.search||'')?'review':reviewed?'summary':'review';
+if(/[?&]import=1(?:&|$)/.test(location.search||''))view='plan';
+else if(plan)view=/[?&]review=1(?:&|$)/.test(location.search||'')?'review':reviewed?'summary':'review';
 window.AeroFlight={get plan(){return plan},get view(){return view},normalize:C.normalize,acceptRaw,applyPlan,get performance(){return performance()}};
 render();
 // A checklist-origin return always resumes the review checklist, not the OFP summary.

@@ -48,11 +48,37 @@ with sync_playwright() as p:
         assert 'WEIGHT LIMIT EXCEEDED' in page.locator('#mass-check').inner_text()
         page.locator('input[data-wb="pilot"]').fill('80')
         assert 'WEIGHT WITHIN LIMITS' in page.locator('#mass-check').inner_text()
+        # The compact TOW/FUEL/CG card and shared performance state must
+        # react to each keystroke, with no APPLY button or mode re-selection.
+        before=page.locator('.loading-metric').first.inner_text()
+        page.locator('input[data-wb="pilot"]').fill('81')
+        assert page.locator('.loading-metric').first.inner_text()!=before
+        assert '1.900,0' in page.locator('.loading-metric').first.inner_text()
+        assert page.evaluate("""()=>
+            Math.abs(JSON.parse(localStorage.getItem('aero-ui-da42-v1')).inputs.takeoff.mass-
+            WBApp.model.takeoff.mass)<0.001""")
+        assert page.locator('.loading-metric strong').evaluate_all("""(items)=>items.every(e=>
+            e.scrollWidth<=e.clientWidth+1 && e.getBoundingClientRect().width>0)"""), (w,h,'summary overflow')
+        assert page.locator('.loading-metrics').evaluate("""(row)=>{
+           const a=[...row.querySelectorAll('.loading-metric')].map(x=>x.getBoundingClientRect());
+           return a.length===3 && a.every((r,i)=>i===0 || r.left>=a[i-1].right+3)
+           && a.every(r=>r.right<=row.getBoundingClientRect().right+1);
+        }"""), (w,h,'summary columns overlap')
+        page.locator('input[data-wb="pilot"]').fill('80')
+        assert page.locator('.loading-metric').first.inner_text()==before
         count+=2
         assert page.locator('#edit-load').inner_text().strip()=='BAGGAGE & FUEL'
         assert page.locator('#edit-load .sub').count()==0
         page.locator('#edit-load').click()
         assert page.locator('.sheet-row input').count()==8
+        fuel_before=page.locator('.loading-metric').nth(1).inner_text()
+        page.locator('input[data-wb="mainL"]').fill('78.5')
+        assert page.locator('.loading-metric').nth(1).inner_text()!=fuel_before
+        assert page.evaluate("""()=>Math.abs(
+            JSON.parse(localStorage.getItem('aero-ui-da42-v1')).inputs.takeoff.mass-
+            WBApp.model.takeoff.mass)<0.001""")
+        page.locator('input[data-wb="mainL"]').fill('79.5')
+        assert page.locator('.loading-metric').nth(1).inner_text()==fuel_before
         assert page.locator('[data-wb^="landing"]').count()==0
         page.locator('input[data-wb="cabin"]').fill('40')
         page.locator('input[data-wb="extension"]').fill('18')

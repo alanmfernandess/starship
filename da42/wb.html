@@ -91,12 +91,12 @@ button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus
 .loading-source.active{background:#203a4c;border-color:#56b9ee;color:#86d2ff}
 .loading-source:disabled{opacity:.35;cursor:default}
 .loading-summary{margin:0 0 12px;border-radius:13px;padding:12px;background:#202d39}
-.loading-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-.loading-metric span{display:block;color:#92aabb;font-size:10px;letter-spacing:.3px}
-.loading-metric strong{display:block;color:#edf6fc;font-size:clamp(16px,3.7vw,22px);font-weight:550;font-variant-numeric:tabular-nums;white-space:nowrap}
-.loading-note{color:#e7b46d;font-size:10px;line-height:1.4;margin-top:10px}
+.loading-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;align-items:start;min-width:0}
+.loading-metric{min-width:0;overflow:hidden}.loading-metric span{display:block;color:#92aabb;font-size:10px;letter-spacing:.3px}
+.loading-metric strong{display:block;max-width:100%;color:#edf6fc;font-size:clamp(15px,4vw,20px);font-weight:550;font-variant-numeric:tabular-nums;letter-spacing:-.25px;white-space:nowrap}
+.loading-note{color:#e7b46d;font-size:10px;line-height:1.4;margin-top:11px;min-height:14px}
 .loading-note.good{color:#67caa9}
-@media(max-width:355px){.loading-source{font-size:9px}.loading-summary{padding:11px}.loading-metrics{gap:4px}}
+@media(max-width:355px){.loading-source{font-size:9px}.loading-summary{padding:11px}.loading-metrics{gap:6px}.loading-metric strong{font-size:15px;letter-spacing:-.4px}}
 </style></head>
 <body><div id="app"></div><script src="./wb-engine.js"></script><script src="./wb-optimizer.js"></script><script src="./loading-profile.js"></script><script>
 'use strict';
@@ -133,9 +133,9 @@ try{optimizedMode=localStorage.getItem(AUTO_KEY)==='true'}catch(e){}
 let optimizeMessage='';
 let previousManual=null;
 try{const saved=JSON.parse(localStorage.getItem(MANUAL_KEY));if(saved&&typeof saved==='object'&&OPT.ADJUSTABLE.every(k=>Object.prototype.hasOwnProperty.call(saved,k)))previousManual=saved}catch(e){}
-let sourceMode=Load.mode(localStorage,Load.plan(sessionStorage));
+let sourceMode=Load.mode(localStorage,Load.plan(sessionStorage,localStorage));
 let model=E.calculate(profile);
-const planRef=()=>Load.plan(sessionStorage);
+const planRef=()=>Load.plan(sessionStorage,localStorage);
 const fuelRef=()=>planRef()?Load.distribute(planRef().plannedFuel):null;
 function resolvedModel(){
  const fuel=fuelRef();
@@ -145,7 +145,9 @@ function syncActive(){
  try{return Load.sync(localStorage,planRef(),sourceMode==='simbrief'?null:E.calculate(profile),sourceMode)}catch{return null}
 }
 function selectSource(value){
- if(value==='simbrief'&&!planRef())return;
+ if(value==='simbrief'&&!planRef()){
+  location.assign('./flight.html?import=1');return;
+ }
  if(value==='optimized'){runOptimize();return}
  if(optimizedMode&&value==='manual'){
   if(previousManual)profile={...profile,...previousManual};
@@ -200,7 +202,7 @@ function sourceSelector(){
   [['simbrief','SIMBRIEF'],['manual','MANUAL'],['optimized','OPTIMIZED']].map(([id,label])=>
    '<button type="button" class="loading-source'+(sourceMode===id?' active':'')+
    '" data-loading-source="'+id+'" aria-pressed="'+(sourceMode===id)+'"'+
-   (id==='simbrief'&&!planRef()?' disabled':'')+'>'+label+'</button>').join('')+'</div>';
+   ''+'>'+label+'</button>').join('')+'</div>';
 }
 function ofpComparison(){
  const data=Load.loading(planRef(),sourceMode==='simbrief'?null:model,sourceMode);
@@ -268,6 +270,7 @@ function recalc(){
  syncActive();
  const set=(s,v)=>{const e=el(s);if(e)e.innerHTML=v};
  set('#envelope',envelope());
+ const summary=el('.loading-summary');if(summary)summary.outerHTML=ofpComparison();
  const active=Load.loading(planRef(),sourceMode==='simbrief'?null:model,sourceMode);
  set('#mass-check','<span class="'+(active.valid?'good':'error')+'">'+(active.valid?'WEIGHT WITHIN LIMITS':sourceMode==='simbrief'?'CHECK OFP WEIGHT':model.ok?'WEIGHT LIMIT EXCEEDED':'CHECK INPUTS')+'</span>');
  const shown=x=>Number.isFinite(x)?format(x,0):'—';

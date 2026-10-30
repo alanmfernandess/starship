@@ -39,9 +39,27 @@ with sync_playwright() as p:
   page.goto(WB)
   page.locator('#menu').click()
   assert page.locator('.sheet a.action').count()==3
+  page.locator('.close').click()
+  # SimBrief must never be a dead/disabled selector: without an OFP it
+  # opens the import page instead of silently doing nothing.
+  assert page.locator('[data-loading-source="simbrief"]').is_enabled()
+  page.locator('[data-loading-source="simbrief"]').click()
+  page.wait_for_url('**/flight.html?import=1')
+  assert page.evaluate('AeroFlight.view')=='plan'
 
   page.goto(FLIGHT)
   page.evaluate("(raw)=>window.AeroFlight.acceptRaw(raw,'SIMBRIEF')",OFP)
+  # A second tab has a separate sessionStorage but must recover the
+  # last valid imported SimBrief OFP from localStorage.
+  second=context.new_page()
+  second.goto(WB)
+  assert second.evaluate('WBApp.mode')=='simbrief'
+  assert second.locator('[data-loading-source="simbrief"]').is_enabled()
+  assert second.locator('.loading-metric').first.inner_text().find('1.850')!=-1
+  assert second.locator('.loading-metric').nth(1).inner_text().find('201')!=-1
+  assert second.evaluate("""()=>
+    !!JSON.parse(localStorage.getItem('aero-ui-last-simbrief-ofp-v1'))""")
+  second.close()
   assert 'PERFORMANCE OVERVIEW' in page.locator('.heading').inner_text()
   page.locator('#open-review').click()
   assert page.locator('[data-check-id="wind"] .check-badge').inner_text()=='REQUIRED'
