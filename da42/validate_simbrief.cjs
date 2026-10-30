@@ -32,8 +32,62 @@ assert.equal(proposed.inputs.takeoff.oat,28);
 assert.equal(proposed.inputs.landing.mass,1730);
 assert.equal(proposed.inputs.cruiseperf.pa,10000);
 assert.equal(proposed.inputs.takeoff.wind,undefined); // no implied true/magnetic variation
-assert.equal(proposed.inputs.runway.length,undefined);
-assert.equal(proposed.inputs.runway.surface,undefined);
+assert.equal(p.runway.identifier,'10R');
+assert.equal(p.runway.tora,null);
+assert.equal(proposed.inputs.runway.length,0);
+assert.equal(proposed.inputs.runway.toraVerified,false);
+assert.equal(proposed.inputs.runway.windVerified,false);
+assert.equal(proposed.inputs.runway.surfaceVerified,false);
+assert.equal(proposed.inputs.runway.slopeVerified,false);
+assert.equal(globalThis.RunwayAnalysis.validate({length:900,toraVerified:false}),'TORA REQUIRED');
+assert.equal(globalThis.RunwayAnalysis.validate({length:900,toraVerified:true,windVerified:false}),'WIND COMPONENT REQUIRED');
+assert.equal(globalThis.RunwayAnalysis.validate({length:900,toraVerified:true,windVerified:true,surfaceVerified:false}),'RUNWAY SURFACE REQUIRED');
+// Optional OFP TLR supplies runway-specific TORA (FEET), true/magnetic
+// course and headwind. Never substitute raw runway length for TORA.
+const tlr=structuredClone(example);
+tlr.tlr={takeoff:{conditions:{airport_icao:'SBGR',planned_runway:'10R',wind_direction:'110',wind_speed:'12',surface_condition:'dry'},
+ runway:[{identifier:'10L',length_tora:'6000',true_course:'100',gradient:'0.8',headwind_component:'11'},
+ {identifier:'10R',length:'12000',length_tora:'3000',true_course:'100',magnetic_course:'99',gradient:'1.5',headwind_component:'9.8'}]}};
+const t=S.normalize(tlr);
+assert.equal(t.runway.tlrMatched,true);
+assert.equal(t.runway.tora,914.4);
+assert.equal(t.runway.headwind,9); // round DOWN: conservative for AFM
+assert.equal(t.runway.windSource,'OFP TLR');
+assert.equal(t.runway.slope,1.5);
+const ready=S.proposedInputs(t,{runway:{length:1234,wind:20,surface:'grass25'}});
+assert.equal(ready.inputs.runway.runwayId,'10R');
+assert.equal(ready.inputs.runway.length,914.4);
+assert.equal(ready.inputs.runway.toraVerified,true);
+assert.equal(ready.inputs.runway.wind,9);
+assert.equal(ready.inputs.runway.windVerified,true);
+assert.equal(ready.inputs.runway.slope,1.5);
+assert.equal(ready.inputs.runway.slopeVerified,true);
+assert.equal(ready.inputs.runway.surfaceVerified,false);
+assert.equal(ready.inputs.runway.surface,'paved');
+assert.equal(ready.inputs.runway.wet,false);
+const lacking=structuredClone(tlr);
+delete lacking.tlr.takeoff.runway[1].length_tora;
+assert.equal(S.normalize(lacking).runway.tora,null);
+assert.equal(S.proposedInputs(S.normalize(lacking),{}).inputs.runway.toraVerified,false);
+const mismatchRunway=structuredClone(tlr);
+mismatchRunway.origin.plan_rwy='11L';
+assert.equal(S.normalize(mismatchRunway).runway.tlrMatched,false);
+assert.equal(S.normalize(mismatchRunway).runway.tora,null);
+assert.equal(S.normalize(mismatchRunway).runway.headwind,null);
+const windCourse=structuredClone(tlr);
+delete windCourse.tlr.takeoff.runway[1].headwind_component;
+windCourse.tlr.takeoff.runway[1].true_course='110';
+assert.equal(S.normalize(windCourse).runway.headwind,12);
+assert.equal(S.normalize(windCourse).runway.windSource,'OFP METAR + TRUE COURSE');
+delete windCourse.tlr.takeoff.runway[1].true_course;
+assert.equal(S.normalize(windCourse).runway.headwind,null);
+const excessive=structuredClone(tlr);
+excessive.tlr.takeoff.runway[1].headwind_component='35';
+assert.equal(S.proposedInputs(S.normalize(excessive),{}).inputs.runway.windVerified,false);
+const downhill=structuredClone(tlr);
+downhill.tlr.takeoff.runway[1].gradient='-0.4';
+assert.equal(S.proposedInputs(S.normalize(downhill),{}).inputs.runway.slopeVerified,false);
+
 const lbs=structuredClone(example);lbs.params.units='lbs';lbs.weights.est_tow='4078.55';lbs.fuel.enroute_burn='264.55';
 p=S.normalize(lbs);
 assert.ok(Math.abs(p.takeoffWeight-1850)<1);
