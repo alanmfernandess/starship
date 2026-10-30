@@ -65,15 +65,17 @@ with sync_playwright() as p:
   assert page.locator('.list-title').first.inner_text()=='FLIGHT DATA'
   assert page.locator('#confirm-plan, #back-plan, #variant-confirm').count()==0
   assert page.locator('.notice').count()==0
-  assert page.locator('.review-details .review-detail').count()>=2
-  assert page.locator('.review-details .review-line').evaluate_all("(items)=>items.every(e=>e.textContent.trim().length<=38 && e.scrollWidth<=e.clientWidth+1)")
-  assert page.locator('.review-details .review-detail').evaluate_all("(items)=>items.every(e=>!e.open)")
+  assert page.locator('.checklist .review-detail').count()>=9
+  assert page.locator('.checklist .review-line').evaluate_all("(items)=>items.every(e=>e.scrollWidth<=e.clientWidth+1)")
+  assert page.locator('.checklist .review-detail').evaluate_all("(items)=>items.every(e=>!e.open)")
+  assert page.locator('[data-check-id="tora"] [data-check-confirm]').count()==0
+  assert page.locator('[data-check-id="wind"] [data-check-confirm]').count()==0
   detail=page.locator('.review-detail').filter(has_text='RUNWAY WIND')
   assert detail.count()==1
   assert not detail.locator('.review-explanation').is_visible()
   detail.locator('summary').click()
   assert detail.locator('.review-explanation').is_visible()
-  assert 'WIND COMPONENT não resolvido' in detail.locator('.review-explanation').inner_text()
+  assert 'componente longitudinal do vento' in detail.locator('.review-explanation').inner_text()
   detail.locator('summary').click()
   assert not detail.locator('.review-explanation').is_visible()
   assert 'SBGR' in page.locator('.route').inner_text()
@@ -122,8 +124,14 @@ with sync_playwright() as p:
   assert page.evaluate("JSON.parse(localStorage.getItem('aero-ui-da42-v1')).inputs.runway.runwayId")=='10R'
   # Summary warnings must remain concise, while full technical detail stays in Review.
   assert page.locator('.review-summary').count()==1
+  assert page.locator('[data-check-id="tora"] .check-badge').inner_text()=='REQUIRED'
+  assert page.locator('[data-check-id="wind"] .check-badge').inner_text()=='REQUIRED'
+  assert page.locator('[data-check-id="slope"] .check-badge').inner_text()=='VERIFY'
+  assert page.locator('.check-progress').get_attribute('role')=='progressbar'
+  assert page.locator('.check-symbol svg').count()>=9
+  assert page.locator('.checklist .check-name').evaluate_all("(items)=>items.every(e=>e.scrollWidth<=e.clientWidth+1)")
   assert page.locator('.review-summary .review-line').count()>=2
-  assert page.locator('.review-summary .review-line').evaluate_all("(items)=>items.every(e=>e.textContent.trim().length<=38 && e.clientHeight<=37)")
+  assert page.locator('.review-summary .review-line').evaluate_all("(items)=>items.every(e=>e.scrollWidth<=e.clientWidth+1 && e.clientHeight<=76)")
   assert 'exigem verificação manual' not in page.locator('.review-summary').inner_text()
   assert page.locator('#open-review.review-action').count()==1
   assert page.locator('#open-comparison.comparison-action.card-button').count()==1
@@ -132,8 +140,8 @@ with sync_playwright() as p:
   assert page.locator('#open-comparison').evaluate("(e)=>e.getBoundingClientRect().height<=68")
   assert abs(page.locator('#open-comparison').bounding_box()['width']-page.locator('.review-summary').bounding_box()['width'])<2
   page.locator('#open-review').click()
-  assert page.locator('.review-details').count()==1
-  assert 'RUNWAY WIND · REQUIRED' in page.locator('.review-details').inner_text()
+  assert page.locator('.checklist').count()==1
+  assert page.locator('[data-check-id="wind"] .check-badge').inner_text()=='REQUIRED'
   assert page.locator('.notice').count()==0
   page.locator('[data-view="summary"]').click()
   page.locator('#open-comparison').click()

@@ -3,8 +3,8 @@
  */
 (function(){
 'use strict';
-const C=window.SimBriefCore,storageKey='aero-ui-da42-v1',flightKey='aero-ui-flight-plan-v1',idKey='aero-ui-simbrief-id-v1';
-const root=document.getElementById('app');
+const C=window.SimBriefCore,Checklist=window.FlightChecklist,storageKey='aero-ui-da42-v1',flightKey='aero-ui-flight-plan-v1',idKey='aero-ui-simbrief-id-v1';
+const root=document.getElementById('app'),checkKey='aero-ui-flight-plan-checks-v1';
 let view='plan',compareTab='fuel',pilotId='',plan=null,reviewed=false,loading=false,err='';
 const icons={
  menu:'M4 7h16M4 12h12M4 17h8',settings:'M4 6h16M4 12h16M4 18h16',next:'m9 5 7 7-7 7',
@@ -23,7 +23,14 @@ const icons={
  trend:'M3 17l6-6 4 4 8-8M15 7h6v6',
  gauge:'M5 17a9 9 0 1 1 14 0M12 14l4-5M7 18h10',
  planeLanding:'M2 19h20M5 7l5 2 2.5-4 2 1-1 5 6 3a2 2 0 0 1-1 3L4 10z',
- rotate:'M3 11a9 9 0 1 0 3-6M3 4v7h7'
+ rotate:'M3 11a9 9 0 1 0 3-6M3 4v7h7',
+ mountain:'M2 20 9 6l4 7 3-4 6 11H2zM7 14l3-3 3 3',
+ runway:'M10 2 6 22M14 2l4 20M12 2v4M12 10v4M12 18v4M3 22h18',
+ wind:'M3 8h11a3 3 0 1 0-3-3M2 12h17a2 2 0 1 1-2 3M4 17h8a3 3 0 1 1-3 3',
+ slope:'M3 20h18L21 7 3 20zM14 11v9M11 14h3',
+ target:'M12 2v4M12 18v4M2 12h4M18 12h4M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10z',
+ cloud:'M7 19h11a4 4 0 0 0 .5-8A6 6 0 0 0 7 9a5 5 0 0 0 0 10z',
+ weight:'M9 8a3 3 0 1 1 6 0M8 9h8l3 12H5L8 9z'
 };
 const icon=n=>'<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="'+(icons[n]||icons.next)+'"/></svg>';
 const esc=v=>String(v??'').replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[x]));
@@ -37,35 +44,57 @@ function wbResult(){
  }catch{return null}
 }
 function getAppInputs(){try{return JSON.parse(localStorage.getItem(storageKey)||'null')||{}}catch{return {}}}
-function hints(){
- if(!plan)return [];
- const p=C.proposedInputs(plan,getAppInputs().inputs||{});
- const messages=[...p.warnings];
- const wb=wbResult();
- if(!wb)messages.push('WEIGHT & BALANCE não configurado para esta aeronave. Comparação de CG pendente.');
- else if(wb.ok&&typeof plan.takeoffWeight==='number'&&Math.abs(wb.takeoff.mass-plan.takeoffWeight)>1)
-  messages.push('TAKEOFF WEIGHT diverge do perfil WEIGHT & BALANCE. Verifique a carga e o combustível por tanque.');
- return messages;
+function checkRecord(){
+ if(!plan||!Checklist)return {};
+ try{
+  const record=JSON.parse(sessionStorage.getItem(checkKey)||'null');
+  return record&&record.version===1&&record.plan===Checklist.fingerprint(plan)&&record.items&&typeof record.items==='object'?record.items:{};
+ }catch{return {}}
 }
-function shortWarning(message){
- if(message.includes('variante NG'))return 'DA42 NG · VERIFY VARIANT';
- if(message.includes('não corresponde ao DA42'))return 'AIRCRAFT · MISMATCH';
- if(message.includes('PRESSURE ALT abaixo'))return 'PRESSURE ALT · 0 FT TABLE';
- if(message.includes('PRESSURE ALT da origem'))return 'PRESSURE ALT · CHECK';
- if(message.includes('RUNWAY não identificada'))return 'RUNWAY · SELECT';
- if(message.includes('TORA indisponível'))return 'TORA · REQUIRED';
- if(message.includes('WIND COMPONENT'))return 'RUNWAY WIND · REQUIRED';
- if(message.includes('RUNWAY SLOPE'))return 'RUNWAY SLOPE · VERIFY';
- if(message.includes('RUNWAY SURFACE'))return 'RUNWAY SURFACE · VERIFY';
- if(message.includes('CG exige'))return 'CG · VERIFY';
- if(message.includes('METAR/TAF'))return 'WEATHER · OFP SNAPSHOT';
- if(message.includes('METAR de origem'))return 'ORIGIN WEATHER · CHECK';
- if(message.includes('OAT da origem'))return 'OAT · CHECK';
- if(message.includes('WEIGHT & BALANCE não configurado'))return 'WEIGHT & BALANCE · SETUP';
- if(message.includes('TAKEOFF WEIGHT diverge'))return 'TAKEOFF WEIGHT · REVIEW';
- if(message.includes('TAKEOFF WEIGHT fora'))return 'TAKEOFF WEIGHT · OUT OF RANGE';
- if(message.includes('LANDING WEIGHT ausente'))return 'LANDING WEIGHT · CHECK';
- return 'INPUT DATA · REVIEW';
+function saveCheck(id,signature,revoke){
+ const items={...checkRecord()};
+ if(revoke)delete items[id];else items[id]=signature;
+ try{sessionStorage.setItem(checkKey,JSON.stringify({version:1,plan:Checklist.fingerprint(plan),items}))}catch{}
+}
+function reviewItems(){
+ if(!plan||!Checklist)return [];
+ let profile='';
+ try{profile=localStorage.getItem('da42-wb-profile-v1')||''}catch{}
+ return Checklist.build(plan,getAppInputs(),wbResult(),checkRecord(),profile);
+}
+function checklistCard(context){
+ const all=reviewItems();
+ if(!all.length)return '';
+ const priority={required:0,verify:1,review:2,checked:3};
+ const items=[...all].sort((a,b)=>priority[a.status]-priority[b.status]);
+ const pending=items.filter(x=>x.status!=='checked').length,done=items.length-pending;
+ const counts={required:0,verify:0,review:0,checked:done};
+ for(const item of items)if(item.status!=='checked')counts[item.status]++;
+ const tokens=['required','verify','review'].filter(x=>counts[x]).map(x=>'<span class="check-count status-'+x+'"><b>'+counts[x]+'</b> '+x.toUpperCase()+'</span>').join('');
+ const rows=items.map(item=>{
+  const checked=item.status==='checked',state=checked?'CHECKED':item.status.toUpperCase();
+  const mark='<span class="check-square" aria-hidden="true">'+(checked?icon('check'):'')+'</span>';
+  const move=item.href?item.href==='#weather-ofp'?
+    '<button type="button" class="check-link" data-open-weather="1">'+esc(item.action)+'</button>':
+    '<a class="check-link" href="'+esc(item.href)+'">'+esc(item.action)+'</a>':'';
+  const confirm=item.manual?
+    '<button type="button" class="check-confirm" data-check-confirm="'+esc(item.id)+'" data-check-sig="'+esc(item.signature)+'" data-check-revoke="'+(item.confirmed?'1':'0')+'">'+(item.confirmed?'REVOKE CONFIRMATION':esc(item.confirmText))+'</button>':'';
+  return '<details class="review-detail check-item status-'+item.status+'" data-check-id="'+esc(item.id)+'">'+
+   '<summary class="review-line" aria-label="'+esc(item.label+' · '+state)+'">'+mark+
+   '<span class="check-symbol">'+icon(item.icon)+'</span><span class="check-name">'+esc(item.label)+'</span>'+
+   '<span class="check-badge">'+state+'</span><span class="check-arrow">'+icon('next')+'</span></summary>'+
+   '<div class="check-expanded"><p class="review-explanation">'+esc(item.detail)+'</p>'+
+   ((move||confirm)?'<div class="check-actions">'+move+confirm+'</div>':'')+'</div></details>';
+ }).join('');
+ const percent=Math.round(done/items.length*100);
+ return '<section class="tile review-summary checklist" aria-label="Data validation checklist">'+
+  '<div class="review-heading"><strong>'+(pending?pending+' ITEMS TO REVIEW':'ALL '+items.length+' ITEMS CHECKED')+'</strong>'+
+  '<span class="check-heading-icon">'+icon(pending?'warning':'check')+'</span></div>'+
+  '<div class="check-overview"><span>'+done+' / '+items.length+' CHECKED</span><span>'+percent+'%</span></div>'+
+  '<div class="check-progress" role="progressbar" aria-valuemin="0" aria-valuemax="'+items.length+'" aria-valuenow="'+done+'" aria-label="Verified data items"><span style="width:'+percent+'%"></span></div>'+
+  (tokens?'<div class="check-counts">'+tokens+'</div>':'')+'<div class="review-lines">'+rows+'</div>'+
+  (context==='summary'?'<button id="open-review" class="review-action" type="button"><span>REVIEW DATA</span>'+icon('next')+'</button>':'')+
+  '<p class="check-note">CHECKED = DATA REVIEWED FOR THIS CHECK · NOT FLIGHT CLEARANCE</p></section>';
 }
 function performance(){
  if(!reviewed||!plan||plan.mismatch)return null;
@@ -107,13 +136,8 @@ function reviewPage(){
  row('ORIGIN QNH',plan.weather?.origin?.qnh,'HPA')+
  row('ORIGIN OAT',plan.weather?.origin?.oat,'°C')+
  row('RUNWAY',plan.originRunway||'NOT PROVIDED')+'</section>';
- items+='<section class="tile"><div class="list-title">WEATHER · OFP SNAPSHOT</div>'+weatherRows()+'</section>';
- const warnings=hints();
- if(warnings.length)items+='<section class="tile review-summary review-details" aria-label="Items to review">'+
-  '<div class="review-heading"><strong>'+warnings.length+' ITEMS TO REVIEW</strong>'+icon('warning')+'</div>'+
-  '<div class="review-lines">'+warnings.map(x=>
-   '<details class="review-detail"><summary class="review-line"><span>'+esc(shortWarning(x))+'</span>'+icon('next')+'</summary>'+
-   '<p class="review-explanation">'+esc(x)+'</p></details>').join('')+'</div></section>';
+ items+='<section class="tile" id="weather-ofp"><div class="list-title">WEATHER · OFP SNAPSHOT</div>'+weatherRows()+'</section>';
+ items+=checklistCard('review');
  return items;
 }
 function weatherRows(){
@@ -124,7 +148,7 @@ function weatherRows(){
 }
 function summaryPage(){
  if(!plan)return '<div class="note">Importe um OFP ou preencha o plano manualmente antes de visualizar o resumo.</div><button id="go-plan" class="primary stretch">IMPORT FLIGHT PLAN</button>';
- const p=performance(),wb=wbResult(),warnings=hints();
+ const p=performance(),wb=wbResult();
  const takeoff=getAppInputs().inputs?.takeoff?.mass??plan.takeoffWeight;
  let body=routeCard();
  body+='<div class="metrics">'+metric('TAKEOFF WEIGHT',takeoff,'KG',reviewed?'AERO UI INPUT / OFP':'SIMBRIEF / PLAN')+
@@ -140,10 +164,7 @@ function summaryPage(){
  row('CLIMB / OEI','AFM MODEL AVAILABLE')+
  row('WEIGHT & BALANCE',wb?.ok?'LOADING PROFILE AVAILABLE':'PROFILE REQUIRED')+
  row('ALTERNATE',''+(plan.alternate||'NOT SET'))+'</section>';
- if(warnings.length)body+='<section class="tile review-summary">'+
-  '<div class="review-heading"><strong>'+warnings.length+' ITEMS TO REVIEW</strong>'+icon('warning')+'</div>'+
-  '<div class="review-lines">'+warnings.map(x=>'<div class="review-line">'+esc(shortWarning(x))+'</div>').join('')+'</div>'+
-  '<button id="open-review" class="review-action" type="button"><span>REVIEW DATA</span>'+icon('next')+'</button></section>';
+ body+=checklistCard('summary');
  body+='<button id="open-comparison" class="card-button comparison-action" type="button"><span>OFP COMPARISON</span>'+icon('next')+'</button>';
  return body;
 }
@@ -237,6 +258,7 @@ function setStatus(message,isError){loading=false;err=isError?message:'';view='p
 function acceptRaw(raw,source){
  const next=C.normalize(raw);next.source=source;
  plan=next;reviewed=false;
+  try{sessionStorage.removeItem(checkKey)}catch{}
  try{sessionStorage.setItem(flightKey,JSON.stringify(plan));sessionStorage.removeItem(flightKey+'-synced')}catch{}
  // The import itself triggers synchronization; there is no second confirmation.
  // Incompatible aircraft remain visible for inspection but never update inputs.
@@ -326,8 +348,23 @@ function bind(){
  const reviewAgain=root.querySelector('#open-review');if(reviewAgain)reviewAgain.onclick=()=>show('review');
  const compare=root.querySelector('#open-comparison');if(compare)compare.onclick=()=>show('comparison');
  root.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{compareTab=b.dataset.tab;render()});
+ root.querySelectorAll('[data-check-confirm]').forEach(b=>b.onclick=()=>{
+  const id=b.dataset.checkConfirm,target=reviewItems().find(x=>x.id===id);
+  if(!target||!target.manual||target.signature!==b.dataset.checkSig)return;
+  const y=root.querySelector('#scroll-content')?.scrollTop||0;
+  saveCheck(id,target.signature,b.dataset.checkRevoke==='1');
+  render();
+  const pane=root.querySelector('#scroll-content'),expanded=root.querySelector('[data-check-id="'+id+'"]');
+  if(expanded)expanded.open=true;
+  if(pane)pane.scrollTop=y;
+ });
+ root.querySelectorAll('[data-open-weather]').forEach(b=>b.onclick=()=>{
+  if(view!=='review')show('review');
+  root.querySelector('#weather-ofp')?.scrollIntoView({block:'start'});
+ });
  const clear=root.querySelector('#clear-plan');if(clear)clear.onclick=()=>{
   plan=null;reviewed=false;err='';
+   try{sessionStorage.removeItem(checkKey)}catch{}
   try{sessionStorage.removeItem(flightKey);sessionStorage.removeItem(flightKey+'-synced')}catch{}
   show('plan');
  };

@@ -125,7 +125,61 @@ label{display:block;font-size:11px;font-weight:600;color:#aabfce;letter-spacing:
 .nav.active{color:var(--blue)}
 .disclaimer{text-align:center;color:#8ca3b3;letter-spacing:.2px;font-size:9px;line-height:1.5;margin:15px 0 7px}
 @media(max-width:355px){.sb-import-card{padding:15px 14px 16px}.sb-import-card .text-input{font-size:19px}.content{padding:15px 11px}.metric .value{font-size:22px}.apt{font-size:24px}.primary{padding:10px}.review-grid{column-gap:8px;row-gap:14px}.review-grid label{font-size:9px;letter-spacing:-.18px}.review-grid .text-input{font-size:19px;padding:10px}}
+
+/* Flight-plan checklist — deliberately visual status, not an operational clearance. */
+.checklist{padding:18px 15px 14px;margin-bottom:12px}
+.checklist .review-heading{font-size:clamp(12px,3.3vw,14px);font-weight:750;color:var(--amber);letter-spacing:.2px;margin-bottom:10px}
+.check-heading-icon{display:flex;align-items:center;justify-content:center;flex:none}
+.check-heading-icon .icon{width:21px;height:21px;stroke-width:2.1}
+.check-overview{display:flex;justify-content:space-between;align-items:center;color:#a9c2d1;font-size:10px;font-weight:650;letter-spacing:.45px;font-variant-numeric:tabular-nums;margin-bottom:7px}
+.check-progress{height:5px;overflow:hidden;border-radius:999px;background:#334756;margin-bottom:12px}
+.check-progress>span{height:100%;display:block;background:var(--green);border-radius:999px;transition:width .18s ease}
+.check-counts{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 14px}
+.check-count{font-size:9px;letter-spacing:.25px;border-radius:7px;padding:5px 7px;border:1px solid transparent;display:inline-flex;gap:5px;align-items:center;font-weight:650}
+.check-count b{font-size:11px;font-variant-numeric:tabular-nums}
+.check-count.status-required{background:#452b2c;border-color:#a94a4e;color:#ffaaa2}
+.check-count.status-verify{background:#45392c;border-color:#a47b3f;color:#f0bf75}
+.check-count.status-review{background:#1b3447;border-color:#396e9d;color:#8bccf5}
+.checklist .review-lines{border-top:1px solid var(--line)}
+.checklist .review-detail{border-bottom:1px solid var(--line)}
+.checklist .review-detail:last-child{border-bottom:0}
+.checklist .review-line{display:flex;align-items:center;gap:8px;min-height:51px;list-style:none;cursor:pointer;padding:9px 0;border:0;color:#d8e5ee}
+.checklist .review-line::-webkit-details-marker{display:none}
+.checklist .review-line::marker{content:''}
+.check-square{width:20px;height:20px;flex:none;border:1.5px solid #66bfee;border-radius:5px;display:flex;align-items:center;justify-content:center;color:#102632}
+.check-square .icon{width:16px;height:16px;stroke-width:3}
+.check-symbol{width:23px;height:23px;display:grid;place-items:center;flex:none;color:#a9c5d7}
+.check-symbol .icon{width:21px;height:21px;stroke-width:1.75}
+.check-name{flex:1;min-width:0;font-size:clamp(10px,2.9vw,12px);letter-spacing:.05px;line-height:1.3;font-weight:550;overflow-wrap:anywhere}
+.check-badge{border:1px solid transparent;border-radius:8px;padding:6px 7px;min-width:69px;text-align:center;font-size:9px;line-height:1.15;font-weight:750;letter-spacing:.12px;flex:none}
+.check-arrow{width:13px;display:flex;align-items:center;flex:none;color:#88a5b7}
+.check-arrow .icon{width:14px;height:14px;transition:transform .16s ease}
+.check-item[open] .check-arrow .icon{transform:rotate(90deg)}
+.check-item.status-required .check-badge{background:#452b2c;border-color:#b84f53;color:#ffaba2}
+.check-item.status-verify .check-badge{background:#45392c;border-color:#af8041;color:#f6c57d}
+.check-item.status-review .check-badge{background:#1b3447;border-color:#397ba9;color:#99d7ff}
+.check-item.status-checked .check-badge{background:#183f35;border-color:#27876e;color:#80e5b8}
+.check-item.status-checked .check-square{background:#56b9ee;border-color:#56b9ee}
+.check-item.status-checked .check-name{color:#a8bfcd}
+.check-item.status-checked .check-symbol{color:#83caaa}
+.check-expanded{padding:0 0 13px 51px}
+.check-expanded .review-explanation{margin:0 0 11px;padding:0;color:#a7bbcb;font-size:11px;line-height:1.5;overflow-wrap:anywhere}
+.check-actions{display:flex;gap:8px;flex-wrap:wrap}
+.check-link,.check-confirm{border:1px solid #456a81;border-radius:9px;padding:9px 10px;text-decoration:none;background:#203b4d;color:#9cdcff;font-size:10px;line-height:1.25;font-weight:650;text-align:center;display:inline-flex;align-items:center;justify-content:center;min-height:36px}
+.check-confirm{background:#243b35;border-color:#3d7867;color:#9be8c5}
+.check-link:focus-visible,.check-confirm:focus-visible,.check-item summary:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.check-note{color:#8299a8;font-size:9px;letter-spacing:.15px;line-height:1.45;margin:13px 0 0}
+.checklist .review-action{margin-top:13px;padding-top:13px}
+@media(max-width:355px){
+ .checklist{padding:15px 12px}
+ .checklist .review-line{gap:5px;min-height:49px}
+ .check-square{width:18px;height:18px}
+ .check-symbol{width:19px;height:19px}
+ .check-symbol .icon{width:19px;height:19px}
+ .check-badge{min-width:62px;padding:6px 5px;font-size:8px}
+ .check-expanded{padding-left:42px}
+}
 </style></head>
 <body><div id="app"></div>
-<script src="./takeoff-tables.js"></script><script src="./climb-tables.js"></script><script src="./oei-tables.js"></script><script src="./runway-analysis.js"></script><script src="./wb-engine.js"></script><script src="./simbrief-core.js"></script><script src="./flight-app.js"></script>
+<script src="./takeoff-tables.js"></script><script src="./climb-tables.js"></script><script src="./oei-tables.js"></script><script src="./runway-analysis.js"></script><script src="./wb-engine.js"></script><script src="./simbrief-core.js"></script><script src="./flight-checklist.js"></script><script src="./flight-app.js"></script>
 </body></html>
