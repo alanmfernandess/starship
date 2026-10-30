@@ -87,11 +87,18 @@ for(const name of ['takeoff-tables','climb-tables','oei-tables','time-to-climb',
 vm.runInContext(js,ctx);
 assert.equal(Object.keys(ctx.AeroCalc.MODELS).length,10);
 assert.equal((markup.match(/class="field /g)||[]).length,4);
-assert.ok(markup.includes('id="main-result">1,855'));
-assert.ok(markup.includes('id="secondary-result">37.5 m'));
-assert.ok(markup.includes('id="runway-required">863 m'));
-assert.ok(markup.includes('id="runway-ground">533 m'));
-assert.ok(markup.includes('class="runway-distance-curve"'));
+// The legacy runway deep link now opens ONE unified Takeoff Performance view.
+assert.equal(ctx.AeroCalc.current,'takeoff');
+assert.equal(ctx.AeroCalc.inputs.takeoff,ctx.AeroCalc.inputs.runway);
+assert.ok(markup.includes('TAKEOFF PERFORMANCE'));
+assert.ok(markup.includes('id="main-result">638'));
+assert.ok(markup.includes('id="secondary-result">406 m'));
+assert.ok(markup.includes('id="runway-margin"'));
+assert.ok(markup.includes('id="runway-max-weight"'));
+assert.ok(markup.includes('id="val-length"'));
+assert.ok(markup.includes('class="takeoff-tora"'));
 assert.ok(markup.includes('id="analysis-settings"'));
-assert.ok(markup.includes('80 KIAS')&&markup.includes('85 KIAS')&&markup.includes('90 KIAS'));
+assert.ok(!markup.includes('id="takeoff-procedure"'));
+assert.ok(!markup.includes('id="takeoff-runway"'));
+assert.ok(markup.includes('KIAS'));
 console.log('PASS runway analysis: 1855kg, 1900/1999 configs, '+qnhCases+' QNH/elevation cases and '+valid+' monotonic runway cases.');
