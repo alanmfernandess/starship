@@ -171,6 +171,7 @@ with sync_playwright() as p:
   assert page.evaluate("JSON.parse(localStorage.getItem('aero-ui-da42-v1')).inputs.runway.surfaceVerified") is False
   page.locator('[data-view="modules"]').click()
   page.locator('a[href*="module=runway"]').click()
+  page.wait_for_function("() => !!window.AeroCalc?.inputs?.runway")
   assert page.evaluate("window.AeroCalc.inputs.runway.runwayId")=='10R'
   assert page.evaluate("window.AeroCalc.compute('runway',window.AeroCalc.inputs.runway).error")=='RUNWAY SURFACE REQUIRED'
   page.locator('#analysis-settings').click()
@@ -184,6 +185,7 @@ with sync_playwright() as p:
   # Import a different OFP without TLR: clear previous runway inputs.
   page.locator('#menu').click()
   page.locator('.sheet a.option[href="./flight.html"]').click()
+  page.wait_for_function("() => !!window.AeroFlight?.acceptRaw")
   page.evaluate("(data)=>window.AeroFlight.acceptRaw(data,'SIMBRIEF')",payload)
   assert page.evaluate("JSON.parse(localStorage.getItem('aero-ui-da42-v1')).inputs.runway.length")==0
   assert page.evaluate("JSON.parse(localStorage.getItem('aero-ui-da42-v1')).inputs.runway.toraVerified") is False
