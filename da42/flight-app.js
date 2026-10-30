@@ -64,7 +64,9 @@ function performance(){
  if(!reviewed||!plan||plan.mismatch)return null;
  const app=getAppInputs(),takeoff=app.inputs?.takeoff;
  if(!takeoff||!window.TakeoffTables)return null;
- const data=window.TakeoffTables.compute(takeoff);
+ const takeoffInput=window.RunwayAnalysis?.modelInput?window.RunwayAnalysis.modelInput(takeoff,takeoff.mass):{...takeoff};
+ takeoffInput.wind=takeoff.wind;
+ const data=window.TakeoffTables.compute(takeoffInput);
  return data.error?{error:data.error}:data;
 }
 function badge(){return '<span class="pill">'+(plan?esc(plan.source==='MANUAL'?'MANUAL PLAN':'SIMBRIEF OFP'):'SIMBRIEF')+'</span>'}
@@ -124,9 +126,9 @@ function summaryPage(){
  metric('TAKEOFF DIST',p&&!p.error?p.main:null,'M',p&&!p.error?'AERO UI · REVIEW WIND':'REVIEW INPUTS')+'</div>';
  if(p?.error)body+='<div class="notice">TAKEOFF PERFORMANCE: '+esc(p.error)+' · Abra o módulo para completar os dados.</div>';
  body+='<section class="tile"><div class="list-title">PERFORMANCE MODULES</div>'+
- row('RUNWAY ANALYSIS',(()=>{const r=getAppInputs().inputs?.runway||{};
+ row('RUNWAY MARGIN',(()=>{const r=getAppInputs().inputs?.runway||{};
    return r.toraVerified===false||r.windVerified===false||r.surfaceVerified===false||r.slopeVerified===false?
-    'INPUTS REQUIRED':r.runwayId?'RWY '+r.runwayId+' · REVIEW':'OPEN MODULE';
+    'DATA REQUIRED':r.runwayId?'RWY '+r.runwayId:'NOT SET';
   })())+
  row('CLIMB / OEI','AFM MODEL AVAILABLE')+
  row('WEIGHT & BALANCE',wb?.ok?'LOADING PROFILE AVAILABLE':'PROFILE REQUIRED')+
