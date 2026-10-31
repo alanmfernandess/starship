@@ -345,7 +345,7 @@ function sheet(type){
  const d=document.createElement('div');d.className='sheet-backdrop';d.innerHTML='<div class="sheet" role="dialog" aria-modal="true" aria-label="'+titles[type]+'"><div class="sheet-head"><h2>'+titles[type]+'</h2></div>'+body+'<button class="close sheet-return" type="button" aria-label="Back · MODULES">BACK</button></div>';
  el('.phone').appendChild(d);
  d.addEventListener('click',ev=>{if(ev.target===d)d.remove()});
- d.querySelector('.close').onclick=backToModules();
+ d.querySelector('.close').onclick=backToModules;
  if(type==='more'){
   const footer=el('#nav-more'),modules=el('[data-nav="modules"]');
   if(footer){footer.classList.add('active');footer.setAttribute('aria-expanded','true')}
