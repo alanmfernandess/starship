@@ -261,20 +261,11 @@ function show(v,returning=false){
  }
  view=v;err='';render();
 }
+// BACK is global and deterministic: always return to the MODULES card menu.
+// It never replays history or redirects to the checklist or a previous module.
 function goBack(){
- // Navigation is history-aware within Flight Plan, with deterministic
- // fallbacks for direct URLs and reloaded sessions.
- if(backTrail.length){return show(backTrail.pop(),true)}
- if(view==='comparison'||view==='review')return show(plan?'summary':'plan',true);
- if(view==='summary'||view==='plan'){
-  if(view==='plan'&&/[?&]returnToWB=1(?:&|$)/.test(location.search||'')){
-   location.assign('./wb.html');return;
-  }
-  return show('modules',true);
- }
- if(view==='more')return show('modules',true);
- if(view==='modules'){location.assign('./index.html?calculator=1');return}
- return show('modules',true);
+ backTrail.length=0;
+ show('modules',true);
 }
 function setStatus(message,isError){loading=false;err=isError?message:'';view='plan';render()}
 function acceptRaw(raw,source){

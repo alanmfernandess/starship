@@ -256,7 +256,7 @@ function content(){
   ofpComparison()+
  '<section class="result" aria-live="polite"><div id="envelope">'+envelope()+'</div><div class="legend"><span><i class="dot" style="background:#e7b46d"></i>ZFW</span><span><i class="dot" style="background:#56b9ee"></i>TOW</span></div>'+
  '<div id="mass-check" class="standalone-status '+(sc.massOK?'':'bad')+'">'+(model.ok?massState:'—')+'</div><div id="metrics">'+metrics+'</div>'+
- '</section><div class="notice" id="notice">NOT FOR FLIGHT</div><div class="page-back"><button id="menu" type="button" aria-label="Back · '+(checklistReturn?'Checklist':'Performance menu')+'">BACK</button></div></main>'+
+ '</section><div class="notice" id="notice">NOT FOR FLIGHT</div><div class="page-back"><button id="menu" type="button" aria-label="Back · MODULES">BACK</button></div></main>'+
  '<nav class="bottom" aria-label="Main navigation">'+
   '<a class="nav" href="./flight.html?tab=plan" data-nav="plan" aria-label="PLAN">'+icon('plan')+'<span>PLAN</span></a>'+
   '<a class="nav" href="./flight.html?tab=summary" data-nav="summary" aria-label="SUMMARY">'+icon('summary')+'<span>SUMMARY</span></a>'+
@@ -342,10 +342,10 @@ function sheet(type){
    '<button class="action" id="nav-scenarios" type="button">FUEL &amp; DE-ICE</button>'+
    '<button class="action" id="nav-settings" type="button">AIRCRAFT PROFILE</button>'+
    '<a class="action" href="./flight.html?tab=more">PREFERENCES</a>';
- const d=document.createElement('div');d.className='sheet-backdrop';d.innerHTML='<div class="sheet" role="dialog" aria-modal="true" aria-label="'+titles[type]+'"><div class="sheet-head"><h2>'+titles[type]+'</h2></div>'+body+'<button class="close sheet-return" type="button" aria-label="Back · Weight and Balance">BACK</button></div>';
+ const d=document.createElement('div');d.className='sheet-backdrop';d.innerHTML='<div class="sheet" role="dialog" aria-modal="true" aria-label="'+titles[type]+'"><div class="sheet-head"><h2>'+titles[type]+'</h2></div>'+body+'<button class="close sheet-return" type="button" aria-label="Back · MODULES">BACK</button></div>';
  el('.phone').appendChild(d);
  d.addEventListener('click',ev=>{if(ev.target===d)d.remove()});
- d.querySelector('.close').onclick=()=>d.remove();
+ d.querySelector('.close').onclick=backToModules();
  if(type==='more'){
   const footer=el('#nav-more'),modules=el('[data-nav="modules"]');
   if(footer){footer.classList.add('active');footer.setAttribute('aria-expanded','true')}
@@ -364,13 +364,11 @@ function sheet(type){
  const restore=d.querySelector('#restore-manual');if(restore)restore.onclick=()=>{d.remove();restoreManualLoad()};
  const reset=d.querySelector('#reset-example');if(reset)reset.onclick=()=>{profile={...E.EXAMPLE};optimizedMode=false;sourceMode='manual';Load.setMode(localStorage,'manual',planRef());previousManual=null;optimizeMessage='';model=E.calculate(profile);try{localStorage.removeItem(KEY);localStorage.removeItem(AUTO_KEY);localStorage.removeItem(MANUAL_KEY)}catch(e){}d.remove();render()};
 }
+function backToModules(){store();location.assign('./flight.html?tab=modules')}
 function render(){
  model=resolvedModel();el('#app').innerHTML=content();bindInputs();
  document.querySelectorAll('[data-loading-source]').forEach(b=>b.onclick=()=>selectSource(b.dataset.loadingSource));
- el('#menu').onclick=()=>{
-   if(checklistReturn){store();location.assign(checklistReturnUrl)}
-   else sheet('modules');
-  };
+ el('#menu').onclick=backToModules;
  el('#settings').onclick=()=>sheet('settings');
  el('#edit-load').onclick=()=>sheet('load');
   const manual=el('#restore-simulated');if(manual)manual.onclick=restoreManualLoad;

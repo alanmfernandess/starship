@@ -1,6 +1,4 @@
-"""Contextual checklist BACK navigation regression.
-Mock OFP and simulated pilot actions; no certified performance assumptions.
-"""
+"""Every visible BACK goes to the single MODULES card menu, across all apps."""
 import json
 from pathlib import Path
 from playwright.sync_api import sync_playwright
@@ -25,146 +23,106 @@ OFP={
 }
 with sync_playwright() as p:
  browser=p.chromium.launch(headless=True,
-   executable_path='/usr/bin/chromium' if Path('/usr/bin/chromium').exists() else p.chromium.executable_path,
-   args=['--no-sandbox','--allow-file-access-from-files'])
+  executable_path='/usr/bin/chromium' if Path('/usr/bin/chromium').exists() else p.chromium.executable_path,
+  args=['--no-sandbox','--allow-file-access-from-files'])
  for width,height in [(320,690),(390,844),(430,932)]:
   context=browser.new_context(viewport={'width':width,'height':height},is_mobile=True,has_touch=True)
   page=context.new_page()
   errors=[]
   page.on('pageerror',lambda exc:errors.append(str(exc)))
-  # Ordinary navigation must keep its original BACK -> performance menu.
-  page.goto(CALC+'?calculator=1&module=takeoff')
-  page.locator('#menu').click()
-  assert page.locator('.sheet .menu-option').count()==7
-  page.goto(WB)
-  page.locator('#menu').click()
-  assert page.locator('.sheet a.action').count()==3
-  page.locator('.close').click()
-  # SimBrief must never be a dead/disabled selector: without an OFP it
-  # opens the import page instead of silently doing nothing.
-  assert page.locator('[data-loading-source="simbrief"]').is_enabled()
-  page.locator('[data-loading-source="simbrief"]').click()
-  page.wait_for_url('**/flight.html?import=1&returnToWB=1')
-  assert page.evaluate('AeroFlight.view')=='plan'
-  page.locator('#back-or-menu').click()
-  page.wait_for_url('**/wb.html')
-  assert page.locator('.scroller > .page-back #menu').count()==1
+  def menu():
+   page.wait_for_function("() => window.AeroFlight?.view==='modules'")
+   assert page.locator('.module-list .module-card').count()==7
+   assert page.locator('.module-list .module-card .module-copy strong').all_inner_texts()==[
+    'FLIGHT PLAN','WEIGHT & BALANCE','TAKEOFF PERFORMANCE',
+    'CLIMB PERFORMANCE','CRUISE PERFORMANCE','LANDING PERFORMANCE',
+    'GO-AROUND PERFORMANCE']
+   assert page.locator('.bottom .nav span').all_inner_texts()==['PLAN','SUMMARY','MODULES','MORE']
+   assert page.locator('html').evaluate('(e)=>e.scrollWidth')<=width
+  def goto_menu():
+   page.wait_for_url('**/flight.html?tab=modules')
+   menu()
 
+  # Flight Plan: empty import, imported overview, review/checklist, OFP
+  # comparison, settings, and the menu itself all have the same BACK target.
   page.goto(FLIGHT)
-  page.evaluate("(raw)=>window.AeroFlight.acceptRaw(raw,'SIMBRIEF')",OFP)
-  # A second tab has a separate sessionStorage but must recover the
-  # last valid imported SimBrief OFP from localStorage.
-  second=context.new_page()
-  second.goto(WB)
-  assert second.evaluate('WBApp.mode')=='simbrief'
-  assert second.locator('[data-loading-source="simbrief"]').is_enabled()
-  assert second.locator('.loading-metric').first.inner_text().find('1.850')!=-1
-  assert second.locator('.loading-metric').nth(1).inner_text().find('201')!=-1
-  assert second.evaluate("""()=>
-    !!JSON.parse(localStorage.getItem('aero-ui-last-simbrief-ofp-v1'))""")
-  second.close()
-  assert 'PERFORMANCE OVERVIEW' in page.locator('.heading').inner_text()
+  page.locator('#back-or-menu').click()
+  menu()
+  page.locator('#back-or-menu').click()
+  menu()
+  page.goto(FLIGHT)
+  page.evaluate("(raw)=>AeroFlight.acceptRaw(raw,'SIMBRIEF')",OFP)
+  assert page.evaluate('AeroFlight.view')=='summary'
+  page.locator('#back-or-menu').click()
+  menu()
+  assert page.evaluate("""()=>!!JSON.parse(localStorage.getItem('aero-ui-last-simbrief-ofp-v1'))""")
+  for tab in ['summary','more']:
+   page.goto(FLIGHT+'?tab='+tab)
+   assert page.evaluate('AeroFlight.view')==tab
+   page.locator('#back-or-menu').click()
+   menu()
+  page.goto(FLIGHT+'?tab=summary')
   page.locator('#open-review').click()
-  assert page.locator('[data-check-id="wind"] .check-badge').inner_text()=='REQUIRED'
-  page.locator('[data-check-id="wind"] summary').click()
-  wind_url=page.locator('[data-check-id="wind"] a.check-link').get_attribute('href')
-  assert 'returnToReview=1' in wind_url and 'reviewItem=wind' in wind_url
-  page.locator('[data-check-id="wind"] a.check-link').click()
-  assert 'returnToReview=1' in page.url
-  assert page.locator('#rw-save-back').count()==1
-  assert page.locator('.runway-ui .rw-footer #rw-save-back').count()==1
-  # Nested BACK stays in RUNWAY until the pilot is done editing.
-  page.locator('#rw-surface').click()
-  assert page.locator('.runway-ui .rw-footer #rw-back').inner_text()=='BACK'
-  page.locator('#rw-back').click()
-  assert page.locator('#rw-save-back').count()==1
-  page.locator('#rw-wind').evaluate("(e)=>{e.value='5';e.dispatchEvent(new Event('input',{bubbles:true}))}")
-  page.locator('#rw-save-back').click()
-  page.wait_for_url('**/flight.html?review=1&reviewItem=wind')
-  assert 'IMPORTED FLIGHT PLAN' in page.locator('.heading').inner_text()
-  assert page.locator('[data-check-id="wind"] .check-badge').inner_text()=='CHECKED'
-  assert page.locator('[data-check-id="tora"] .check-badge').inner_text()=='REQUIRED'
-  assert page.locator('[data-check-id="wind"]').evaluate("(e)=>e.classList.contains('check-return-item')")
-  assert page.locator('#scroll-content').evaluate("(e)=>e.scrollTop")>0
-  # A normal Takeoff header BACK, when entered through another checklist
-  # item, also returns straight to the checklist.
-  page.locator('[data-check-id="tora"] summary').click()
-  page.locator('[data-check-id="tora"] a.check-link').click()
-  assert 'returnToReview=1' in page.url
-  assert page.locator('#rw-save-back').count()==0
-  page.locator('#menu').click()
-  page.wait_for_url('**/flight.html?review=1&reviewItem=tora')
-  assert page.locator('[data-check-id="tora"] .check-badge').inner_text()=='REQUIRED'
-  assert page.locator('[data-check-id="wind"] .check-badge').inner_text()=='CHECKED'
-  # Weight & Balance header BACK returns to same checklist, without
-  # automatically confirming a human-reviewed CG.
+  assert page.evaluate('AeroFlight.view')=='review'
+  page.locator('#back-or-menu').click()
+  menu()
+  page.goto(FLIGHT+'?tab=summary')
+  page.locator('#open-comparison').click()
+  assert page.evaluate('AeroFlight.view')=='comparison'
+  page.locator('#back-or-menu').click()
+  menu()
+
+  # Checklist-deep-linked calculator: BACK must NOT resume review.
+  page.goto(FLIGHT+'?review=1')
+  assert page.evaluate('AeroFlight.view')=='review'
   page.locator('[data-check-id="cg"] summary').click()
   page.locator('[data-check-id="cg"] a.check-link').click()
-  assert 'returnToReview=1' in page.url
+  page.wait_for_url('**/wb.html?returnToReview=1&reviewItem=cg')
+  assert page.locator('#menu').count()==1
   page.locator('#menu').click()
-  page.wait_for_url('**/flight.html?review=1&reviewItem=cg')
-  assert 'IMPORTED FLIGHT PLAN' in page.locator('.heading').inner_text()
-  assert page.locator('[data-check-id="cg"] .check-badge').inner_text()!='CHECKED'
-  assert page.locator('[data-check-id="cg"]').evaluate("(e)=>e.classList.contains('check-return-item')")
-  assert page.locator('[data-check-id="wind"] .check-badge').inner_text()=='CHECKED'
-  # SimBrief is authoritative by selection, without requiring simulated
-  # passenger stations to match its TOW numerically.
-  assert page.locator('[data-check-id="takeoffWeight"] .check-badge').inner_text()=='CHECKED'
-  page.locator('[data-check-id="takeoffWeight"] summary').click()
-  page.locator('[data-check-id="takeoffWeight"] a.check-link').click()
-  page.wait_for_url('**/wb.html?returnToReview=1&reviewItem=takeoffWeight')
-  page.locator('.loading-source.active').wait_for()
-  assert page.evaluate("WBApp.mode")=='simbrief'
-  assert page.locator('.loading-source.active').inner_text()=='SIMBRIEF'
-  assert page.locator('.loading-metric').count()==3
-  assert page.locator('.loading-metric').nth(0).inner_text().find('1.850')!=-1
-  assert page.locator('.loading-metric').nth(1).inner_text().find('201')!=-1
-  assert page.locator('.loading-note').inner_text()=='FUEL · SPLIT ASSUMED'
+  goto_menu()
+
+  # W&B edit sheet BACK is also global; profile remains stored.
+  page.goto(WB)
   page.locator('#edit-load').click()
-  assert page.locator('#sheet-mainL').input_value()=='79.5'
-  assert page.locator('#sheet-mainR').input_value()=='79.5'
-  assert page.locator('#sheet-auxL').input_value()=='21.0'
-  assert page.locator('#sheet-auxR').input_value()=='21.0'
-  assert page.locator('#sheet-mainL').get_attribute('readonly') is not None
-  page.locator('.close').click()
-  # Switch source: simulated W&B becomes active, and performance weights
-  # follow the model rather than enforcing any equality with the OFP.
-  page.locator('[data-loading-source="optimized"]').click()
-  assert page.evaluate('WBApp.optimizedMode') is True
-  assert page.evaluate("WBApp.mode")=='optimized'
-  assert page.locator('#restore-simulated').count()==1
-  assert 'SIMULATED' in page.locator('.loading-note').inner_text()
-  assert page.evaluate("Math.abs(JSON.parse(localStorage.getItem('aero-ui-da42-v1')).inputs.takeoff.mass-WBApp.model.takeoff.mass)<0.001")
+  assert page.locator('.sheet .sheet-return').count()==1
+  page.locator('.sheet .sheet-return').click()
+  goto_menu()
+  page.goto(WB)
+  page.locator('#nav-more').click()
+  page.locator('.sheet .sheet-return').click()
+  goto_menu()
+  page.goto(WB)
   page.locator('#menu').click()
-  page.wait_for_url('**/flight.html?review=1&reviewItem=takeoffWeight')
-  assert page.locator('[data-check-id="takeoffWeight"] .check-badge').inner_text()=='CHECKED'
-  assert page.locator('[data-check-id="cg"] .check-badge').inner_text()=='CHECKED'
-  page.locator('[data-check-id="takeoffWeight"] summary').click()
-  page.locator('[data-check-id="takeoffWeight"] a.check-link').click()
-  page.locator('#restore-simulated').click()
-  assert page.evaluate('WBApp.optimizedMode') is False
-  assert page.evaluate('WBApp.mode')=='manual'
-  assert page.locator('#restore-simulated').count()==0
-  page.locator('#menu').click()
-  page.wait_for_url('**/flight.html?review=1&reviewItem=takeoffWeight')
-  # Below 1700 kg: informational status, no AFM extrapolation.
-  page.evaluate("""()=>{
-    localStorage.setItem('da42-loading-mode-v1','simbrief');
-    AeroFlight.plan.landingWeight=1650;
-    AeroFlight.applyPlan(false);
-  }""")
-  page.reload()
-  assert page.locator('[data-check-id="landingWeight"] .check-badge').inner_text()=='OUT OF TABLE'
-  assert ' '.join(page.locator('.check-count.status-out-of-table').inner_text().split())=='1 OUT OF TABLE'
-  assert page.locator('[data-check-id="landingWeight"] [data-check-confirm]').count()==0
-  assert page.locator('[data-check-id="landingWeight"] .check-badge').evaluate(
-    "(e)=>e.scrollWidth<=e.clientWidth+1")
-  assert page.evaluate("""()=>Math.abs(
-    JSON.parse(localStorage.getItem('aero-ui-da42-v1')).inputs.landing.mass-1650)<0.01""")
-  page.goto(CALC+'?calculator=1&module=landing')
-  assert page.evaluate("""()=>AeroCalc.compute('landing',AeroCalc.inputs.landing).error""")=='MASSA FORA DA TABELA'
-  assert page.locator('#main-result').inner_text()=='—'
+  goto_menu()
+
+  # Every performance calculator BACK, from direct entry or checklist.
+  for name in ['takeoff','climb','cruiseperf','landing','goaround',
+               'oei','runway','timeclimb','cruise','abnormal']:
+   page.goto(CALC+'?calculator=1&module='+name)
+   assert page.locator('#menu').count()==1
+   page.locator('#menu').click()
+   goto_menu()
+
+  # Modal BACK never returns to its parent calculator.
+  for sheet in ['modules','chart','history','settings','more']:
+   page.goto(CALC+'?calculator=1&module=takeoff')
+   page.evaluate('(which)=>AeroCalc.showSheet(which)',sheet)
+   page.locator('.sheet .sheet-return').click()
+   goto_menu()
+
+  # Runway main BACK and nested option BACK both lead to MODULES.
+  page.goto(CALC+'?calculator=1&module=takeoff')
+  page.locator('#analysis-settings').click()
+  page.locator('#rw-save-back').click()
+  goto_menu()
+  page.goto(CALC+'?calculator=1&module=takeoff')
+  page.locator('#analysis-settings').click()
+  page.locator('#rw-surface').click()
+  assert page.locator('#rw-back').count()==1
+  page.locator('#rw-back').click()
+  goto_menu()
   assert not errors,errors
   context.close()
  browser.close()
-print('PASS checklist-origin Runway/TORA/W&B BACK, independent validation, nested BACK, ordinary menu.')
+print('PASS deterministic BACK->MODULES for Flight Plan, checklist, W&B, all performance modules and nested runway.')

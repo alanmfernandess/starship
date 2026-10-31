@@ -35,15 +35,15 @@ with sync_playwright() as p:
         assert page.locator('#nav-more').get_attribute('aria-expanded')=='true'
         page.locator('[data-more-action="chart"]').click()
         assert page.locator('.sheet h2').inner_text()=='SENSIBILIDADE'
-        page.locator('.sheet .close').click()
+        page.locator('.sheet-backdrop').evaluate('(e)=>e.remove()')
         page.locator('#nav-more').click()
         page.locator('[data-more-action="history"]').click()
         assert page.locator('.sheet h2').inner_text()=='HISTÓRICO'
-        page.locator('.sheet .close').click()
+        page.locator('.sheet-backdrop').evaluate('(e)=>e.remove()')
         page.locator('#nav-more').click()
         page.locator('[data-more-action="settings"]').click()
         assert page.locator('.sheet h2').inner_text()=='PREFERÊNCIAS'
-        page.locator('.sheet .close').click()
+        page.locator('.sheet-backdrop').evaluate('(e)=>e.remove()')
         assert page.locator('.bottom [data-nav="modules"]').get_attribute('aria-current')=='page'
 
         assert page.locator('header #menu').count()==0
@@ -66,13 +66,13 @@ with sync_playwright() as p:
         assert page.locator('.runway-ui .sheet-header #rw-back').count()==0
         assert page.locator('.runway-ui .rw-footer #rw-back').count()==1
         page.locator('button[data-rw-pick="short"]').click()
-        page.locator('#rw-save-back').click()
+        page.locator('#rw-close').click()
         assert page.evaluate("window.AeroCalc.inputs.takeoff.procedure")=='short'
         assert int(page.locator('#main-result').inner_text())<638
         page.locator('#analysis-settings').click()
         page.locator('#rw-takeoff').click()
         page.locator('button[data-rw-pick="normal"]').click()
-        page.locator('#rw-save-back').click()
+        page.locator('#rw-close').click()
         assert page.locator('#main-result').inner_text()=='638'
         page.locator('#takeoff-isa-toggle').click()
         assert page.locator('#takeoff-isa-toggle').inner_text()=='OAT'
@@ -85,18 +85,18 @@ with sync_playwright() as p:
         assert page.locator('#rw-slope').get_attribute('type')=='range'
         page.locator('#rw-slope').evaluate("(el)=>{el.value='2.5';el.dispatchEvent(new Event('input',{bubbles:true}))}")
         assert page.locator('#rw-slope-output').inner_text()=='2,5%'
-        page.locator('#rw-save-back').click()
+        page.locator('#rw-close').click()
         assert int(page.locator('#main-result').inner_text())>638
         page.locator('#analysis-settings').click()
         page.locator('#rw-slope').evaluate("(el)=>{el.value='0';el.dispatchEvent(new Event('input',{bubbles:true}))}")
         page.locator('#rw-surface').click()
         page.locator('button[data-rw-pick="grass5"]').click()
-        page.locator('#rw-save-back').click()
+        page.locator('#rw-close').click()
         assert int(page.locator('#main-result').inner_text())>638
         page.locator('#analysis-settings').click()
         page.locator('#rw-surface').click()
         page.locator('button[data-rw-pick="paved"]').click()
-        page.locator('#rw-save-back').click()
+        page.locator('#rw-close').click()
         assert page.locator('#main-result').inner_text()=='638'
         page.locator('input[data-key="mass"]').fill('1999')
         page.locator('input[data-key="mass"]').blur()
@@ -107,7 +107,7 @@ with sync_playwright() as p:
         page.locator('input[data-key="mass"]').fill('1800')
         assert page.locator('#main-result').inner_text()=='638'
         all_checks+=31
-        page.locator('#menu').click()
+        page.evaluate("AeroCalc.showSheet('modules')")
         expected_modules=[
             'TAKEOFF PERFORMANCE',
             'CLIMB PERFORMANCE',
@@ -261,13 +261,13 @@ with sync_playwright() as p:
         page.locator('#climb-mode-both').click()
         assert page.locator('.oei-note').count()==0
         assert page.locator('.climb-profile').count()==1
-        page.locator('#menu').click()
+        page.evaluate("AeroCalc.showSheet('modules')")
         assert page.locator('button[data-module="cruise"]').count()==0
-        page.locator('.sheet .close').click()
+        page.locator('.sheet-backdrop').evaluate('(e)=>e.remove()')
         all_checks+=5
         # Landing: same four-card Aero UI, proportional airborne + ground-roll chart.
         # AFM §5.3.11: Landing 4 cards, ISA and runway corrections.
-        page.locator('#menu').click()
+        page.evaluate("AeroCalc.showSheet('modules')")
         page.locator('button[data-module="landing"]').click()
         assert page.locator('#main-result').inner_text()=='557'
         assert page.locator('#secondary-result').inner_text()=='330 m'
@@ -327,7 +327,7 @@ with sync_playwright() as p:
         assert page.locator('html').evaluate('(el)=>el.scrollWidth')<=w
         all_checks+=16
         # AFM §5.3.12: Go-Around; full 1700–1999kg, OAT & ISA and no-data cells.
-        page.locator('#menu').click()
+        page.evaluate("AeroCalc.showSheet('modules')")
         page.locator('button[data-module="goaround"]').click()
         assert page.locator('.field').count()==4
         assert page.locator('input[data-key]').count()==3
@@ -369,7 +369,7 @@ with sync_playwright() as p:
         assert len(errors)==0,errors
         all_checks+=30
         # AFM §5.3.9 profile shares CLIMB inputs; independent engine retained.
-        page.locator('#menu').click()
+        page.evaluate("AeroCalc.showSheet('modules')")
         assert page.locator('button[data-module="timeclimb"]').count()==0
         page.evaluate("() => Object.assign(window.AeroCalc.inputs.climb,{pa:2000,oat:11,mass:1900,isa:false,flaps:'up',profileTarget:16000,engineMode:'both'})")
         page.locator('button[data-module="climb"]').click()
@@ -388,7 +388,7 @@ with sync_playwright() as p:
         assert page.locator('#profile-time').inner_text()=='15.0 MIN'
         all_checks+=15
         # Cruise Performance §5.3.10 — published 1999kg power/FF/TAS grids.
-        page.locator('#menu').click()
+        page.evaluate("AeroCalc.showSheet('modules')")
         assert page.locator('button[data-module="cruiseperf"]').count()==1
         page.locator('button[data-module="cruiseperf"]').click()
         assert page.locator('.field').count()==4
@@ -445,7 +445,7 @@ with sync_playwright() as p:
         assert len(errors)==0,errors
         all_checks+=29
         # Unified Takeoff Performance retains independent runway analysis.
-        page.locator('#menu').click()
+        page.evaluate("AeroCalc.showSheet('modules')")
         assert page.locator('button[data-module="runway"]').count()==0
         page.locator('button[data-module="takeoff"]').click()
         assert page.locator('.field').count()==4
@@ -464,7 +464,7 @@ with sync_playwright() as p:
         assert page.locator('#runway-margin').count()==1
         page.locator('input[data-key="length"]').fill('900')
         assert page.locator('#main-result').inner_text()!='—'
-        # RUNWAY edits are applied on BACK; there is no separate APPLY step.
+        # RUNWAY inputs can be saved via close without using the global BACK.
         page.locator('#analysis-settings').click()
         assert page.locator('#rw-takeoff').count()==1
         assert page.locator('#rw-weight').count()==1
@@ -485,7 +485,7 @@ with sync_playwright() as p:
         assert page.locator('.rw-picker').count()==4
         assert page.locator('.rw-picker').all_inner_texts()==['PAVED · DRY','GRASS · 5 CM','GRASS · 5–10 CM','GRASS · 25 CM']
         assert page.locator('.rw-picker').evaluate_all("(cards)=>cards.every(c=>c.querySelectorAll('strong').length===1 && c.querySelectorAll('small, .sub').length===0)")
-        page.locator('#rw-back').click()
+        page.locator('button[data-rw-pick="paved"]').click()
         page.locator('#rw-takeoff').click()
         assert page.locator('.rw-picker').evaluate_all("(cards)=>cards.every(c=>c.querySelectorAll('strong').length===1 && c.querySelectorAll('small, .sub').length===0)")
         assert page.locator('button[data-rw-pick="normal"]').count()==1
@@ -493,17 +493,17 @@ with sync_playwright() as p:
         page.locator('button[data-rw-pick="short"]').click()
         assert 'SHORT · APP' in page.locator('#rw-takeoff').inner_text()
         assert page.evaluate("window.AeroCalc.inputs.runway.procedure")=='normal'
-        page.locator('#rw-save-back').click()
+        page.locator('#rw-close').click()
         assert page.evaluate("window.AeroCalc.inputs.runway.procedure")=='short'
         page.locator('#analysis-settings').click()
         page.locator('#rw-takeoff').click()
         page.locator('button[data-rw-pick="short"]').click()
-        page.locator('#rw-save-back').click()
+        page.locator('#rw-close').click()
         assert page.evaluate("window.AeroCalc.inputs.runway.procedure")=='short'
         page.locator('#analysis-settings').click()
         page.locator('#rw-takeoff').click()
         page.locator('button[data-rw-pick="normal"]').click()
-        page.locator('#rw-save-back').click()
+        page.locator('#rw-close').click()
         assert page.evaluate("window.AeroCalc.inputs.runway.procedure")=='normal'
         page.locator('#analysis-settings').click()
         assert page.locator('#rw-weight .rw-value').inner_text()=='1900 KG'
@@ -515,13 +515,13 @@ with sync_playwright() as p:
         assert page.locator('#rw-weight .rw-value').evaluate("(e)=>e.scrollWidth<=e.clientWidth")
         assert page.locator('#rw-authorize').count()==0
         assert page.evaluate("window.AeroCalc.inputs.runway.maxMass")==1900
-        page.locator('#rw-save-back').click()
+        page.locator('#rw-close').click()
         assert page.evaluate("window.AeroCalc.inputs.runway.maxMass")==1999
         assert '1,999 KG' in page.locator('#analysis-settings').inner_text()
         page.locator('#analysis-settings').click()
         page.locator('#rw-weight').click()
         page.locator('button[data-rw-pick="1900"]').click()
-        page.locator('#rw-save-back').click()
+        page.locator('#rw-close').click()
         assert page.evaluate("window.AeroCalc.inputs.runway.maxMass")==1900
         page.locator('#analysis-settings').click()
         assert page.locator('#rw-weight .rw-value').inner_text()=='1900 KG'
@@ -531,13 +531,13 @@ with sync_playwright() as p:
         assert page.locator('#rw-elevation').count()==1
         assert page.locator('#rw-qnh').count()==1
         assert page.locator('#val-pa').get_attribute('readonly') is None
-        page.locator('#rw-save-back').click()
+        page.locator('#rw-close').click()
         assert page.locator('#val-pa').get_attribute('readonly') is not None
         # QNH above standard at sea level: negative PA is physically valid.
         page.locator('#analysis-settings').click()
         page.locator('#rw-elevation').fill('0')
         page.locator('#rw-qnh').fill('1030')
-        page.locator('#rw-save-back').click()
+        page.locator('#rw-close').click()
         assert page.locator('#main-result').inner_text()!='—'
         assert page.locator('#val-pa').input_value().startswith('-')
         assert '0 FT TABLE' in page.locator('#banner').inner_text()
@@ -545,32 +545,32 @@ with sync_playwright() as p:
         assert page.evaluate("window.AeroCalc.compute('runway',window.AeroCalc.inputs.runway).tablePa")==0
         page.locator('#analysis-settings').click()
         page.locator('#rw-qnh').fill('1000')
-        page.locator('#rw-save-back').click()
+        page.locator('#rw-close').click()
         assert page.locator('#main-result').inner_text()!='—'
         assert float(page.locator('#val-pa').input_value().replace(',',''))>0
         assert '0 FT TABLE' not in page.locator('#banner').inner_text()
         page.locator('#analysis-settings').click()
         page.locator('#rw-qnh').fill('1013.25')
-        page.locator('#rw-save-back').click()
+        page.locator('#rw-close').click()
         assert page.locator('#main-result').inner_text()!='—'
         page.locator('#analysis-settings').click()
         page.locator('#rw-pressure').click()
         page.locator('button[data-rw-pick="direct"]').click()
-        page.locator('#rw-save-back').click()
+        page.locator('#rw-close').click()
         assert page.locator('#val-pa').get_attribute('readonly') is None
         page.locator('#analysis-settings').click()
         page.locator('#rw-wind').evaluate("el => { el.value='-5'; el.dispatchEvent(new Event('input',{bubbles:true})) }")
         assert page.evaluate("window.AeroCalc.inputs.runway.wind")==10
         assert 'TAILWIND' in page.locator('#rw-wind-output').inner_text()
-        page.locator('#rw-save-back').click()
+        page.locator('#rw-close').click()
         assert page.evaluate("window.AeroCalc.inputs.runway.wind")==-5
         page.locator('#analysis-settings').click()
         page.locator('#rw-wind').evaluate("el => { el.value='12'; el.dispatchEvent(new Event('input',{bubbles:true})) }")
-        page.locator('#rw-save-back').click()
+        page.locator('#rw-close').click()
         assert page.evaluate("window.AeroCalc.inputs.runway.wind")==12
         page.locator('#analysis-settings').click()
         page.locator('#rw-wind').evaluate("el => { el.value='0'; el.dispatchEvent(new Event('input',{bubbles:true})) }")
-        page.locator('#rw-save-back').click()
+        page.locator('#rw-close').click()
         assert page.evaluate("window.AeroCalc.inputs.runway.wind")==0
         assert page.locator('html').evaluate('(el)=>el.scrollWidth')<=w
         assert len(errors)==0, errors

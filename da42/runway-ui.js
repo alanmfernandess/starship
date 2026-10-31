@@ -1,4 +1,4 @@
-/* Aero UI Master Design 1.0 — RUNWAY modal: select and save on Back.
+/* Aero UI Master Design 1.0 — RUNWAY modal: BACK returns to MODULES.
    UI only: calculations remain in runway-analysis.js and takeoff-tables.js. */
 (function(){
 'use strict';
@@ -12,18 +12,25 @@ function open(values,render,icon,escape){
  const state={...values};let view='main',error='';
  overlay.className='sheet-backdrop';
  function close(){document.removeEventListener('keydown',keyHandler);overlay.remove()}
- function saveAndBack(){
+ function finish(navigate){
   if(state.paMode==='qnh'&&(!Number.isFinite(state.elevation)||state.elevation< -1000||state.elevation>10000||!Number.isFinite(state.qnh)||state.qnh<870||state.qnh>1085))error='FIELD ELEV (−1000 a 10000 FT) e QNH (870 a 1085 HPA) são obrigatórios e devem ser válidos.';
   else if(state.windVerified!==false&&(!Number.isFinite(state.wind)||state.wind< -10||state.wind>20))error='Vento fora da faixa permitida (−10 a +20 KT).';
   else if(state.slopeVerified!==false&&(!Number.isFinite(state.slope)||state.slope<0||state.slope>5))error='Aclive deve estar entre 0 e 5%.';
   else error='';
-  if(error){view='main';draw();return}
+  if(error){
+   if(navigate){close();location.assign('./flight.html?tab=modules')}
+   else{view='main';draw()}
+   return;
+  }
   Object.assign(values,state);
   close();
   render();
+  if(navigate)location.assign('./flight.html?tab=modules');
  }
+ function saveAndBack(){finish(true)}
+ function saveAndClose(){finish(false)}
  function keyHandler(e){
-  if(e.key==='Escape'){e.preventDefault();if(view==='main')saveAndBack();else go('main')}
+  if(e.key==='Escape'){e.preventDefault();saveAndClose()}
   if(e.key==='Tab'){
    const controls=[...overlay.querySelectorAll('button:not([disabled]),input:not([disabled])')].filter(x=>x.getClientRects().length>0);
    if(!controls.length)return;
@@ -71,8 +78,8 @@ function open(values,render,icon,escape){
    body=candidates.map(o=>'<button type="button" class="option rw-picker '+(selected===o[0]?'selected':'')+'" data-rw-pick="'+o[0]+'" aria-label="'+escape(o[1])+'"><strong>'+o[1]+'</strong>'+(selected===o[0]?icon('check'):icon('next'))+'</button>').join('')+'<div class="rw-footer"><button type="button" id="rw-back" class="rw-save-back">BACK</button></div>';
   }
   overlay.innerHTML='<section class="sheet runway-ui" role="dialog" aria-modal="true" aria-labelledby="rw-dialog-title">'+head+body+'</section>';
-  overlay.querySelector('#rw-close').onclick=()=>view==='main'?saveAndBack():go('main');
-  const back=overlay.querySelector('#rw-back');if(back)back.onclick=()=>go('main');
+  overlay.querySelector('#rw-close').onclick=()=>view==='main'?saveAndClose():go('main');
+  const back=overlay.querySelector('#rw-back');if(back)back.onclick=saveAndBack;
   if(view!=='main'){
    overlay.querySelectorAll('[data-rw-pick]').forEach(b=>b.onclick=()=>{
     const pick=b.dataset.rwPick;
@@ -110,7 +117,7 @@ function open(values,render,icon,escape){
   });
   overlay.querySelector('#rw-save-back').onclick=saveAndBack;
  }
- overlay.addEventListener('click',e=>{if(e.target===overlay){if(view==='main')saveAndBack();else go('main')}});
+ overlay.addEventListener('click',e=>{if(e.target===overlay){if(view==='main')saveAndClose();else go('main')}});
  document.addEventListener('keydown',keyHandler);
  root.appendChild(overlay);draw();
  const first=overlay.querySelector('#rw-takeoff');if(first)first.focus({preventScroll:true});

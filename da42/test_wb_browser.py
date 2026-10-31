@@ -57,7 +57,7 @@ with sync_playwright() as p:
         assert '2,35' in page.locator('svg.graph').text_content()
         assert page.locator('html').evaluate('(el)=>el.scrollWidth')<=w
         # Minimal PERFORMANCE menu: three consistent destinations.
-        page.locator('#menu').click()
+        page.evaluate("WBApp.sheet('modules')")
         assert page.locator('.sheet a.action').all_inner_texts()==['FLIGHT PLAN','PERFORMANCE','WEIGHT & BALANCE']
         assert page.locator('.sheet-head .close').count()==0
         assert page.locator('.sheet > .sheet-return').inner_text()=='BACK'
@@ -70,7 +70,7 @@ with sync_playwright() as p:
                &&common.every(k=>props.every(y=>y[k]===props[0][k]));
         }"""), (w,h,'W&B action and BACK must share design tokens')
         assert [x.split('/')[-1] for x in page.locator('.sheet a.action').evaluate_all("(xs)=>xs.map(a=>a.getAttribute('href'))")]==['flight.html','index.html?calculator=1','wb.html']
-        page.locator('.close').click()
+        page.locator('.sheet-backdrop').evaluate('(e)=>e.remove()')
         assert page.locator('svg.graph polygon').count()==1
         count+=8
         page.locator('input[data-wb="pilot"]').fill('110')
@@ -141,7 +141,7 @@ with sync_playwright() as p:
         assert 'CABIN + EXTENSION' not in page.locator('#notice').inner_text()
         assert 'LANDING FUEL' not in page.locator('.sheet').inner_text()
         assert 'LANDING' not in page.locator('#notice').inner_text()
-        page.locator('.close').click()
+        page.locator('.sheet-backdrop').evaluate('(e)=>e.remove()')
         count+=5
         page.locator('#nav-more').click()
         assert page.locator('.sheet-head h2').inner_text()=='MORE'
@@ -156,7 +156,7 @@ with sync_playwright() as p:
         assert 'LANDING' not in page.locator('.sheet').inner_text()
         assert 'FUEL FULL' in page.locator('.sheet').inner_text()
         assert 'study cases' not in page.locator('.sheet').inner_text()
-        page.locator('.close').click()
+        page.locator('.sheet-backdrop').evaluate('(e)=>e.remove()')
         page.locator('#nav-more').click()
         page.locator('#nav-settings').click()
         assert page.locator('input[data-wb="emptyMass"]').count()==1
@@ -220,7 +220,7 @@ with sync_playwright() as p:
         page.locator('input[data-wb="mainL"]').fill('35')
         assert page.evaluate("WBApp.profile.mainL")==35
         assert page.evaluate("WBApp.profile.mainR")==79.5
-        page.locator('.close').click()
+        page.locator('.sheet-backdrop').evaluate('(e)=>e.remove()')
         page.locator('#optimize').click()
         assert page.evaluate("WBApp.model.statuses.cgOK && WBApp.model.statuses.massOK && WBApp.model.statuses.scenariosOK") is True
         assert page.evaluate("WBApp.profile.mainL")==35

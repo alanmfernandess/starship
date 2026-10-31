@@ -71,6 +71,9 @@ with sync_playwright() as p:
   page.locator('#open-review').click()
   assert page.locator('.content > .page-back #back-or-menu').count()==1
   page.locator('#back-or-menu').click()
+  assert page.evaluate('AeroFlight.view')=='modules'
+  assert page.locator('.module-card').count()==7
+  page.locator('[data-view="summary"]').click()
   assert 'PERFORMANCE OVERVIEW' in page.locator('.heading').inner_text()
   page.locator('#open-review').click()
   assert page.locator('.heading').inner_text().find('IMPORTED FLIGHT PLAN')>=0
@@ -177,9 +180,9 @@ with sync_playwright() as p:
   page.locator('[data-view="modules"]').click()
   page.locator('a[href="./wb.html"]').click()
   page.locator('#menu').click()
-  assert page.locator('.sheet a.action').all_inner_texts()==['FLIGHT PLAN','PERFORMANCE','WEIGHT & BALANCE']
-  assert page.locator('.sheet .note').count()==0
-  page.locator('.sheet a.action').first.click()
+  page.wait_for_url('**/flight.html?tab=modules')
+  assert page.locator('.module-card').count()==7
+  page.locator('[data-go="plan"]').click()
   assert 'PERFORMANCE OVERVIEW' in page.locator('.heading').inner_text()
   assert page.locator('#pilot-id').count()==0
   assert page.locator('html').evaluate('(e)=>e.scrollWidth')<=w
@@ -208,14 +211,15 @@ with sync_playwright() as p:
   assert page.locator('#rw-wind-output').inner_text().startswith('+9 KT')
   page.locator('#rw-surface').click()
   page.locator('button[data-rw-pick="paved"]').click()
-  page.locator('#rw-save-back').click()
+  page.locator('#rw-close').click()
   assert page.evaluate("window.AeroCalc.inputs.runway.surfaceVerified") is True
   assert page.evaluate("window.AeroCalc.compute('runway',window.AeroCalc.inputs.runway).error")==None
   assert page.locator('#runway-margin').inner_text()!='—'
   assert page.locator('#runway-max-weight').inner_text()!='—'
   # Import a different OFP without TLR: clear previous runway inputs.
   page.locator('#menu').click()
-  page.locator('.sheet a.option[href="./flight.html"]').click()
+  page.wait_for_url('**/flight.html?tab=modules')
+  page.locator('[data-go="plan"]').click()
   page.wait_for_function("() => !!window.AeroFlight?.acceptRaw")
   page.evaluate("(data)=>window.AeroFlight.acceptRaw(data,'SIMBRIEF')",payload)
   assert page.evaluate("JSON.parse(localStorage.getItem('aero-ui-da42-v1')).inputs.runway.length")==0
