@@ -1,1 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect width="192" height="192" rx="38" fill="#101820"/><path d="M30 134l46-49 26 25 56-67" fill="none" stroke="#56b9ee" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/><path d="M129 43h30v30" fill="none" stroke="#e7b46d" stroke-width="9" stroke-linecap="round"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" role="img" aria-label="Aero UI">
+  <defs>
+    <linearGradient id="rim" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#A19AFF"/>
+      <stop offset=".53" stop-color="#64AFFF"/>
+      <stop offset="1" stop-color="#62EBED"/>
+    </linearGradient>
+    <linearGradient id="ui" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#A3EFFF"/>
+      <stop offset="1" stop-color="#51B9F6"/>
+    </linearGradient>
+  </defs>
+  <rect width="192" height="192" rx="38" fill="#081522"/>
+  <circle cx="96" cy="96" r="78" fill="none" stroke="url(#rim)" stroke-width="4"/>
+  <path d="m35 118 50-50q10-10 17 1l14 22H95q-6 0-11 5l-23 22q-3 3-9 3H35z" fill="#EEF4FA"/>
+  <path d="M89 97h31q9 0 15 8l20 19h-16q-7 0-14-5z" fill="url(#ui)"/>
+</svg>

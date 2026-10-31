@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
+  <title id="title">Aero UI</title>
+  <desc id="desc">Minimal abstract aviation monogram in white and cyan, enclosed by a violet-to-cyan ring on a midnight navy background.</desc>
+  <defs>
+    <linearGradient id="rim" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#A19AFF"/>
+      <stop offset="0.53" stop-color="#64AFFF"/>
+      <stop offset="1" stop-color="#62EBED"/>
+    </linearGradient>
+    <linearGradient id="aero" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#D9EBF6"/>
+    </linearGradient>
+    <linearGradient id="ui" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#A3EFFF"/>
+      <stop offset="1" stop-color="#51B9F6"/>
+    </linearGradient>
+  </defs>
+  <rect width="1024" height="1024" fill="#081522"/>
+  <circle cx="512" cy="512" r="433" fill="none" stroke="url(#rim)" stroke-width="12"/>
+  <g>
+    <path d="M216 587 484 330c33-32 69-30 93 4l76 106H534c-17 0-36 8-49 21L341 590c-10 9-20 13-34 13h-91z" fill="url(#aero)"/>
+    <path d="M506 474h163c29 0 45 8 63 29l86 98h-77c-32 0-58-9-82-27z" fill="url(#ui)"/>
+  </g>
+  <g font-family="Arial,Helvetica,sans-serif" font-size="80" font-weight="600" letter-spacing="9" text-anchor="middle">
+    <text x="445" y="738" fill="#EEF4FA">AERO</text>
+    <text x="674" y="738" fill="url(#ui)">UI</text>
+  </g>
+</svg>

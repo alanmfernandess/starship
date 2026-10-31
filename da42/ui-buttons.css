@@ -106,3 +106,6 @@
  .phone .optimize-row .optimize-button,
  .phone .optimize-row .restore-simulated{font-size:11px;letter-spacing:0}
 }
+
+/* Aero UI visual identity — consistent header emblem across applications. */
+.phone .topbar .app-brand-icon{display:block;width:30px;height:30px;object-fit:contain;justify-self:start;align-self:start;margin:1px 0 0 4px;pointer-events:none;flex:none}

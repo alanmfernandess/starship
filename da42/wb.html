@@ -246,7 +246,7 @@ function content(){
  const metrics='<div class="metrics"><div class="metric"><label>ZFW</label><b>'+shown(active.zfw)+' kg</b></div>'+
  '<div class="metric"><label>TOW</label><b>'+shown(active.tow)+' kg</b></div></div>';
  const massState=active.valid?'WEIGHT WITHIN LIMITS':sourceMode==='simbrief'?'CHECK OFP WEIGHT':model.ok?'WEIGHT LIMIT EXCEEDED':'CHECK INPUTS';
- return '<div class="phone"><header class="topbar"><span class="topbar-placeholder" aria-hidden="true"></span><h1>DA42 NG</h1><button class="icon-btn" id="settings" aria-label="Configurações da aeronave">'+icon('settings')+'</button></header>'+
+ return '<div class="phone"><header class="topbar"><img class="app-brand-icon" src="./icon.svg" alt="" aria-hidden="true"><h1>DA42 NG</h1><button class="icon-btn" id="settings" aria-label="Configurações da aeronave">'+icon('settings')+'</button></header>'+
  '<main class="scroller" id="scroller"><div class="module-heading"><span>WEIGHT &amp; BALANCE</span><span class="accent">CG ENVELOPE</span></div>'+sourceSelector()+
  (sourceMode==='simbrief'?'':'<div class="fields">'+card('pilot','PILOT')+card('copilot','COPILOT')+card('pax1','PASSENGER 1')+card('pax2','PASSENGER 2')+'</div>')+
  '<button class="open-load" id="edit-load" aria-label="BAGGAGE &amp; FUEL"><span class="main">BAGGAGE &amp; FUEL</span>'+icon('next')+'</button>'+

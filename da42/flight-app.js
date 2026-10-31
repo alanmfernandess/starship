@@ -248,7 +248,7 @@ function heading(){
 }
 function render(){
  const page=view==='plan'?planPage():view==='review'?reviewPage():view==='summary'?summaryPage():view==='comparison'?comparisonPage():view==='modules'?modulesPage():morePage();
- root.innerHTML='<div class="phone"><header class="topbar"><span class="topbar-placeholder" aria-hidden="true"></span><h1>DA42 NG</h1><button id="open-more" aria-label="Settings">'+icon('settings')+'</button></header>'+
+ root.innerHTML='<div class="phone"><header class="topbar"><img class="app-brand-icon" src="./icon.svg" alt="" aria-hidden="true"><h1>DA42 NG</h1><button id="open-more" aria-label="Settings">'+icon('settings')+'</button></header>'+
  '<main class="content" id="scroll-content">'+heading()+page+(view==='plan'?'':'<p class="disclaimer">EXPERIMENTAL PERFORMANCE · NOT FOR FLIGHT</p>')+'<div class="page-back"><button id="back-or-menu" type="button" aria-label="Back">BACK</button></div></main>'+
  '<nav class="bottom" aria-label="Main navigation">'+[['plan','PLAN'],['summary','SUMMARY'],['modules','MODULES'],['more','MORE']].map(([k,label])=>
  '<button type="button" class="nav '+((view===k||view==='review'&&k==='plan'||view==='comparison'&&k==='summary')?'active':'')+'" data-view="'+k+'" aria-label="'+label+'">'+icon(k)+'<span>'+label+'</span></button>').join('')+'</nav></div>';

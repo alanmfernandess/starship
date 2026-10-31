@@ -36,6 +36,7 @@ with sync_playwright() as p:
   page.route('**/xml.fetcher.php**',fulfill)
   page.goto(url)
   assert page.locator('.heading').count()==0
+  assert page.locator('.topbar .app-brand-icon').evaluate("(i)=>i.complete&&i.naturalWidth>0&&i.getBoundingClientRect().width===30")
   assert page.locator('.topbar #back-or-menu').count()==0
   assert page.locator('.content > .page-back #back-or-menu').count()==1
   assert page.locator('#back-or-menu').inner_text()=='BACK'

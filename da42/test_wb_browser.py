@@ -18,6 +18,7 @@ with sync_playwright() as p:
         page.on('pageerror',lambda e:errors.append(str(e)))
         page.goto(url)
         assert page.locator('#cg').count()==0
+        assert page.locator('.topbar .app-brand-icon').evaluate("(i)=>i.complete&&i.naturalWidth>0&&i.getBoundingClientRect().width===30"), (w,h,'Aero UI brand icon missing')
         assert page.locator('.topbar #menu').count()==0
         assert page.locator('.scroller > .page-back #menu').count()==1
         assert page.locator('#menu').inner_text()=='BACK'

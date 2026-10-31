@@ -17,6 +17,7 @@ with sync_playwright() as p:
         assert page.locator('.phone').evaluate('(el)=>el.clientWidth')<=w
         assert len(errors)==0, errors
         all_checks+=5
+        assert page.locator('.topbar .app-brand-icon').evaluate("(i)=>i.complete&&i.naturalWidth>0&&i.getBoundingClientRect().width===30"), (w,h,'Aero UI brand icon missing')
         assert page.locator('.module-heading .name').inner_text()=='TAKEOFF PERFORMANCE'
         # A single global four-tab footer is retained in every performance module.
         assert page.locator('.bottom .nav span').all_inner_texts()==['PLAN','SUMMARY','MODULES','MORE']
