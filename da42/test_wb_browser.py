@@ -80,6 +80,29 @@ with sync_playwright() as p:
            return a.length===3 && a.every((r,i)=>i===0 || r.left>=a[i-1].right+3)
            && a.every(r=>r.right<=row.getBoundingClientRect().right+1);
         }"""), (w,h,'summary columns overlap')
+
+        assert page.locator('.loading-summary').evaluate("""(card)=>{
+          const cells=[...card.querySelectorAll('.loading-metric')];
+          if(cells.length!==3)return false;
+          const areas=cells.map(c=>c.getBoundingClientRect()),center=r=>r.left+r.width/2;
+          const equalWidths=areas.every(r=>Math.abs(r.width-areas[0].width)<1);
+          const equalTops=areas.every(r=>Math.abs(r.top-areas[0].top)<1);
+          const centered=cells.every(c=>{
+            const label=c.querySelector('span'),number=c.querySelector('strong');
+            const ls=getComputedStyle(label),ns=getComputedStyle(number);
+            const lb=label.getBoundingClientRect(),nb=number.getBoundingClientRect();
+            const range=document.createRange();range.selectNodeContents(number);
+            const glyphs=range.getBoundingClientRect();
+            return ls.textAlign==='center'&&ns.textAlign==='center'&&
+              Math.abs(center(lb)-center(nb))<1&&
+              Math.abs(center(nb)-center(c.getBoundingClientRect()))<1&&
+              glyphs.left>=nb.left-1&&glyphs.right<=nb.right+1&&
+              ns.fontVariantNumeric.includes('tabular-nums');
+          });
+          return equalWidths&&equalTops&&centered&&
+            getComputedStyle(card.querySelector('.loading-note')).textAlign==='center'&&
+            card.scrollWidth<=card.clientWidth+1;
+        }"""), (w,h,'TOW/FUEL/CG center alignment and clipping')
         page.locator('input[data-wb="pilot"]').fill('80')
         assert page.locator('.loading-metric').first.inner_text()==before
         count+=2
@@ -152,6 +175,7 @@ with sync_playwright() as p:
             buttons.every(x=>x.scrollWidth<=x.clientWidth+1);
         }"""), (w,h,'optimize/manual design mismatch')
         assert page.locator('html').evaluate('(e)=>e.scrollWidth')<=w
+        assert page.locator('.loading-note').evaluate("(n)=>getComputedStyle(n).textAlign==='center'")
         assert page.evaluate("WBApp.model.statuses.cgOK && WBApp.model.statuses.massOK && WBApp.model.statuses.scenariosOK") is True
         assert page.locator('#envelope svg circle').count()==2
         assert page.locator('#mass-check').inner_text().find('WEIGHT WITHIN LIMITS')!=-1

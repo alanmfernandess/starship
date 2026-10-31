@@ -91,12 +91,13 @@ button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus
 .loading-source.active{background:#203a4c;border-color:#56b9ee;color:#86d2ff}
 .loading-source:disabled{opacity:.35;cursor:default}
 .loading-summary{margin:0 0 12px;border-radius:13px;padding:12px;background:#202d39}
-.loading-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;align-items:start;min-width:0}
-.loading-metric{min-width:0;overflow:hidden}.loading-metric span{display:block;color:#92aabb;font-size:10px;letter-spacing:.3px}
-.loading-metric strong{display:block;max-width:100%;color:#edf6fc;font-size:clamp(15px,4vw,20px);font-weight:550;font-variant-numeric:tabular-nums;letter-spacing:-.25px;white-space:nowrap}
-.loading-note{color:#e7b46d;font-size:10px;line-height:1.4;margin-top:11px;min-height:14px}
+.loading-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;align-items:stretch;min-width:0}
+.loading-metric{min-width:0;display:grid;grid-template-rows:15px 26px;justify-items:center;align-items:center;text-align:center}
+.loading-metric span{display:block;width:100%;color:#92aabb;font-size:10px;line-height:15px;letter-spacing:.3px;text-align:center}
+.loading-metric strong{display:block;width:100%;min-width:0;color:#edf6fc;font-size:clamp(16px,4vw,20px);line-height:26px;font-weight:550;font-variant-numeric:tabular-nums;letter-spacing:-.25px;white-space:nowrap;text-align:center}
+.loading-note{color:#e7b46d;font-size:10px;line-height:1.4;margin-top:12px;min-height:14px;text-align:center}
 .loading-note.good{color:#67caa9}
-@media(max-width:355px){.loading-source{font-size:9px}.loading-summary{padding:11px}.loading-metrics{gap:6px}.loading-metric strong{font-size:15px;letter-spacing:-.4px}}
+@media(max-width:355px){.loading-source{font-size:9px}.loading-summary{padding:11px}.loading-metrics{gap:4px}.loading-metric strong{font-size:16px;letter-spacing:-.4px}}
 
 .topbar-placeholder{width:42px;height:36px}
 .page-back{margin:17px 0 11px;padding-top:13px;border-top:1px solid var(--line)}
