@@ -58,8 +58,11 @@ button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus
 .metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}.metric{background:#1a2732;border-radius:12px;padding:10px;min-width:0}
 .metric label{display:block;font-size:10px;color:var(--label);margin-bottom:5px}.metric b{font-size:16px;font-weight:500}
 .notice{min-height:12px;margin:11px 0 2px;text-align:center;color:#8ba2b2;font-size:9px;letter-spacing:.15px}.notice.bad{color:var(--amber)}
-.bottom{height:65px;flex:0 0 auto;display:flex;justify-content:space-around;align-items:center;padding:3px 24px 10px;background:var(--bg)}
-.nav-btn{color:#839bae;background:none;border:0;width:46px;height:47px;display:grid;place-items:center;border-radius:10px}.nav-btn.active{color:var(--blue)}
+.bottom{flex:none;height:66px;background:var(--bg);border-top:1px solid #293946;display:flex;justify-content:space-around;align-items:center;padding:4px 12px 8px;gap:4px}
+.bottom .nav{border:0;background:transparent;color:#849cad;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:10px;min-width:58px;padding:5px 4px;text-decoration:none;font-weight:400;line-height:normal}
+.bottom .nav .icon{width:20px;height:20px}
+.bottom .nav.active{color:var(--blue)}
+.bottom .nav span{white-space:nowrap}
 .sheet-backdrop{position:absolute;inset:0;background:#050b12b8;z-index:4;display:flex;align-items:flex-end}
 .sheet{width:100%;max-height:82%;overflow:auto;background:#17232e;border-radius:24px 24px 0 0;padding:20px 19px max(24px,env(safe-area-inset-bottom));overscroll-behavior:contain}
 .sheet-head{display:flex;align-items:center;justify-content:space-between;padding-bottom:13px;border-bottom:1px solid var(--line);margin-bottom:15px}.sheet-head h2{font-size:17px;margin:0;font-weight:500}
@@ -130,6 +133,12 @@ const icons={
  check:'<path d="m4 13 5 5L20 6"/>',
  plane:'<path d="m3 19 18-14M8 10l-1-6M14 14l7 1"/>'
 };
+Object.assign(icons,{
+ plan:'<path d="M3 3h18v18H3zM7 8h10M7 12h10M7 16h6"/>',
+ summary:'<path d="M4 20V11M10 20V5M16 20v-9M22 20V8"/>',
+ modules:'<path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/>',
+ more:'<path d="M5 12h.1M12 12h.1M19 12h.1"/>'
+});
 const icon=name=>'<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">'+icons[name]+'</svg>';
 const el=s=>document.querySelector(s);
 const format=(x,d=0)=>typeof x==='number'&&Number.isFinite(x)?new Intl.NumberFormat('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d}).format(x):'—';
@@ -248,10 +257,11 @@ function content(){
  '<section class="result" aria-live="polite"><div id="envelope">'+envelope()+'</div><div class="legend"><span><i class="dot" style="background:#e7b46d"></i>ZFW</span><span><i class="dot" style="background:#56b9ee"></i>TOW</span></div>'+
  '<div id="mass-check" class="standalone-status '+(sc.massOK?'':'bad')+'">'+(model.ok?massState:'—')+'</div><div id="metrics">'+metrics+'</div>'+
  '</section><div class="notice" id="notice">NOT FOR FLIGHT</div><div class="page-back"><button id="menu" type="button" aria-label="Back · '+(checklistReturn?'Checklist':'Performance menu')+'">BACK</button></div></main>'+
- '<nav class="bottom"><button class="nav-btn active" id="nav-input" aria-label="Ocupantes">'+icon('calculator')+'</button>'+
- '<button class="nav-btn" id="nav-chart" aria-label="Envelope CG">'+icon('chart')+'</button>'+
- '<button class="nav-btn" id="nav-scenarios" aria-label="Cenários de combustível e degelo">'+icon('history')+'</button>'+
- '<button class="nav-btn" id="nav-settings" aria-label="Dados da aeronave">'+icon('settings')+'</button></nav></div>';
+ '<nav class="bottom" aria-label="Main navigation">'+
+  '<a class="nav" href="./flight.html?tab=plan" data-nav="plan" aria-label="PLAN">'+icon('plan')+'<span>PLAN</span></a>'+
+  '<a class="nav" href="./flight.html?tab=summary" data-nav="summary" aria-label="SUMMARY">'+icon('summary')+'<span>SUMMARY</span></a>'+
+  '<a class="nav active" href="./flight.html?tab=modules" data-nav="modules" aria-current="page" aria-label="MODULES">'+icon('modules')+'<span>MODULES</span></a>'+
+  '<button class="nav" id="nav-more" data-nav="more" type="button" aria-label="MORE" aria-expanded="false">'+icon('more')+'<span>MORE</span></button></nav></div>';
 }
 function normalizeNumericEntry(text){
  const raw=String(text).replace(/\s/g,'');
@@ -302,7 +312,7 @@ function bindInputs(root=document){
  });
 }
 function sheet(type){
- const titles={load:'LOAD CONFIGURATION',settings:'AIRCRAFT PROFILE',scenarios:'FUEL & DE-ICE',modules:'PERFORMANCE'};
+ const titles={load:'LOAD CONFIGURATION',settings:'AIRCRAFT PROFILE',scenarios:'FUEL & DE-ICE',modules:'PERFORMANCE',more:'MORE'};
  const sections={
   load:[
    ['BAGGAGE',['nose','cabin','extension']],
@@ -328,10 +338,28 @@ function sheet(type){
   if(model.ok)body+='<div class="section-title">LOADED CONDITION</div><div class="case"><div class="value"><span>ZFW</span><b>'+format(model.zeroFuel.mass,0)+' kg</b></div></div><div class="case"><div class="value"><span>TOW</span><b>'+format(model.takeoff.mass,0)+' kg</b></div></div>';
  }
  if(type==='modules')body='<a class="action" href="./flight.html">FLIGHT PLAN</a><a class="action" href="./index.html?calculator=1">PERFORMANCE</a><a class="action" href="./wb.html">WEIGHT &amp; BALANCE</a>';
+ if(type==='more')body='<button class="action" id="nav-chart" type="button">CG ENVELOPE</button>'+
+   '<button class="action" id="nav-scenarios" type="button">FUEL &amp; DE-ICE</button>'+
+   '<button class="action" id="nav-settings" type="button">AIRCRAFT PROFILE</button>'+
+   '<a class="action" href="./flight.html?tab=more">PREFERENCES</a>';
  const d=document.createElement('div');d.className='sheet-backdrop';d.innerHTML='<div class="sheet" role="dialog" aria-modal="true" aria-label="'+titles[type]+'"><div class="sheet-head"><h2>'+titles[type]+'</h2></div>'+body+'<button class="close sheet-return" type="button" aria-label="Back · Weight and Balance">BACK</button></div>';
  el('.phone').appendChild(d);
  d.addEventListener('click',ev=>{if(ev.target===d)d.remove()});
  d.querySelector('.close').onclick=()=>d.remove();
+ if(type==='more'){
+  const footer=el('#nav-more'),modules=el('[data-nav="modules"]');
+  if(footer){footer.classList.add('active');footer.setAttribute('aria-expanded','true')}
+  if(modules){modules.classList.remove('active');modules.removeAttribute('aria-current')}
+  const restoreFooter=()=>{
+   if(footer){footer.classList.remove('active');footer.setAttribute('aria-expanded','false')}
+   if(modules){modules.classList.add('active');modules.setAttribute('aria-current','page')}
+  };
+  const observer=new MutationObserver(()=>{if(!d.isConnected){restoreFooter();observer.disconnect()}});
+  observer.observe(el('.phone'),{childList:true});
+  d.querySelector('#nav-chart').onclick=()=>{d.remove();el('.result')?.scrollIntoView({behavior:'smooth',block:'start'})};
+  d.querySelector('#nav-scenarios').onclick=()=>{d.remove();sheet('scenarios')};
+  d.querySelector('#nav-settings').onclick=()=>{d.remove();sheet('settings')};
+ }
  bindInputs(d);
  const restore=d.querySelector('#restore-manual');if(restore)restore.onclick=()=>{d.remove();restoreManualLoad()};
  const reset=d.querySelector('#reset-example');if(reset)reset.onclick=()=>{profile={...E.EXAMPLE};optimizedMode=false;sourceMode='manual';Load.setMode(localStorage,'manual',planRef());previousManual=null;optimizeMessage='';model=E.calculate(profile);try{localStorage.removeItem(KEY);localStorage.removeItem(AUTO_KEY);localStorage.removeItem(MANUAL_KEY)}catch(e){}d.remove();render()};
@@ -347,10 +375,7 @@ function render(){
  el('#edit-load').onclick=()=>sheet('load');
   const manual=el('#restore-simulated');if(manual)manual.onclick=restoreManualLoad;
  el('#optimize').onclick=runOptimize;
-  el('#nav-input').onclick=()=>{el('#scroller').scrollTo({top:0,behavior:'smooth'})};
- el('#nav-chart').onclick=()=>el('.result').scrollIntoView({behavior:'smooth',block:'start'});
- el('#nav-scenarios').onclick=()=>sheet('scenarios');
- el('#nav-settings').onclick=()=>sheet('settings');
+  el('#nav-more').onclick=()=>sheet('more');
  recalc();
 }
 window.WBApp={get profile(){return profile},get model(){return model},get optimizedMode(){return optimizedMode},get mode(){return sourceMode},render,sheet,optimize:()=>OPT.optimize(profile,E)};

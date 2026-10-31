@@ -18,6 +18,34 @@ with sync_playwright() as p:
         assert len(errors)==0, errors
         all_checks+=5
         assert page.locator('.module-heading .name').inner_text()=='TAKEOFF PERFORMANCE'
+        # A single global four-tab footer is retained in every performance module.
+        assert page.locator('.bottom .nav span').all_inner_texts()==['PLAN','SUMMARY','MODULES','MORE']
+        assert page.locator('.bottom .nav svg.icon').count()==4
+        assert page.locator('.bottom [data-nav="modules"]').get_attribute('aria-current')=='page'
+        assert page.locator('.bottom').evaluate("""(n)=>{
+          const b=n.getBoundingClientRect(),t=[...n.querySelectorAll('.nav')];
+          const r=t.map(x=>x.getBoundingClientRect());
+          return t.length===4&&b.height>=55&&
+            r.every((v,i)=>v.right<=b.right+1&&v.bottom<=b.bottom+1&&
+              (i===0||v.left>=r[i-1].right-1));
+        }"""),(w,h,'global performance footer overflow')
+        page.locator('#nav-more').click()
+        assert page.locator('.sheet h2').inner_text()=='MORE'
+        assert page.locator('.sheet [data-more-action]').all_inner_texts()==['CALCULATOR','CHART','HISTORY','PREFERENCES']
+        assert page.locator('#nav-more').get_attribute('aria-expanded')=='true'
+        page.locator('[data-more-action="chart"]').click()
+        assert page.locator('.sheet h2').inner_text()=='SENSIBILIDADE'
+        page.locator('.sheet .close').click()
+        page.locator('#nav-more').click()
+        page.locator('[data-more-action="history"]').click()
+        assert page.locator('.sheet h2').inner_text()=='HISTÓRICO'
+        page.locator('.sheet .close').click()
+        page.locator('#nav-more').click()
+        page.locator('[data-more-action="settings"]').click()
+        assert page.locator('.sheet h2').inner_text()=='PREFERÊNCIAS'
+        page.locator('.sheet .close').click()
+        assert page.locator('.bottom [data-nav="modules"]').get_attribute('aria-current')=='page'
+
         assert page.locator('header #menu').count()==0
         assert page.locator('.scroller > .page-back #menu').count()==1
         assert page.locator('#menu').inner_text()=='BACK'
@@ -106,6 +134,7 @@ with sync_playwright() as p:
         }"""), (w,h,'Performance menu typography and BACK design')
         assert page.locator('.sheet a.option[href="./wb.html"] strong').inner_text()=='WEIGHT & BALANCE'
         assert page.locator('.sheet .option').count()==7
+        assert page.locator('.bottom .nav span').all_inner_texts()==['PLAN','SUMMARY','MODULES','MORE']
         assert page.locator('.sheet a.option[href="./flight.html"] strong').inner_text()=='FLIGHT PLAN'
         assert page.locator('.sheet .option .sub').count()==0
         assert page.locator('.sheet .option').evaluate_all("(xs)=>xs.every(x=>x.querySelectorAll('strong').length===1)")

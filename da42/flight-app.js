@@ -409,8 +409,15 @@ if(!plan&&Load)try{
  if(retained){plan=retained;reviewed=false}
 }catch{}
 // Returning from Performance/W&B resumes the imported OFP summary.
+// Global footer destinations also work from Weight & Balance in another page.
+const requestedTab=(location.search||'').match(/[?&]tab=(plan|summary|modules|more)(?:&|$)/);
 if(/[?&]import=1(?:&|$)/.test(location.search||''))view='plan';
-else if(plan)view=/[?&]review=1(?:&|$)/.test(location.search||'')?'review':reviewed?'summary':'review';
+else if(/[?&]review=1(?:&|$)/.test(location.search||'')&&plan)view='review';
+else if(requestedTab){
+ const selected=requestedTab[1];
+ view=selected==='plan'?(plan?(reviewed?'summary':'review'):'plan'):selected;
+}
+else if(plan)view=reviewed?'summary':'review';
 window.AeroFlight={get plan(){return plan},get view(){return view},normalize:C.normalize,acceptRaw,applyPlan,get performance(){return performance()}};
 render();
 // A checklist-origin return always resumes the review checklist, not the OFP summary.

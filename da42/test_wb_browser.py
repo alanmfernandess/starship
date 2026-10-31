@@ -5,6 +5,7 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 
 url=Path(__file__).with_name('wb.html').resolve().as_uri()
+flight_url=Path(__file__).with_name('flight.html').resolve().as_uri()
 count=0
 with sync_playwright() as p:
     browser=p.chromium.launch(headless=True,
@@ -21,6 +22,20 @@ with sync_playwright() as p:
         assert page.locator('.scroller > .page-back #menu').count()==1
         assert page.locator('#menu').inner_text()=='BACK'
         assert page.locator('#menu').evaluate("(b)=>b.getBoundingClientRect().height>=51")
+        assert page.locator('.bottom .nav').count()==4
+        assert page.locator('.bottom .nav span').all_inner_texts()==['PLAN','SUMMARY','MODULES','MORE']
+        assert page.locator('.bottom .nav svg.icon').count()==4
+        assert page.locator('[data-nav="modules"]').get_attribute('aria-current')=='page'
+        assert page.locator('.bottom').evaluate("""(nav)=>{
+          const bar=nav.getBoundingClientRect(),tabs=[...nav.querySelectorAll('.nav')];
+          const r=tabs.map(n=>n.getBoundingClientRect());
+          return r.length===4&&bar.height>=55 &&
+            tabs.every(t=>t.getBoundingClientRect().bottom<=bar.bottom+1) &&
+            r.every((x,i)=>i===0||x.left>=r[i-1].right-1) &&
+            getComputedStyle(tabs[0]).fontSize==='10px'&&
+            getComputedStyle(nav.querySelector('.nav .icon')).width==='20px' &&
+            nav.scrollWidth<=nav.clientWidth+1;
+        }"""), (w,h,'footer not responsive')
         assert page.locator('#cg-status').count()==0
         assert page.locator('#zfcg').count()==0
         assert page.locator('.result-head').count()==0
@@ -128,6 +143,12 @@ with sync_playwright() as p:
         assert 'LANDING' not in page.locator('#notice').inner_text()
         page.locator('.close').click()
         count+=5
+        page.locator('#nav-more').click()
+        assert page.locator('.sheet-head h2').inner_text()=='MORE'
+        assert page.locator('#nav-more').get_attribute('aria-expanded')=='true'
+        assert page.locator('#nav-more').evaluate("(e)=>e.classList.contains('active')")
+        assert page.locator('.sheet button.action').all_inner_texts()==['CG ENVELOPE','FUEL & DE-ICE','AIRCRAFT PROFILE']
+        assert page.locator('.sheet a.action').inner_text()=='PREFERENCES'
         page.locator('#nav-scenarios').click()
         assert page.locator('.case').count()==6
         assert '1.665,5 kg' in page.locator('.sheet').inner_text()
@@ -136,6 +157,7 @@ with sync_playwright() as p:
         assert 'FUEL FULL' in page.locator('.sheet').inner_text()
         assert 'study cases' not in page.locator('.sheet').inner_text()
         page.locator('.close').click()
+        page.locator('#nav-more').click()
         page.locator('#nav-settings').click()
         assert page.locator('input[data-wb="emptyMass"]').count()==1
         assert page.locator('input[data-wb="emptyMoment"]').count()==1
@@ -206,6 +228,7 @@ with sync_playwright() as p:
         assert page.evaluate("WBApp.optimizedMode") is True
         assert page.evaluate("WBApp.profile.mainL")==35
         assert page.locator('input[data-wb="pilot"]').get_attribute('readonly') is not None
+        page.locator('#nav-more').click()
         page.locator('#nav-settings').click()
         assert page.locator('#restore-manual').count()==1
         page.locator('#restore-manual').click()
@@ -213,6 +236,25 @@ with sync_playwright() as p:
         assert page.evaluate("WBApp.profile.pilot")==80
         assert page.evaluate("WBApp.profile.mainL")==35
         assert page.locator('input[data-wb="pilot"]').get_attribute('readonly') is None
+        # Full navigation loop does not change Weight & Balance values.
+        saved=page.evaluate("JSON.stringify(WBApp.profile)")
+        for tab,screen in [('plan','plan'),('summary','summary'),('modules','modules')]:
+            page.locator('[data-nav="'+tab+'"]').click()
+            page.wait_for_url('**/flight.html?tab='+tab)
+            assert page.evaluate("AeroFlight.view")==screen,(tab,page.url)
+            assert page.locator('.bottom .nav span').all_inner_texts()==['PLAN','SUMMARY','MODULES','MORE']
+            page.go_back()
+            assert page.evaluate("JSON.stringify(WBApp.profile)")==saved
+            assert page.locator('.bottom .nav').count()==4
+        page.locator('#nav-more').click()
+        page.locator('#nav-chart').click()
+        assert page.locator('.sheet').count()==0
+        page.locator('#nav-more').click()
+        page.locator('.sheet a.action').click()
+        page.wait_for_url('**/flight.html?tab=more')
+        assert page.evaluate("AeroFlight.view")=='more'
+        page.go_back()
+        assert page.evaluate("JSON.stringify(WBApp.profile)")==saved
         count+=29
         assert len(errors)==0,errors
         context.close()
