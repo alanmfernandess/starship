@@ -5,6 +5,7 @@
 'use strict';
 const C=window.SimBriefCore,Checklist=window.FlightChecklist,Load=window.LoadingProfile,storageKey='aero-ui-da42-v1',flightKey='aero-ui-flight-plan-v1',idKey='aero-ui-simbrief-id-v1';
 const root=document.getElementById('app'),checkKey='aero-ui-flight-plan-checks-v1';
+const supportUrl='https://ko-fi.com/aeroui';
 let view='plan',compareTab='fuel',pilotId='',plan=null,reviewed=false,loading=false,err='';
 let backTrail=[];
 const icons={
@@ -215,11 +216,11 @@ function comparisonPage(){
  body+='</section>';
  return body;
 }
-function moduleCard(name,sub,iconName,url){
+function moduleCard(name,sub,iconName,url,external=false){
  const body='<span class="module-icon">'+icon(iconName)+'</span>'+
  '<span class="module-copy"><strong>'+esc(name)+'</strong><span class="module-sub">'+esc(sub)+'</span></span>'+
  '<span class="module-chevron">'+icon('next')+'</span>';
- return url?'<a class="card-button module-card" href="'+url+'">'+body+'</a>':
+ return url?'<a class="card-button module-card" href="'+esc(url)+'"'+(external?' target="_blank" rel="noopener noreferrer"':'')+'>'+body+'</a>':
  '<button type="button" class="card-button module-card" data-go="plan">'+body+'</button>';
 }
 function modulesPage(){
@@ -234,7 +235,10 @@ function modulesPage(){
  '</section>';
 }
 function morePage(){
- return '<section class="tile"><div class="list-title">AERO UI · MASTER DESIGN 1.0</div>'+
+ return '<section id="support-development" aria-label="Support development">'+
+  moduleCard('SUPPORT DEVELOPMENT','Optional contribution · all features remain free','more',supportUrl,true)+
+  '<p class="sub">Ko-fi opens in a new tab. Aero UI does not collect or store payment details.</p></section>'+
+  '<section class="tile"><div class="list-title">AERO UI · MASTER DESIGN 1.0</div>'+
   row('IMPORT SOURCE','SIMBRIEF JSON V2')+row('APP','EXPERIMENTAL ENGINEERING')+
   row('PILOT ID','SAVED LOCALLY')+
   '</section><button class="secondary stretch" id="clear-plan">CLEAR IMPORTED FLIGHT PLAN</button>'+
@@ -242,7 +246,7 @@ function morePage(){
   '<div class="notice">NOT FOR FLIGHT · Esta ferramenta e seus cálculos preliminares não constituem autorização operacional, despacho, peso/balanceamento certificado, nem substituem AFM, meteorologia oficial ou planejamento aprovado.</div>';
 }
 function heading(){
- const names={plan:['FLIGHT PLAN','SIMBRIEF'],review:['IMPORTED FLIGHT PLAN','REVIEW'],summary:['PERFORMANCE OVERVIEW','AERO UI'],comparison:['OFP COMPARISON','SUMMARY'],modules:['PERFORMANCE MODULES','AERO UI'],more:['PREFERENCES','AERO UI']};
+ const names={plan:['FLIGHT PLAN','SIMBRIEF'],review:['IMPORTED FLIGHT PLAN','REVIEW'],summary:['PERFORMANCE OVERVIEW','AERO UI'],comparison:['OFP COMPARISON','SUMMARY'],modules:['PERFORMANCE MODULES','AERO UI'],more:['MORE','AERO UI']};
  const d=names[view]||names.plan;
  return view==='plan'?'':'<div class="heading"><span>'+d[0]+'</span><span class="accent">'+d[1]+'</span></div>';
 }

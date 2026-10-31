@@ -149,7 +149,7 @@ with sync_playwright() as p:
         assert page.locator('#nav-more').get_attribute('aria-expanded')=='true'
         assert page.locator('#nav-more').evaluate("(e)=>e.classList.contains('active')")
         assert page.locator('.sheet button.action').all_inner_texts()==['CG ENVELOPE','FUEL & DE-ICE','AIRCRAFT PROFILE']
-        assert page.locator('.sheet a.action').inner_text()=='PREFERENCES'
+        assert page.locator('.sheet a.action').all_inner_texts()==['SUPPORT DEVELOPMENT','PREFERENCES']
         page.locator('#nav-scenarios').click()
         assert page.locator('.case').count()==6
         assert '1.665,5 kg' in page.locator('.sheet').inner_text()
@@ -251,7 +251,7 @@ with sync_playwright() as p:
         page.locator('#nav-chart').click()
         assert page.locator('.sheet').count()==0
         page.locator('#nav-more').click()
-        page.locator('.sheet a.action').click()
+        page.locator('.sheet a.action').filter(has_text='PREFERENCES').click()
         page.wait_for_url('**/flight.html?tab=more')
         assert page.evaluate("AeroFlight.view")=='more'
         page.go_back()

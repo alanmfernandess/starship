@@ -824,6 +824,7 @@ function showSheet(type){if(type==='runwayanalysis'&&(current==='runway'||curren
  '<button class="option" type="button" data-more-action="chart">CHART</button>'+
  '<button class="option" type="button" data-more-action="history">HISTORY</button>'+
  '<button class="option" type="button" data-more-action="settings">PREFERENCES</button>'+
+ '<a class="option" href="./flight.html?tab=more#support-development">SUPPORT DEVELOPMENT</a>'+
  '<a class="option" href="./flight.html?tab=more">MORE SETTINGS</a>';
  if(type==='history')content=history.length?history.map(h=>`<button class="option" data-restore="${h.id}"><strong>${escapeHTML(h.name)} · ${escapeHTML(h.result)}</strong>${icon('next')}</button>`).join(''):'<p class="history-empty">Nenhum cálculo salvo.</p>';
  if(type==='chart')content=`<div style="background:#202d39;border-radius:17px;padding:15px"><div class="mini">${escapeHTML(MODELS[current].panel)}</div><div style="font-size:31px;margin:12px 0 6px">${r.error?'—':fmt(r.main,current==='timeclimb'?1:0)} <span style="color:#9cb1bf;font-size:16px">${MODELS[current].unit}</span></div>${createPlot(activeModule(),activeInputs(),r)}</div><small>${current==='goaround'?'AFM §5.3.12 · ROC TABULADA · NOT FOR FLIGHT':current==='timeclimb'?'AFM §5.3.9 · ISA · ZERO WIND · NOT FOR FLIGHT':current==='cruiseperf'?'AFM §5.3.10 · 1999 KG · NOT FOR FLIGHT':'Curvas derivadas da digitalização gráfica preliminar. Sem autorização para uso operacional.'}</small><button class="small-action" id="save">SALVAR CÁLCULO NO HISTÓRICO</button>`;
